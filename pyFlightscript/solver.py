@@ -152,14 +152,14 @@ def solver_proximal_boundaries(*boundaries):
     script.append_lines(lines)
     return
 
-def solver_uninitialize():
+def solver_remove_initialization():
     """
     Appends lines to script state to remove the solver initialization.
     
 
     
     Example usage:
-    >>> solver_uninitialize()
+    >>> solver_remove_initialization()
     """
     
     lines = [
@@ -167,7 +167,7 @@ def solver_uninitialize():
         "#********* Remove the solver initialization *****************************",
         "#************************************************************************",
         "#",
-        "SOLVER_UNINITIALIZE"
+        "SOLVER_REMOVE_INITIALIZATION"
     ]
     
     script.append_lines(lines)

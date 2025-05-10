@@ -22,14 +22,14 @@ def start_solver():
     script.append_lines(lines)
     return
 
-def solver_clear():
+def clear_solution():
     """
     Appends lines to script state to clear the existing solution.
     
 
 
     Example usage:
-    solver_clear()
+    clear_solution()
     """
     
     lines = [
@@ -37,7 +37,7 @@ def solver_clear():
         "#********* Clear the existing solution **********************************",
         "#************************************************************************",
         "#",
-        "SOLVER_CLEAR"
+        "CLEAR_SOLUTION"
     ]
     
     script.append_lines(lines)

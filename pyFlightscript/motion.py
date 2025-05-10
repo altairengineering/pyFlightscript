@@ -1,81 +1,28 @@
 from .utils import *    
 from .script import script
 
-def create_new_motion_euclidean():
+def create_new_motion(motion_type):
     """
-    Appends lines to script state to create a new Euclidean motion definition.
+    Appends lines to script state to create a new motion definition based on the motion type.
+    
+    :param motion_type: Type of the motion. One of: 'EUCLIDEAN', 'CUSTOM', '6DOF'.
     
     Example usage:
-    create_new_motion_euclidean()
-
-
+        create_new_motion('EUCLIDEAN')
+        create_new_motion('CUSTOM')
+        create_new_motion('6DOF')
     """
     
+    valid_types = ['EUCLIDEAN', 'CUSTOM', '6DOF']
+    if motion_type not in valid_types:
+        raise ValueError(f"`motion_type` should be one of {valid_types}")
+
     lines = [
         "#************************************************************************",
-        "#************** Create a new Euclidean motion definition ****************",
+        f"#************** Create a new {motion_type} motion definition ********************",
         "#************************************************************************",
         "#",
-        "CREATE_NEW_MOTION_EUCLIDEAN"
-    ]
-
-    script.append_lines(lines)
-    return
-
-def create_new_motion_custom():
-    """
-    Appends lines to script state to create a new Custom motion definition.
-
-    Example usage:
-    create_new_motion_custom()
-    """
-    
-    lines = [
-        "#************************************************************************",
-        "#************** Create a new Custom motion definition *******************",
-        "#************************************************************************",
-        "#",
-        "CREATE_NEW_MOTION_CUSTOM"
-    ]
-
-    script.append_lines(lines)
-    return
-
-def create_new_motion_6dof():
-    """
-    Appends lines to script state to create a new 6DOF motion definition.
-    
-    Example usage:
-        create_new_motion_6dof()
-    
-
-    """
-    
-    lines = [
-        "#************************************************************************",
-        "#************** Create a new 6DOF motion definition ********************",
-        "#************************************************************************",
-        "#",
-        "CREATE_NEW_MOTION_6DOF"
-    ]
-
-    script.append_lines(lines)
-    return
-
-def create_new_motion_fsi():
-    """
-    Appends lines to script state to create a new FSI motion definition.
-    
-    Example usage:
-    create_new_motion_fsi()
-    """
-    
-    lines = [
-        "#************************************************************************",
-        "#************** Create a new FSI motion definition **********************",
-        "#************************************************************************",
-        "#",
-        "CREATE_NEW_MOTION_FSI"
+        f"CREATE_NEW_MOTION {motion_type}"
     ]
 
     script.append_lines(lines)
