@@ -1,25 +1,7 @@
 from .utils import *    
 from .script import script
 
-def create_new_model(model_name):
-    """
-    Appends lines to script state to create a new CAD-->Model.
-    
-
-    :param model_name: Name of the new CAD model.
-    """
-    lines = [
-        "#************************************************************************",
-        "#****************** Create a new CAD-->Model ****************************",
-        "#************************************************************************",
-        "#",
-        f"CAD_CREATE_NEW_MODEL {model_name}"
-    ]
-
-    script.append_lines(lines)
-    return
-
-def create_initialize(model_index=1):
+def cad_create_initialize(model_index=1):
     """
     Appends lines to script state to initialize the CAD-->Create pane window.
     
@@ -37,7 +19,7 @@ def create_initialize(model_index=1):
     script.append_lines(lines)
     return
 
-def create_import_curve_txt(txt_filepath, units='METER', dimension='2D', frame=1, plane='YZ'):
+def cad_create_import_curve_txt(txt_filepath, units='METER', dimension='2D', frame=1, plane='YZ'):
     """
     Appends lines to script state to import a CAD-->Create drawing curve from a txt file.
     
@@ -74,7 +56,7 @@ def create_import_curve_txt(txt_filepath, units='METER', dimension='2D', frame=1
     script.append_lines(lines)
     return
 
-def create_import_ccs(ccs_filepath):
+def cad_create_import_ccs(ccs_filepath):
     """
     Appends lines to script state to import a CAD-->Create drawing curve from a csv file.
     
@@ -95,19 +77,19 @@ def create_import_ccs(ccs_filepath):
     script.append_lines(lines)
     return
 
-def create_auto_cross_sections(frame=1, axis='Y', sections=20, body_index=1, 
+def cad_create_auto_cross_sections(frame=1, axis='Y', sections=20, body_index=1, 
                                growth_scheme=3, growth_rate=1.2, symmetry='NONE'):
     """
     Appends lines to script state to create a series of automatic cross-sections from mesh body.
     
 
-    :param frame: Index of coordinate system to be used.
-    :param axis: Sweep direction for creating cross-section curves (X, Y, Z).
-    :param sections: Number of cross-sections requested.
-    :param body_index: Index of the mesh body to be used for creating cross-sections.
-    :param growth_scheme: Clustering scheme to be used when positioning cross-sections along the sweep axis.
-    :param growth_rate: Growth rate to be used with the selected growth_scheme.
-    :param symmetry: Symmetry plane to be used for creating half-section curves (YZ, XZ, XY) or NONE for full section.
+    :param frame: Index of coordinate system to be used. Defaults to 1.
+    :param axis: Sweep direction for creating cross-section curves (X, Y, Z). Defaults to 'Y'.
+    :param sections: Number of cross-sections requested. Defaults to 20.
+    :param body_index: Index of the mesh body to be used for creating cross-sections. Defaults to 1.
+    :param growth_scheme: Clustering scheme to be used when positioning cross-sections along the sweep axis. Defaults to 3.
+    :param growth_rate: Growth rate to be used with the selected growth_scheme. Defaults to 1.2.
+    :param symmetry: Symmetry plane to be used for creating half-section curves (YZ, XZ, XY) or NONE for full section. Defaults to 'NONE'.
     """
     
     lines = [
@@ -121,15 +103,15 @@ def create_auto_cross_sections(frame=1, axis='Y', sections=20, body_index=1,
     script.append_lines(lines)
     return
 
-def create_cross_section(frame=1, plane='XZ', offset=0.0, body_index=1, quadrant=3):
+def cad_create_cross_section(frame=1, plane='XZ', offset=0.0, body_index=1, quadrant=3):
     """
     Appends lines to script state to create a cross-section from an existing mesh body.
     
 
-    :param frame: Index of coordinate system to be used.
-    :param plane: Plane of the selected coordinate system to use for slicing the mesh faces (YZ, XZ, XY).
-    :param offset: Offset distance of the selected plane along the normal axis of the plane.
-    :param body_index: Index of the mesh body to be used for creating cross-section.
+    :param frame: Index of coordinate system to be used. Defaults to 1.
+    :param plane: Plane of the selected coordinate system to use for slicing the mesh faces (YZ, XZ, XY). Defaults to 'XZ'.
+    :param offset: Offset distance of the selected plane along the normal axis of the plane. Defaults to 0.0.
+    :param body_index: Index of the mesh body to be used for creating cross-section. Defaults to 1.
     :param quadrant: Quadrant information for creating cross-section.
 
     Value YZ  XZ  XY 
@@ -166,7 +148,7 @@ def create_cross_section(frame=1, plane='XZ', offset=0.0, body_index=1, quadrant
     script.append_lines(lines)
     return
 
-def create_point_curve(x=0.0, y=1.0, z=0.0):
+def cad_create_point_curve(x=0.0, y=1.0, z=0.0):
     """
     Appends lines to script state to create a singular point curve in 3D.
     
@@ -197,7 +179,7 @@ def create_point_curve(x=0.0, y=1.0, z=0.0):
     script.append_lines(lines)
     return
 
-def create_curve_arc(x0=0.0, y0=0.0, z0=0.0, x1=-1.0, y1=0.0, z1=0.0, x2=0.0, y2=1.0, z2=0.0):
+def cad_create_curve_arc(x0=0.0, y0=0.0, z0=0.0, x1=-1.0, y1=0.0, z1=0.0, x2=0.0, y2=1.0, z2=0.0):
     """
     Appends lines to script state to create a circular arc curve in 3D.
     
@@ -223,7 +205,7 @@ def create_curve_arc(x0=0.0, y0=0.0, z0=0.0, x1=-1.0, y1=0.0, z1=0.0, x2=0.0, y2
     script.append_lines(lines)
     return
 
-def create_curve_select(curve_index=1):
+def cad_create_curve_select(curve_index=1):
     """
     Appends lines to script state to select one of the CAD-->Create drawing curves.
     
@@ -250,7 +232,7 @@ def create_curve_select(curve_index=1):
     script.append_lines(lines)
     return
 
-def create_curve_unselect(curve_index=1):
+def cad_create_curve_unselect(curve_index=1):
     """
     Appends lines to script state to unselect one of the CAD-->Create drawing curves.
     
@@ -277,7 +259,7 @@ def create_curve_unselect(curve_index=1):
     script.append_lines(lines)
     return
 
-def create_curve_reverse(curve_index=1):
+def cad_create_curve_reverse(curve_index=1):
     """
     Appends lines to script state to reverse CAD->Create drawing curves by index.
 
@@ -312,7 +294,7 @@ def create_curve_reverse(curve_index=1):
     script.append_lines(lines)
     return
 
-def create_curve_delete_all():
+def cad_create_curve_delete_all():
     """
     Appends lines to script state to delete all CAD->Create drawing curves.
 
@@ -333,7 +315,7 @@ def create_curve_delete_all():
     script.append_lines(lines)
     return
 
-def create_curve_delete_selected():
+def cad_create_curve_delete_selected():
     """
     Appends lines to script state to delete only selected CAD-->Create drawing curves.
 
@@ -354,7 +336,7 @@ def create_curve_delete_selected():
     script.append_lines(lines)
     return
 
-def create_curve_delete_unselected():
+def cad_create_curve_delete_unselected():
     """
     Appends lines to script state to delete only unselected CAD-->Create drawing curves.
 
@@ -375,7 +357,7 @@ def create_curve_delete_unselected():
     script.append_lines(lines)
     return
 
-def create_curve_export_ccs(file_path):
+def cad_create_curve_export_ccs(file_path):
     """
     Appends lines to script state to export selected CAD-->Create drawing curves to CSV file.
 
@@ -402,7 +384,7 @@ def create_curve_export_ccs(file_path):
     script.append_lines(lines)
     return
 
-def import_cad(cad_filepath):
+def cad_import_cad(cad_filepath):
     """
     Appends lines to script state to import a CAD geometry into the simulation.
     
@@ -410,7 +392,7 @@ def import_cad(cad_filepath):
     :param cad_filepath: Path to the CAD file.
     
     Example usage:
-    import_cad(, 'C:\\Users\\Desktop\\Geometries\\sample.igs')
+    cad_import_cad('C:\\Users\\Desktop\\Geometries\\sample.igs')
     """
 
     lines = [
@@ -452,3 +434,37 @@ def convert_cad_to_mesh(model_index):
     script.append_lines(lines)
     return
 
+
+def cad_create_auto_annular_cross_sections(frame=1, sections=20, body_index=1):
+    """
+    Appends lines to script state to create a series of automatic annular cross-sections.
+    
+    Args:
+        frame (int): Index of coordinate system to be used. Use value of 1 for reference coordinate system. Defaults to 1.
+        sections (int): Number of cross-sections requested (> 1). Defaults to 20.
+        body_index (int): Index of the mesh body to be used for creating cross-sections (> 0). Defaults to 1.
+    
+    Example usage:
+    cad_create_auto_annular_cross_sections(1, 20, 2)
+    """
+    
+    # Type and value checking
+    if not isinstance(frame, int) or frame <= 0:
+        raise ValueError("`frame` should be an integer greater than 0.")
+    
+    if not isinstance(sections, int) or sections <= 1:
+        raise ValueError("`sections` should be an integer greater than 1.")
+    
+    if not isinstance(body_index, int) or body_index <= 0:
+        raise ValueError("`body_index` should be an integer greater than 0.")
+    
+    lines = [
+        "#************************************************************************",
+        "#****** Create a series of automatic annular cross-sections *************",
+        "#************************************************************************",
+        "#",
+        f"CAD_CREATE_AUTO_ANNULAR_CROSS_SECTIONS {frame} {sections} {body_index}"
+    ]
+    
+    script.append_lines(lines)
+    return
