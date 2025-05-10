@@ -571,8 +571,47 @@ def surface_clearall():
     script.append_lines(lines)
     return
 
+def transform_selected_nodes(coordinate_system, translation_type, x, y, z):
+    """
+    Appends lines to script state to transform selected nodes by translation.
+    
 
+    :param coordinate_system: Index of the coordinate system to be used.
+    :param translation_type: Type of translation - 'ABSOLUTE' or 'TRANSLATION'.
+                             ABSOLUTE specifies the absolute values of the new XYZ coordinates.
+                             TRANSLATION specifies delta increments to the current node XYZ values.
+    :param x: X value of translation.
+    :param y: Y value of translation.
+    :param z: Z value of translation.
+    
+    Example usage:
+        pyfs.transform_selected_nodes(1, 'TRANSLATION', -1, 0, 0)
+    """
+    
+    # Type and value checking
+    if not isinstance(coordinate_system, int):
+        raise ValueError("`coordinate_system` should be an integer value.")
+    
+    if coordinate_system <= 0:
+        raise ValueError("`coordinate_system` index should be greater than 0.")
+    
+    # Validate translation type
+    valid_translation_types = ["ABSOLUTE", "TRANSLATION"]
+    if translation_type not in valid_translation_types:
+        raise ValueError(f"`translation_type` should be one of {valid_translation_types}. Received: {translation_type}")
+    
+    # Validate x, y, z are numeric
+    for val, name in [(x, 'x'), (y, 'y'), (z, 'z')]:
+        if not isinstance(val, (int, float)):
+            raise ValueError(f"`{name}` should be a numeric value.")
+    
+    lines = [
+        "#************************************************************************",
+        "#****************** Transform node by translation ***********************",
+        "#************************************************************************",
+        "#",
+        f"TRANSFORM_SELECTED_NODES {coordinate_system} {translation_type} {x} {y} {z}"
+    ]
 
-
-
-
+    script.append_lines(lines)
+    return
