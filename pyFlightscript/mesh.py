@@ -456,61 +456,6 @@ def surface_mirror(surface=1, coordinate_system=1, mirror_plane=1,
     script.append_lines(lines)
     return
 
-def surface_copy_paste(surface=1):
-    """
-    Appends lines to script state to copy and paste an existing surface.
-    
-
-    :param surface: Index of the surface that must be copied and pasted.
-    """
-    
-    # Type and value checking
-    if not isinstance(surface, int) or surface < 1:
-        raise ValueError("`surface` should be a positive integer value representing the index of the surface.")
-    
-    lines = [
-        "#************************************************************************",
-        "#****************** Copy/Paste an existing surface **********************",
-        "#************************************************************************",
-        "#",
-        f"SURFACE_COPY_PASTE {surface}"
-    ]
-
-    script.append_lines(lines)
-    return
-
-def surface_circular_pattern(surface, coordinate_system, axis, num_copies):
-    """
-    Appends lines to script state to create a circular pattern of a selected surface.
-
-    :param surface: Index of the surface that must be copied (integer).
-    :param coordinate_system: Index of the coordinate system to be used (integer).
-    :param axis: Axis of the specified coordinate system to be used as the circular pattern axis (string).
-    :param num_copies: Number of copies in the circular pattern, including the original (integer).
-    """
-    
-    # Type and value checking
-    if not isinstance(surface, int):
-        raise ValueError("`surface` should be an integer representing the surface index.")
-    if not isinstance(coordinate_system, int):
-        raise ValueError("`coordinate_system` should be an integer representing the coordinate system index.")
-    if not isinstance(axis, str):
-        raise ValueError("`axis` should be a string representing the axis (e.g., 'X', 'Y', 'Z').")
-    if not isinstance(num_copies, int):
-        raise ValueError("`num_copies` should be an integer representing the number of copies.")
-    
-    # Creating command strings
-    lines = [
-        "#************************************************************************",
-        "#****************** Create Circular Pattern of Surfaces *****************",
-        "#************************************************************************",
-        "#",
-        f"SURFACE_CIRCULAR_PATTERN {surface} {coordinate_system} {axis} {num_copies}"
-    ]
-
-    script.append_lines(lines)
-    return
-
 def surface_auto_hole_fill(surface=1):
     """
     Appends lines to script state to automatically fill holes on a surface.

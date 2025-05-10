@@ -339,8 +339,7 @@ def delete_actuator(actuator_index):
         "#****************** Delete an actuator **********************************",
         "#************************************************************************",
         "#",
-        "DELETE_ACTUATOR",
-        f"ACTUATOR {actuator_index}"
+        f"DELETE ACTUATOR {actuator_index}"
     ]
 
     script.append_lines(lines)

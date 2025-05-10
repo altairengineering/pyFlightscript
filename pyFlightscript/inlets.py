@@ -134,8 +134,7 @@ def delete_inlet(inlet):
         "#****************** Delete an existing inlet boundary *******************",
         "#************************************************************************",
         "#",
-        "DELETE_INLET",
-        f"INLET {inlet}"
+        f"DELETE INLET {inlet}"
     ]
 
     script.append_lines(lines)
