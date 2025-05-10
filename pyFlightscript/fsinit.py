@@ -7,8 +7,8 @@ def open_fsm(fsm_filepath, reset_parallel_cores='DISABLE', load_solver_initializ
     
     Args:
         fsm_filepath (str): Path to the FlightStream file to open
-        reset_parallel_cores (str): 'ENABLE' to reset parallel core count, 'DISABLE' to use existing
-        load_solver_initialization (str): 'ENABLE' to load solver initialization from file, 'DISABLE' to skip
+        reset_parallel_cores (str): 'ENABLE' to reset parallel core count, 'DISABLE' to use existing. Defaults to 'DISABLE'.
+        load_solver_initialization (str): 'ENABLE' to load solver initialization from file, 'DISABLE' to skip. Defaults to 'ENABLE'.
     """
     valid_options = ['ENABLE', 'DISABLE']
 
@@ -25,7 +25,6 @@ def open_fsm(fsm_filepath, reset_parallel_cores='DISABLE', load_solver_initializ
         "#",
         "OPEN",
         fsm_filepath,  # File path and name
-        f"RESET_PARALLEL_CORES {reset_parallel_cores}",
         f"LOAD_SOLVER_INITIALIZATION {load_solver_initialization}"
     ]
 
@@ -228,6 +227,25 @@ def set_base_region_bending_angle(angle=25.):
         "#************************************************************************",
         "#",
         f"SET_BASE_REGION_BENDING_ANGLE {angle}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+def run_script(script_filepath):
+    """
+    Appends lines to script state to run a script from within another script.
+    
+    Args:
+        script_filepath (str): Path to the script file to run.
+    """
+    lines = [
+        "#************************************************************************",
+        "#**************** Call a script from within another script **************",
+        "#************************************************************************",
+        "#",
+        "RUN_SCRIPT",
+        script_filepath
     ]
 
     script.append_lines(lines)
