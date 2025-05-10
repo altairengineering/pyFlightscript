@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pyFlightscript",
-    version="2025.0.0",
+    version="2025.1.0",
     description="Python package to write FlightStream scripts using python.",
     long_description=open("README.md", "r").read(),
     long_description_content_type="text/markdown",

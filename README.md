@@ -1,5 +1,5 @@
 ## pyFlightscript
-!Compatible with FlightStream 2025.0 and later.
+!Compatible with FlightStream 2025.1.
 
 A python API for generating native FlightStream scripts.
 This is an open source project, but is sponsored in part by Research In Flight. Development is on-going.
@@ -18,6 +18,9 @@ Install dependencies.
 Simply download the repo and install with within the directory:
 
 `pip install .`
+
+Can also install directly from the git repo:
+`pip install git+https://github.com/altairengineering/pyFlightscript.git`
 
 ## Features
 
