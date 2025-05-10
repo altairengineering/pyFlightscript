@@ -110,27 +110,52 @@ def set_base_region_trailing_edges(base_region_boundary=-1):
     script.append_lines(lines)
     return
 
-def delete_base_region(base_region_boundary):
+def delete_base_region(base_region_index):
     """
     Example usage:
-    delete_base_region(, 2)
+    delete_base_region(2)
     
     Appends lines to script state to delete an existing base region.
     
 
-    :param base_region_boundary: Index of the base region boundary to be deleted.
+    :param base_region_index: Index of the base region boundary to be deleted.
     """
     
     # Type and value checking
-    if not isinstance(base_region_boundary, int) or base_region_boundary <= 0:
-        raise ValueError("`base_region_boundary` should be an integer value greater than 0.")
+    if not isinstance(base_region_index, int) or base_region_index <= 0:
+        raise ValueError("`base_region_index` should be an integer value greater than 0.")
     
     lines = [
         "#************************************************************************",
         "#****************** Delete an existing base region **********************",
         "#************************************************************************",
         "#",
-        f"DELETE_BASE_REGION {base_region_boundary}"
+        f"DELETE_BASE_REGION {base_region_index}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+def select_base_region(base_region_index):
+    """
+    Example usage:
+    select_base_region(2)
+    
+    Appends lines to script state to select an existing base region.
+    
+    :param base_region_index: Index of the base region boundary to be deleted.
+    """
+    
+    # Type and value checking
+    if not isinstance(base_region_index, int) or base_region_index <= 0:
+        raise ValueError("`base_region_index` should be an integer value greater than 0.")
+    
+    lines = [
+        "#************************************************************************",
+        "#****************** Select an existing base region **********************",
+        "#************************************************************************",
+        "#",
+        f"SELECT_BASE_REGION_FACES {base_region_index}"
     ]
 
     script.append_lines(lines)
