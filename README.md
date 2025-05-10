@@ -2,14 +2,14 @@
 !Compatible with FlightStream 2025.1.
 
 A python API for generating native FlightStream scripts.
-This is an open source project, but is sponsored in part by Research In Flight. Development is on-going.
+This is an open source project, but is sponsored in part by Altair. Development is on-going.
 
 pyFlightscript contains all of the traditional scripting functions found in FlightStream. The functions are nested within
-submodules categorized by function. for example `pyFlighscript.solver.initialize_solver() `
+submodules categorized by function. for example `pyFlighscript.initialize_solver() `
 
 ## Installation
 Download the repo
-`git clone https://github.com/danielenriquez59/pyFlightscript.git`
+`git clone https://github.com/altairengineering/pyFlightscript.git`
 NOTE: you may have to install git first.
 
 Install dependencies. 
@@ -40,22 +40,24 @@ The general flow for a pyFlightscript based script is:
 
     ### Enter FlightStream macro commands ###
     ### Example code ####
-    pyfs.fsinit.open_fsm(fsm_filepath=f)
-    pyfs.exec_solver.close_flightstream
+    pyfs.open_fsm(fsm_filepath=f)
+    pyfs.close_flightstream
     ################################
 
     # all macro commands done
-    pyfs.script.write_to_file() # now write script_out.txt
-    pyfs.execute_fsm_script(fsexe_path=fsexe_path, hidden=True) # execute the script in headless FS
-    pyfs.script.display_lines()
-    pyfs.script.hard_reset()  # clear the lines from local memory and delete the script.txt file
+    pyfs.write_to_file() # now write script_out.txt
+    # execute the script in headless mode
+    pyfs.execute_fsm_script(fsexe_path=fsexe_path, hidden=True) 
+    pyfs.display_lines()
+    # clear the lines from local memory and delete the script.txt file
+    pyfs.hard_reset()  
 
 ```
 
 ## To read/generate new docs
 
 run the index.html file in your browser.
-HTML documentation can be found: https://danielenriquez59.github.io/pyFlightscript/
+HTML documentation can be found: https://altairengineering.github.io/pyFlightscript/
 
 ### on Windows
 
