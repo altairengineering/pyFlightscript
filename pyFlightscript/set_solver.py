@@ -1,30 +1,6 @@
 from .utils import *    
 from .script import script
 
-def set_solver_model(model_type='INCOMPRESSIBLE'):
-    """
-    Appends lines to script state to set the solver model.
-
-    :param model_type: Type of the solver model which can be 'INCOMPRESSIBLE', 'SUBSONIC', or 'TRANSONIC'.
-    """
-    
-    # Validate model_type
-    valid_types = ['INCOMPRESSIBLE', 'SUBSONIC', 'TRANSONIC']
-    if model_type not in valid_types:
-        raise ValueError("`model_type` must be one of 'INCOMPRESSIBLE', 'SUBSONIC', or 'TRANSONIC'.")
-
-    # Preparing the script line
-    lines = [
-        "#************************************************************************",
-        "#********* Set the solver model *****************************************",
-        "#************************************************************************",
-        f"SET_SOLVER_MODEL {model_type}"
-    ]
-
-    # Appending the line to the script
-    script.append_lines(lines)
-    return
-
 def steady():
     """
     Appends lines to script state to set the steady solver.
