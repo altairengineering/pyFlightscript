@@ -78,26 +78,62 @@ def cad_create_import_ccs(ccs_filepath):
     return
 
 def cad_create_auto_cross_sections(frame=1, axis='Y', sections=20, body_index=1, 
-                               growth_scheme=3, growth_rate=1.2, symmetry='NONE'):
+                               growth_scheme=3, growth_rate=1.2, symmetry='NONE', cad_mesh='MESH'):
     """
-    Appends lines to script state to create a series of automatic cross-sections from mesh body.
+    Appends lines to script state to create a series of automatic cross-sections from mesh body or CAD body.
     
 
-    :param frame: Index of coordinate system to be used. Defaults to 1.
-    :param axis: Sweep direction for creating cross-section curves (X, Y, Z). Defaults to 'Y'.
-    :param sections: Number of cross-sections requested. Defaults to 20.
-    :param body_index: Index of the mesh body to be used for creating cross-sections. Defaults to 1.
-    :param growth_scheme: Clustering scheme to be used when positioning cross-sections along the sweep axis. Defaults to 3.
-    :param growth_rate: Growth rate to be used with the selected growth_scheme. Defaults to 1.2.
-    :param symmetry: Symmetry plane to be used for creating half-section curves (YZ, XZ, XY) or NONE for full section. Defaults to 'NONE'.
+    :param frame: Index of coordinate system to be used. Use value of 1 for reference coordinate system. Defaults to 1.
+    :param axis: Sweep direction for creating cross-section curves. One of the following: X, Y or Z. Defaults to 'Y'.
+    :param sections: Number of cross-sections requested (> 1). Defaults to 20.
+    :param body_index: Index of the mesh body to be used for creating cross-sections (> 0). Defaults to 1.
+    :param growth_scheme: Clustering scheme to be used when positioning cross-sections along the sweep axis. 
+                          One of the following: 1: Uniform, 2:Successive, 3:Dual-successive, 4: Reverse-successive. Defaults to 3.
+    :param growth_rate: Growth rate to be used with the selected growth_scheme. Use value of 1.0 for uniform spacing of cross-sections. Defaults to 1.2.
+    :param symmetry: Specify which symmetry plane (if any) to be used for creating half-section curves. 
+                     Use one of the following: YZ, XZ or XY. If full section is desired instead, use NONE. Defaults to 'NONE'.
+    :param cad_mesh: Specify whether the CAD body or mesh body with specified index should be used for generation of cross sections. 
+                     Use 'CAD' for CAD body or 'MESH' for mesh body. Defaults to 'MESH'.
+    
+    Example usage:
+        pyfs.cad_create_auto_cross_sections(1, 'Y', 20, 1, 3, 1.2, 'NONE', 'MESH')
     """
+    
+    # Type and value checking
+    if not isinstance(frame, int) or frame <= 0:
+        raise ValueError("`frame` should be a positive integer value.")
+    
+    valid_axes = ['X', 'Y', 'Z']
+    if axis not in valid_axes:
+        raise ValueError(f"`axis` should be one of {valid_axes}. Received: {axis}")
+    
+    if not isinstance(sections, int) or sections <= 1:
+        raise ValueError("`sections` should be an integer greater than 1.")
+    
+    if not isinstance(body_index, int) or body_index <= 0:
+        raise ValueError("`body_index` should be a positive integer value.")
+    
+    valid_growth_schemes = [1, 2, 3, 4]
+    if growth_scheme not in valid_growth_schemes:
+        raise ValueError(f"`growth_scheme` should be one of {valid_growth_schemes}. Received: {growth_scheme}")
+    
+    if not isinstance(growth_rate, (int, float)) or growth_rate <= 0:
+        raise ValueError("`growth_rate` should be a positive numeric value.")
+    
+    valid_symmetry = ['YZ', 'XZ', 'XY', 'NONE']
+    if symmetry not in valid_symmetry:
+        raise ValueError(f"`symmetry` should be one of {valid_symmetry}. Received: {symmetry}")
+    
+    valid_cad_mesh = ['CAD', 'MESH']
+    if cad_mesh not in valid_cad_mesh:
+        raise ValueError(f"`cad_mesh` should be one of {valid_cad_mesh}. Received: {cad_mesh}")
     
     lines = [
         "#************************************************************************",
         "#****** Create a series of automatic cross-sections from mesh body ******",
         "#************************************************************************",
         "#",
-        f"CAD_CREATE_AUTO_CROSS_SECTIONS {frame} {axis} {sections} {body_index} {growth_scheme} {growth_rate} {symmetry}"
+        f"CAD_CREATE_AUTO_CROSS_SECTIONS {frame} {axis} {sections} {body_index} {growth_scheme} {growth_rate} {symmetry} {cad_mesh}"
     ]
 
     script.append_lines(lines)
