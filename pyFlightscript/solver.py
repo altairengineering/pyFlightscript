@@ -181,7 +181,7 @@ def solver_remove_initialization() -> None:
         "#********* Remove the solver initialization *****************************",
         "#************************************************************************",
         "#",
-        "SOLVER_REMOVE_INITIALIZATION"
+        "REMOVE_INITIALIZATION"
     ]
     
     script.append_lines(lines)
