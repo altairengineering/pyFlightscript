@@ -1,9 +1,18 @@
 from .utils import *    
 from .script import script
+from typing import Union, List, Tuple, Optional, Any, Literal
 
-def initialize_solver(solver_model, surfaces, wake_termination_x='DEFAULT', symmetry='NONE', 
-                      symmetry_periodicity=1, wall_collision_avoidance='ENABLE', 
-                      stabilization='ENABLE', stabilization_strength=1.0):
+def initialize_solver(
+    solver_model: Literal['INCOMPRESSIBLE', 'SUBSONIC_PRANDTL_GLAUERT', 'TRANSONIC_FIELD_PANEL', 
+                         'SUPERSONIC_LINEAR_DOUBLET', 'TANGENT_CONE', 'MODIFIED_NEWTONIAN'],
+    surfaces: Union[int, List[Union[int, Tuple[int, Literal['ENABLE', 'DISABLE']]]]],
+    wake_termination_x: Union[str, float] = 'DEFAULT',
+    symmetry: Literal['NONE', 'MIRROR', 'PERIODIC'] = 'NONE',
+    symmetry_periodicity: int = 1,
+    wall_collision_avoidance: Literal['ENABLE', 'DISABLE'] = 'ENABLE',
+    stabilization: Literal['ENABLE', 'DISABLE'] = 'ENABLE',
+    stabilization_strength: float = 1.0
+) -> None:
     """
     Appends lines to script state to initialize the solver.
     
@@ -13,6 +22,7 @@ def initialize_solver(solver_model, surfaces, wake_termination_x='DEFAULT', symm
         surfaces (int or list): Number of surfaces being initialized in the solver (> 0 and < total surfaces).
                                Value can be -1 to specify all boundaries. If a list is provided, each item should
                                be a tuple of (surface_index, quad_mesher_enabled) where quad_mesher_enabled is 'ENABLE' or 'DISABLE'.
+                               Alternatively, a list of integers can be provided, in which case quad_mesher_enabled will default to 'ENABLE'.
         wake_termination_x (str or float): Wake termination plane location downstream of the geometry. X axis value 
                                          measured relative to the Reference coordinate system. Use value of 'DEFAULT' 
                                          if you require this value to be auto-computed. Required for solvers 1-3.
@@ -42,7 +52,11 @@ def initialize_solver(solver_model, surfaces, wake_termination_x='DEFAULT', symm
     # Validate surfaces
     if surfaces != -1:
         if not isinstance(surfaces, list):
-            raise ValueError("`surfaces` should be a list of tuples or -1.")
+            raise ValueError("`surfaces` should be a list of integers, a list of tuples, or -1.")
+        
+        # Convert list of integers to list of tuples with 'ENABLE' as default
+        if surfaces and all(isinstance(surface, int) for surface in surfaces):
+            surfaces = [(surface, 'ENABLE') for surface in surfaces]
         
         for surface in surfaces:
             if not isinstance(surface, tuple) or len(surface) != 2:
@@ -122,7 +136,7 @@ def initialize_solver(solver_model, surfaces, wake_termination_x='DEFAULT', symm
     script.append_lines(lines)
     return
 
-def solver_proximal_boundaries(*boundaries):
+def solver_proximal_boundaries(*boundaries: int) -> None:
     """
     Appends lines to script state to enable solver proximity checking for specified boundaries.
     
@@ -152,7 +166,7 @@ def solver_proximal_boundaries(*boundaries):
     script.append_lines(lines)
     return
 
-def solver_remove_initialization():
+def solver_remove_initialization() -> None:
     """
     Appends lines to script state to remove the solver initialization.
     
@@ -172,8 +186,3 @@ def solver_remove_initialization():
     
     script.append_lines(lines)
     return
-
-
-
-
-
