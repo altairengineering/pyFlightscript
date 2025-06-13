@@ -1,5 +1,6 @@
 from .utils import *    
 from .script import script
+import numpy as np
 
 def create_new_coordinate_system():
     """
@@ -247,8 +248,8 @@ def rotate_coordinate_system(frame=2, rotation_frame=3,
     if rotation_axis not in valid_axes:
         raise ValueError(f"`rotation_axis` should be one of {valid_axes}")
     
-    if not isinstance(angle, (int, float)):
-        raise ValueError("`angle` should be an integer or float value.")
+    if not isinstance(angle, (int, float, np.integer, np.floating)):
+        raise ValueError("`angle` should be an integer or float value, including numpy types.")
     
     lines = [
         "#************************************************************************",

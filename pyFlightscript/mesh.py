@@ -1,5 +1,6 @@
 from .utils import *    
 from .script import script
+import numpy as np
 
 def import_mesh( geometry_filepath, units='METER', file_type='STL', clear=True):
     """
@@ -144,7 +145,7 @@ def surface_rotate(frame=1, axis='X', angle=0, surfaces=[-1],
         f"AXIS {axis}",
         f"ANGLE {angle}",
         f"SURFACES {len(surfaces)}",
-        "\n".join(str(s) for s in surfaces),
+        ", ".join(str(s) for s in surfaces),
         f"SPLIT_VERTICES {split_vertices}",
         f"ADAPTIVE_MESH {adaptive_mesh}",
         f"DETACH_NORMAL_TO_AXIS {detach_normal_to_axis}"
