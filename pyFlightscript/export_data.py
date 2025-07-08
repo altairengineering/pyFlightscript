@@ -122,7 +122,7 @@ def set_vtk_export_variables(num_variables, export_wake, variables=None):
 
 def export_solver_analysis_csv(file_path, 
                                format_value='DIFFERENCE-PRESSURE', 
-                               units='PASCALS', surfaces=-1, 
+                               units='PASCALS', surfaces=-1, frame=1
                                boundary_indices=None):
     """
     Appends lines to script state to export the FEM CSV based on the solver results.
@@ -136,17 +136,13 @@ def export_solver_analysis_csv(file_path,
     
     Example usage:
     # Export the FEM CSV file for the first three boundaries
-    export_solver_analysis_csv(, 
-                               'C:\\Users\\Desktop\\Models\\scripting_test_output_data.txt',
-                               surfaces=3,
+    export_solver_analysis_csv('C:\\Users\\Desktop\\Models\\scripting_test_output_data.txt',
+                               surfaces=3, frame=1,
                                boundary_indices=[1,2,3])
                                
-    # Export the FEM CSV file for ALL boundaries
-    export_solver_analysis_csv(, 
-                               'C:\\Users\\Desktop\\Models\\scripting_test_output_data.txt')
     """
     
-    valid_formats = ['CP-FREESTREAM', 'CP-REFERENCE', 'PRESSURE', 'DIFFERENCE-PRESSURE']
+    valid_formats = ['CP-FREESTREAM', 'CP-REFERENCE', 'PRESSURE']
     valid_units = ['PASCALS', 'MEGAPASCALS', 'BAR', 'ATMOSPHERES', 'PSI']
 
     if format_value not in valid_formats:
@@ -170,12 +166,17 @@ def export_solver_analysis_csv(file_path,
         file_path,
         f"FORMAT {format_value}",
         f"UNITS {units}",
+        f"FRAME {frame}",
         f"SURFACES {surfaces}"
     ]
     
-    if boundary_indices:
+    if surfaces != -1:
+        if not boundary_indices:
+            raise ValueError("`boundary_indices` must be provided if `surfaces` is not -1.")
         for boundary in boundary_indices:
             lines.append(str(boundary))
+    else:
+        lines.append("ALL")
     
     script.append_lines(lines)
     return
