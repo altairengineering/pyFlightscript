@@ -1,7 +1,12 @@
 from .utils import *    
 from .script import script
+from typing import Literal
 
-def open_fsm(fsm_filepath, reset_parallel_cores='DISABLE', load_solver_initialization='ENABLE'):
+RunOptions = Literal['ENABLE', 'DISABLE']
+ValidUnits = Literal["INCH", "MILLIMETER", "OTHER", "FEET", "MILE", "METER", "KILOMETER", 
+                   "MILS", "MICRON", "CENTIMETER", "MICROINCH"]
+
+def open_fsm(fsm_filepath: str, reset_parallel_cores: RunOptions = 'DISABLE', load_solver_initialization: RunOptions = 'ENABLE') -> None:
     """
     Opens a FlightStream file with specified settings.
     
@@ -10,14 +15,12 @@ def open_fsm(fsm_filepath, reset_parallel_cores='DISABLE', load_solver_initializ
         reset_parallel_cores (str): 'ENABLE' to reset parallel core count, 'DISABLE' to use existing. Defaults to 'DISABLE'.
         load_solver_initialization (str): 'ENABLE' to load solver initialization from file, 'DISABLE' to skip. Defaults to 'ENABLE'.
     """
-    valid_options = ['ENABLE', 'DISABLE']
+    if reset_parallel_cores not in RunOptions:
+        raise ValueError(f"`reset_parallel_cores` should be one of {RunOptions}")
 
-    if reset_parallel_cores not in valid_options:
-        raise ValueError(f"`reset_parallel_cores` should be one of {valid_options}")
-
-    if load_solver_initialization not in valid_options:
-        raise ValueError(f"`load_solver_initialization` should be one of {valid_options}")
-
+    if load_solver_initialization not in RunOptions:
+        raise ValueError(f"`load_solver_initialization` should be one of {RunOptions}")
+        
     lines = [
         "#************************************************************************",
         "#****************** Open an existing simulation file ********************",
@@ -46,7 +49,7 @@ def stop_script():
     script.append_lines(lines)
     return
 
-def print(message="Hello from FlightStream!"):
+def print(message: str = "Hello from FlightStream!"):
     """
     Print a user-defined message to the log.
     """
@@ -61,7 +64,7 @@ def print(message="Hello from FlightStream!"):
     script.append_lines(lines)
     return
 
-def save_as_fsm(fsm_filepath):
+def save_as_fsm(fsm_filepath: str):
     """
     Appends lines to script state to save an existing simulation file,
     using the path from 'fsm_filepath'.
@@ -93,16 +96,13 @@ def new_simulation():
     script.append_lines(lines)
     return
 
-def set_significant_digits(digits=5):
+def set_significant_digits(digits: int = 5):
     """
     Appends lines to script state to set the number of significant digits.
     
     :param : Path to the script file.
     :param digits: Number of significant digits.
     """
-    if not isinstance(digits, int):
-        raise ValueError("Digits should be an integer ")
-    
     lines = [
         "#************************************************************************",
         "#****************** Set significant digits ******************************",
@@ -114,7 +114,7 @@ def set_significant_digits(digits=5):
     script.append_lines(lines)
     return
 
-def set_vertex_merge_tolerance(tolerance='1E-5'):
+def set_vertex_merge_tolerance(tolerance: float = 1e-5):
     """
     Appends lines to script state to set the vertex merge tolerance.
     
@@ -132,7 +132,7 @@ def set_vertex_merge_tolerance(tolerance='1E-5'):
     script.append_lines(lines)
     return
 
-def set_simulation_length_units(units='METER'):
+def set_simulation_length_units(units: ValidUnits = 'METER'):
     """
     Appends lines to script state to set the simulation length scale units.
     Checks if the provided unit is valid.
@@ -141,7 +141,8 @@ def set_simulation_length_units(units='METER'):
     :param units: Desired simulation length unit.
     :raises ValueError: If the provided unit is not valid.
     """
-    check_valid_length_units(units)
+    if units not in ValidUnits:
+        raise ValueError(f"`units` should be one of {ValidUnits}")
 
     lines = [
         "#************************************************************************",
@@ -154,7 +155,7 @@ def set_simulation_length_units(units='METER'):
     script.append_lines(lines)
     return
 
-def set_trailing_edge_sweep_angle(angle=45.):
+def set_trailing_edge_sweep_angle(angle: float = 45.):
     """
     Appends lines to script state to set the trailing edge sweep angle.
     Checks if the provided angle is within the valid range.
@@ -180,7 +181,7 @@ def set_trailing_edge_sweep_angle(angle=45.):
     script.append_lines(lines)
     return
 
-def set_trailing_edge_bluntness_angle(angle=85.):
+def set_trailing_edge_bluntness_angle(angle: float = 85.):
     """
     Appends lines to script state to set the trailing edge bluntness angle.
     Checks if the provided angle is within the valid range.
@@ -206,7 +207,7 @@ def set_trailing_edge_bluntness_angle(angle=85.):
     script.append_lines(lines)
     return
 
-def set_base_region_bending_angle(angle=25.):
+def set_base_region_bending_angle(angle: float = 25.):
     """
     Appends lines to script state to set the base region bending angle.
     Checks if the provided angle is within the valid range.
@@ -232,7 +233,7 @@ def set_base_region_bending_angle(angle=25.):
     script.append_lines(lines)
     return
 
-def run_script(script_filepath):
+def run_script(script_filepath: str):
     """
     Appends lines to script state to run a script from within another script.
     
