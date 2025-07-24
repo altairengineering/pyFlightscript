@@ -515,10 +515,10 @@ def solver_settings(angle_of_attack: float = 0., sideslip_angle: float = 0.,
     """
     # Type and value checking
     if not isinstance(angle_of_attack, (int, float)) or abs(angle_of_attack) >= 90:
-        raise ValueError("`angle_of_attack` should be a number with |angle| < 90.")
+        raise ValueError("`angle_of_attack` should be a number with angle < 90.")
     
     if not isinstance(sideslip_angle, (int, float)) or abs(sideslip_angle) >= 90:
-        raise ValueError("`sideslip_angle` should be a number with |angle| < 90.")
+        raise ValueError("`sideslip_angle` should be a number with angle < 90.")
     
     if not isinstance(freestream_velocity, (int, float)):
         raise ValueError("`freestream_velocity` should be a number.")
@@ -567,7 +567,7 @@ def aoa(angle: float):
     """
     Appends lines to script state to set the solver AOA.
     
-    :param angle: Angle of attack in degrees. |angle| must be < 90.
+    :param angle: Angle of attack in degrees. angle must be < 90.
     
     Example usage:
     aoa(-5.0)
@@ -592,7 +592,7 @@ def sideslip(angle: float):
     Appends lines to script state to set the solver Side-slip angle.
     
 
-    :param angle: Side-slip angle in degrees. |angle| must be < 90.
+    :param angle: Side-slip angle in degrees. angle must be < 90.
     
     Example usage:
     sideslip(, 5.0)

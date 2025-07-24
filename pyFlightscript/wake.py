@@ -62,17 +62,15 @@ def detect_trailing_edges_by_surface(surfaces=[1]):
     script.append_lines(lines)
     return
 
-def trailing_edges_import(file_path):
+def trailing_edges_import(file_path: str):
     """
     Appends lines to script state to import trailing edges from a given file.
-    
+
     :Example usage:
-        trailing_edges_import(, 'C:/.../Custom_TE.txt')
+    trailing_edges_import('C:/.../Custom_TE.txt')
         
     :param file_path: Path to the CSV text file containing the vertices on which the trailing edges are to be marked.
 
-
-    ----------------------------
     Sample File Format: 
     10
     MILLIMETER

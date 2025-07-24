@@ -1,5 +1,3 @@
-import os, sys
-sys.path.insert(0, os.path.abspath('..'))
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
@@ -9,9 +7,8 @@ sys.path.insert(0, os.path.abspath('..'))
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'pyFlightscript'
-copyright = '2023, Daniel Enriquez'
-author = 'Daniel Enriquez'
-release = '25.1.0'
+copyright = '2025, Author'
+author = 'Author'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -19,13 +16,21 @@ release = '25.1.0'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.todo',
 ]
+
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+
+language = 'en'
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
+
+# -- Options for todo extension ----------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/extensions/todo.html#configuration
+
+todo_include_todos = True

@@ -134,7 +134,6 @@ def export_solver_analysis_csv(
 ):
     """
     Appends lines to script state to export the FEM CSV based on the solver results.
-
     :param file_path: File name with path to file.
     :param format_value: Format of the export data. 
     :param units: Units for the exported data.
