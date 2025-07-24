@@ -1,4 +1,4 @@
-@echo off
+@echo on
 
 REM Remove the _build directory if it exists
 if exist _build rmdir /s /q _build

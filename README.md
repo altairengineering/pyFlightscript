@@ -7,6 +7,12 @@ This is an open source project, but is sponsored in part by Altair. Development 
 pyFlightscript contains all of the traditional scripting functions found in FlightStream. The functions are nested within
 submodules categorized by function. for example `pyFlighscript.initialize_solver() `
 
+
+## To read/generate new docs
+
+run the index.html file in your browser.
+HTML documentation can be found: https://altairengineering.github.io/pyFlightscript/
+
 ## Installation
 Download the repo
 `git clone https://github.com/altairengineering/pyFlightscript.git`
@@ -54,10 +60,6 @@ The general flow for a pyFlightscript based script is:
 
 ```
 
-## To read/generate new docs
-
-run the index.html file in your browser.
-HTML documentation can be found: https://altairengineering.github.io/pyFlightscript/
 
 ### on Windows
 
