@@ -44,7 +44,7 @@ jobs:
         run: |
           # Build the HTML documentation
           sphinx-apidoc -F -f -o . ../pyFlightscript/
-          call make.bat html
+          make.bat html
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
