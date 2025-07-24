@@ -124,13 +124,16 @@ def set_vtk_export_variables(num_variables, export_wake, variables=None):
     script.append_lines(lines)
     return
 
-def export_solver_analysis_csv(file_path, 
-                               format_value='DIFFERENCE-PRESSURE', 
-                               units='PASCALS', surfaces=-1, frame=1
-                               boundary_indices=None):
+def export_solver_analysis_csv(
+    file_path: str, 
+    format_value: str = 'DIFFERENCE-PRESSURE', 
+    units: str = 'PASCALS', 
+    surfaces: int = -1, 
+    frame: int = 1,
+    boundary_indices: list = None
+):
     """
     Appends lines to script state to export the FEM CSV based on the solver results.
-    
 
     :param file_path: File name with path to file.
     :param format_value: Format of the export data. 
@@ -143,24 +146,28 @@ def export_solver_analysis_csv(file_path,
     export_solver_analysis_csv('C:\\Users\\Desktop\\Models\\scripting_test_output_data.txt',
                                surfaces=3, frame=1,
                                boundary_indices=[1,2,3])
-                               
     """
-    
+
     valid_formats = ['CP-FREESTREAM', 'CP-REFERENCE', 'PRESSURE']
     valid_units = ['PASCALS', 'MEGAPASCALS', 'BAR', 'ATMOSPHERES', 'PSI']
+
 
     if format_value not in valid_formats:
         raise ValueError(f"Invalid format value. Valid formats are: {valid_formats}")
 
     if units not in valid_units:
         raise ValueError(f"Invalid unit type. Valid units are: {valid_units}")
-    
-    if not isinstance(surfaces, int):
-        raise ValueError("`surfaces` should be an integer.")
-    
+
     if surfaces != -1 and boundary_indices is None:
         raise ValueError("`boundary_indices` must be provided if `surfaces` is not -1.")
-    
+
+    if boundary_indices is not None:
+        if not isinstance(boundary_indices, list):
+            raise TypeError("`boundary_indices` must be a list of integers.")
+        for idx in boundary_indices:
+            if not isinstance(idx, int):
+                raise TypeError("Each element in `boundary_indices` must be an integer.")
+
     lines = [
         "#************************************************************************",
         "#****************** Export the FEM CSV based on solver results **********",
@@ -173,7 +180,7 @@ def export_solver_analysis_csv(file_path,
         f"FRAME {frame}",
         f"SURFACES {surfaces}"
     ]
-    
+
     if surfaces != -1:
         if not boundary_indices:
             raise ValueError("`boundary_indices` must be provided if `surfaces` is not -1.")
@@ -181,7 +188,7 @@ def export_solver_analysis_csv(file_path,
             lines.append(str(boundary))
     else:
         lines.append("ALL")
-    
+
     script.append_lines(lines)
     return
 

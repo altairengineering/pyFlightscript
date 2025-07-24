@@ -23,10 +23,10 @@ def create_new_coordinate_system():
     script.append_lines(lines)
     return
 
-def edit_coordinate_system(frame, name, origin_x, origin_y, origin_z, 
-                           vector_x_x, vector_x_y, vector_x_z, 
-                           vector_y_x, vector_y_y, vector_y_z,
-                           vector_z_x, vector_z_y, vector_z_z):
+def edit_coordinate_system(frame: int, name: str, origin_x: float, origin_y: float, origin_z: float, 
+                           vector_x_x: float, vector_x_y: float, vector_x_z: float, 
+                           vector_y_x: float, vector_y_y: float, vector_y_z: float,
+                           vector_z_x: float, vector_z_y: float, vector_z_z: float):
     """
     Appends lines to script state to edit a local coordinate system.
 
@@ -85,7 +85,7 @@ def edit_coordinate_system(frame, name, origin_x, origin_y, origin_z,
     script.append_lines(lines)
     return
 
-def set_coordinate_system_name(frame, name):
+def set_coordinate_system_name(frame: int, name: str):
     """
     Appends lines to script state to set the name of an existing local coordinate system.
     
