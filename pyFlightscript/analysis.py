@@ -1,44 +1,60 @@
 from .utils import *    
 from .script import script    
+from .types import *
+from typing import Union, Optional, Literal, List
 
-def scene_contour(variable=4):
+def scene_contour(variable: int = 4) -> None:
     """
-    Appends lines to script state to set the scene contour parameter.
-    
-    Example usage:
-        set_scene_contour(variable=5)
-    
+    Set the scene contour parameter for visualization.
 
-    :param variable: Value of the contour parameter.
+    This function appends a command to the script state to change the contour
+    parameter displayed in the scene.
 
-    | value, variable
-    | 0 No contour
-    | 1 X
-    | 2 Y
-    | 3 Z
-    | 4 Vorticity
-    | 5 Skin friction coefficient
-    | 6 Area
-    | 7 Boundary Mach Number
-    | 8 Coefficient of pressure (Free-stream velocity)
-    | 9 Mach Number
-    | 10 Solver partition ID
-    | 11 Separation marker
-    | 12 Velocity X component
-    | 13 Velocity Y component
-    | 14 Velocity Z component
-    | 15 Velocity magnitude
-    | 16 Boundary layer displacement thickness
-    | 17 Boundary layer streamline length
-    | 18 Coefficient of pressure (reference velocity)
-    | 19 Solver mesh quality
-    | 20 Boundary layer transition marker
-    | 21 Solver mesh stabilization
-    | 22 Boundary layer momentum thickness
-    | 23 Boundary layer momentum gradient
-    | 24 Boundary layer shape factor
-    | 25 Boundary layer stagnation marker
+    Parameters
+    ----------
+    variable : int, optional
+        The value corresponding to the desired contour parameter.
+        Defaults to 4 (Vorticity).
 
+        - 0: No contour
+        - 1: X
+        - 2: Y
+        - 3: Z
+        - 4: Vorticity
+        - 5: Skin friction coefficient
+        - 6: Area
+        - 7: Boundary Mach Number
+        - 8: Coefficient of pressure (Free-stream velocity)
+        - 9: Mach Number
+        - 10: Solver partition ID
+        - 11: Separation marker
+        - 12: Velocity X component
+        - 13: Velocity Y component
+        - 14: Velocity Z component
+        - 15: Velocity magnitude
+        - 16: Boundary layer displacement thickness
+        - 17: Boundary layer streamline length
+        - 18: Coefficient of pressure (reference velocity)
+        - 19: Solver mesh quality
+        - 20: Boundary layer transition marker
+        - 21: Solver mesh stabilization
+        - 22: Boundary layer momentum thickness
+        - 23: Boundary layer momentum gradient
+        - 24: Boundary layer shape factor
+        - 25: Boundary layer stagnation marker
+
+    Raises
+    ------
+    ValueError
+        If `variable` is not a valid integer between 0 and 25.
+
+    Examples
+    --------
+    >>> # Set the scene contour to display Mach Number
+    >>> scene_contour(variable=9)
+
+    >>> # Set the scene contour to display skin friction
+    >>> scene_contour(variable=5)
     """
     
     # Type and value checking
@@ -58,12 +74,39 @@ def scene_contour(variable=4):
     script.append_lines(lines)
     return
 
-def set_vorticity_drag_boundaries(num_boundaries, boundary_indices=None):
+def set_vorticity_drag_boundaries(
+    num_boundaries: int,
+    boundary_indices: Optional[List[int]] = None
+) -> None:
     """
-    Appends lines to script state to set vorticity-based induced drag boundaries.
+    Set vorticity-based induced drag boundaries.
 
-    :param num_boundaries: Number of boundaries to be added to the list, or -1 to set all.
-    :param boundary_indices: List of boundary indices, ignored if num_boundaries is -1.
+    This function appends a command to the script state to define which
+    boundaries are used for calculating vorticity-based induced drag.
+
+    Parameters
+    ----------
+    num_boundaries : int
+        The number of boundaries to be added to the list. If -1, all boundaries
+        are used.
+    boundary_indices : Optional[List[int]], optional
+        A list of boundary indices to be used. This parameter is ignored if
+        `num_boundaries` is -1. Defaults to None.
+
+    Raises
+    ------
+    ValueError
+        If `num_boundaries` is not an integer, or if `boundary_indices` is not
+        a list of integers when required, or if its length does not match
+        `num_boundaries`.
+
+    Examples
+    --------
+    >>> # Set all boundaries for vorticity drag calculation
+    >>> set_vorticity_drag_boundaries(num_boundaries=-1)
+
+    >>> # Set specific boundaries for vorticity drag calculation
+    >>> set_vorticity_drag_boundaries(num_boundaries=3, boundary_indices=[1, 3, 5])
     """
     
     # Type and value checking for num_boundaries
@@ -113,11 +156,31 @@ def delete_vorticity_drag_boundaries():
     script.append_lines(lines)
     return
 
-def set_analysis_moments_model(model="PRESSURE"):
+def set_analysis_moments_model(model: str = "PRESSURE") -> None:
     """
-    Sets the moments model used in the analysis to either 'PRESSURE' or 'VORTICITY'.
+    Set the moments model used in the analysis.
 
-    :param model: A string that indicates the model type, either 'PRESSURE' (default) or 'VORTICITY'.
+    This function appends a command to the script state to set the moments
+    model to either 'PRESSURE' or 'VORTICITY'.
+
+    Parameters
+    ----------
+    model : str, optional
+        The moments model to be used. Must be either 'PRESSURE' or 'VORTICITY'.
+        Defaults to 'PRESSURE'.
+
+    Raises
+    ------
+    ValueError
+        If `model` is not 'PRESSURE' or 'VORTICITY'.
+
+    Examples
+    --------
+    >>> # Set the moments model to VORTICITY
+    >>> set_analysis_moments_model(model='VORTICITY')
+
+    >>> # Set the moments model to PRESSURE (default)
+    >>> set_analysis_moments_model(model='PRESSURE')
     """
     
     # Type and value checking
@@ -135,11 +198,30 @@ def set_analysis_moments_model(model="PRESSURE"):
     script.append_lines(lines)
     return
 
-def set_analysis_symmetry_loads(enable):
+def set_analysis_symmetry_loads(enable: bool) -> None:
     """
-    Enables or disables the analysis to include loads from symmetry boundaries.
+    Enable or disable including loads from symmetry boundaries in the analysis.
 
-    :param enable: Boolean to enable (True) or disable (False) symmetry loads.
+    This function appends a command to the script state to control whether
+    loads from symmetry boundaries are included in the analysis calculations.
+
+    Parameters
+    ----------
+    enable : bool
+        If True, enables the inclusion of symmetry loads. If False, disables it.
+
+    Raises
+    ------
+    ValueError
+        If `enable` is not a boolean value.
+
+    Examples
+    --------
+    >>> # Enable symmetry loads in the analysis
+    >>> set_analysis_symmetry_loads(enable=True)
+
+    >>> # Disable symmetry loads in the analysis
+    >>> set_analysis_symmetry_loads(enable=False)
     """
     
     # Type checking
@@ -159,15 +241,31 @@ def set_analysis_symmetry_loads(enable):
     script.append_lines(lines)
     return
 
-def analysis_loads_frame(load_frame=1):
+def analysis_loads_frame(load_frame: int = 1) -> None:
     """
-    Appends lines to script state to set the loads frame in the analysis tab.
-    
+    Set the loads frame for analysis.
 
-    :param load_frame: Index of the coordinate system used for evaluating aerodynamic loads and moments.
-    
-    Example usage:
-    analysis_loads_frame()
+    This function appends a command to the script state to specify the
+    coordinate system frame used for evaluating aerodynamic loads and moments.
+
+    Parameters
+    ----------
+    load_frame : int, optional
+        The index of the coordinate system to be used for evaluating loads
+        and moments. Defaults to 1.
+
+    Raises
+    ------
+    ValueError
+        If `load_frame` is not an integer.
+
+    Examples
+    --------
+    >>> # Set the analysis loads frame to coordinate system 2
+    >>> analysis_loads_frame(load_frame=2)
+
+    >>> # Use the default loads frame
+    >>> analysis_loads_frame()
     """
     
     # Type and value checking
@@ -185,15 +283,31 @@ def analysis_loads_frame(load_frame=1):
     script.append_lines(lines)
     return
 
-def vorticity_lift_model(enable=True):
+def vorticity_lift_model(enable: bool = True) -> None:
     """
-    Appends lines to script state to set the lift model to vorticity mode.
-    
+    Enable or disable the vorticity lift model.
 
-    :param enable: Boolean to indicate if the model should be enabled or disabled.
-    
-    Example usage:
-    set_vorticity_lift_model(, enable=True)
+    This function appends a command to the script state to set the lift model
+    to vorticity mode.
+
+    Parameters
+    ----------
+    enable : bool, optional
+        If True, enables the vorticity lift model. If False, disables it.
+        Defaults to True.
+
+    Raises
+    ------
+    ValueError
+        If `enable` is not a boolean value.
+
+    Examples
+    --------
+    >>> # Enable the vorticity lift model
+    >>> vorticity_lift_model(enable=True)
+
+    >>> # Disable the vorticity lift model
+    >>> vorticity_lift_model(enable=False)
     """
     
     # Type and value checking

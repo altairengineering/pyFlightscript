@@ -1,14 +1,17 @@
 from .utils import *    
 from .script import script
 
-def view_resize():
+def view_resize() -> None:
     """
-    Appends lines to script state to resize the view in the scene.
-    
+    Resize the view in the scene.
 
-    
-    Example usage:
-    view_resize()
+    This function appends a command to the script state to resize the view,
+    which may be useful after changing the window size or layout.
+
+    Examples
+    --------
+    >>> # Resize the scene view
+    >>> view_resize()
     """
     
     lines = [
