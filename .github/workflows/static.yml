@@ -27,7 +27,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,7 +43,12 @@ jobs:
       - name: Build with Sphinx
         run: |
           # Build the HTML documentation
+          cd sphinx
+          set PYTHONPATH=%GITHUB_WORKSPACE%;%PYTHONPATH%
           sphinx-apidoc -F -f -o . ../pyFlightscript/
+          call make.bat html
+          cd ..
+        shell: cmd
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
