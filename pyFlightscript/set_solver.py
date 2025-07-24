@@ -563,14 +563,14 @@ def solver_settings(angle_of_attack: float = 0., sideslip_angle: float = 0.,
     script.append_lines(lines)
     return
 
-def set_aoa(angle: float):
+def aoa(angle: float):
     """
     Appends lines to script state to set the solver AOA.
     
     :param angle: Angle of attack in degrees. |angle| must be < 90.
     
     Example usage:
-    set_aoa(-5.0)
+    aoa(-5.0)
     """
 
     if abs(angle) >= 90:
@@ -595,7 +595,7 @@ def sideslip(angle: float):
     :param angle: Side-slip angle in degrees. |angle| must be < 90.
     
     Example usage:
-    set_sideslip(, 5.0)
+    sideslip(, 5.0)
     """
     
     if abs(angle) >= 90:
@@ -612,7 +612,7 @@ def sideslip(angle: float):
     script.append_lines(lines)
     return
 
-def velocity(velocity: float = 30.0):
+def solver_velocity(velocity: float = 30.0):
     """
     Appends lines to script state to set the solver free-stream velocity.
     
@@ -620,7 +620,7 @@ def velocity(velocity: float = 30.0):
     :param velocity: The free-stream velocity value.
     
     Example usage:
-    set_velocity(30.)
+    solver_velocity(30.)
     """
     
     
@@ -635,7 +635,7 @@ def velocity(velocity: float = 30.0):
     script.append_lines(lines)
     return
 
-def mach_number(mach: float = 3.0):
+def solver_mach_number(mach: float = 3.0):
     """
     Appends lines to script state to set the solver Mach number.
     
@@ -643,7 +643,7 @@ def mach_number(mach: float = 3.0):
     :param velocity: The Mach number value.
     
     Example usage:
-    mach_number(3.)
+    solver_mach_number(3.)
     """
     
 
@@ -658,7 +658,7 @@ def mach_number(mach: float = 3.0):
     script.append_lines(lines)
     return
 
-def iterations(num_iterations: int = 500):
+def solver_iterations(num_iterations: int = 500):
     """
     Appends lines to script state to set the solver iterations.
     
@@ -666,7 +666,7 @@ def iterations(num_iterations: int = 500):
     :param num_iterations: The number of solver iterations.
     
     Example usage:
-    set_iterations()
+    solver_iterations()
     """
     
 
@@ -681,7 +681,7 @@ def iterations(num_iterations: int = 500):
     script.append_lines(lines)
     return
 
-def convergence(threshold: float = 1E-5):
+def convergence_threshold(threshold: float = 1E-5):
     """
     Appends lines to script state to set the solver convergence threshold.
     
@@ -689,7 +689,7 @@ def convergence(threshold: float = 1E-5):
     :param threshold: Convergence threshold value.
     
     Example usage:
-    set_convergence()
+    convergence_threshold()
     """
     
 
@@ -712,7 +712,7 @@ def forced_iterations(mode: RunOptions = 'ENABLE'):
     :param mode: Either 'ENABLE' or 'DISABLE'.
     
     Example usage:
-    set_forced_iterations()
+    forced_iterations('ENABLE')
     """
     
 
@@ -735,7 +735,7 @@ def ref_velocity(value: float = 100.):
     :param value: Reference velocity.
     
     Example usage:
-    set_ref_velocity()
+    ref_velocity()
     """
     
 
