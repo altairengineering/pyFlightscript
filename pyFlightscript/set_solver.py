@@ -1,5 +1,6 @@
 from .utils import *    
 from .script import script
+from .types import ValidForceUnits, VALID_FORCE_UNITS_LIST, RunOptions
 
 def steady():
     """
@@ -21,25 +22,24 @@ def steady():
     script.append_lines(lines)
     return
 
-def unsteady(time_iterations=100, delta_time=0.1):
+def unsteady(time_iterations: int = 100, delta_time: float = 0.1):
     """
     Appends lines to script state to set the unsteady solver.
-    
 
     :param time_iterations: Number of time-stepping iterations to be run by the unsteady solver.
     :param delta_time: Physical time step of the unsteady solver.
-    
+
     Example usage:
         unsteady()
     """
-    
+
     # Type and value checking
-    if not isinstance(time_iterations, int) or time_iterations <= 0:
-        raise ValueError("`time_iterations` should be a positive integer value.")
-    
-    if not isinstance(delta_time, (int, float)) or delta_time <= 0:
-        raise ValueError("`delta_time` should be a positive number.")
-    
+    if type(time_iterations) is not int or time_iterations <= 0:
+        raise TypeError("`time_iterations` should be a positive integer value.")
+
+    if type(delta_time) not in (int, float) or delta_time <= 0:
+        raise TypeError("`delta_time` should be a positive number.")
+
     lines = [
         "#************************************************************************",
         "#********* Set the unsteady solver **************************************",
@@ -53,11 +53,16 @@ def unsteady(time_iterations=100, delta_time=0.1):
     script.append_lines(lines)
     return
 
-def unsteady_solver_new_force_plot(frame=1, units='NEWTONS', parameter='FORCE_X', 
-                                   name='Plot_Name', boundaries=-1, boundary_indices=None):
+def unsteady_solver_new_force_plot(
+    frame: int = 1,
+    units: ValidForceUnits = 'NEWTONS',
+    parameter: str = 'FORCE_X',
+    name: str = 'Plot_Name',
+    boundaries: int = -1,
+    boundary_indices: list = None
+):
     """
     Appends lines to script state to create a new unsteady solver force & moments plot.
-    
 
     :param frame: Index of the coordinate system to be used.
     :param units: Units for the plot.
@@ -65,21 +70,26 @@ def unsteady_solver_new_force_plot(frame=1, units='NEWTONS', parameter='FORCE_X'
     :param name: Name of the plot.
     :param boundaries: Total geometry boundaries to be linked.
     :param boundary_indices: List of boundary indices.
-    
+
     Example usage:
     unsteady_solver_new_force_plot(, name='Propeller_thrust', boundaries=3, boundary_indices=[1, 2, 4])
     """
-    
+
     # Type and value checking
     if not isinstance(frame, int):
         raise ValueError("`frame` should be an integer value.")
-    
-    check_valid_force_units(units)
-    
-    valid_parameters = ['CL', 'CDI', 'CDO', 'CD', 'FORCE_X', 'FORCE_Y', 'FORCE_Z', 'MOMENT_X', 'MOMENT_Y', 'MOMENT_Z']
+
+    if units not in VALID_FORCE_UNITS_LIST:
+        raise ValueError(f"`units` should be one of {VALID_FORCE_UNITS_LIST}")
+
+    valid_parameters = [
+        'CL', 'CDI', 'CDO', 'CD',
+        'FORCE_X', 'FORCE_Y', 'FORCE_Z',
+        'MOMENT_X', 'MOMENT_Y', 'MOMENT_Z'
+    ]
     if parameter not in valid_parameters:
         raise ValueError(f"`parameter` should be one of {valid_parameters}")
-    
+
     lines = [
         "#************************************************************************",
         "#********* Create a new unsteady solver force & moments plot ************",
@@ -92,14 +102,19 @@ def unsteady_solver_new_force_plot(frame=1, units='NEWTONS', parameter='FORCE_X'
         f"NAME {name}",
         f"BOUNDARIES {boundaries}"
     ]
-    
+
     if boundaries != -1 and boundary_indices:
         lines.append(','.join(map(str, boundary_indices)))
 
     script.append_lines(lines)
     return
 
-def unsteady_solver_new_fluid_plot(frame=1, parameter='VELOCITY', name='Plot_Name', vertex=(-1.0, 1.0, 0.0)):
+def unsteady_solver_new_fluid_plot(
+    frame: int = 1,
+    parameter: str = 'VELOCITY',
+    name: str = 'Plot_Name',
+    vertex: tuple = (-1.0, 1.0, 0.0)
+):
     """
     Appends lines to script state to create a new unsteady solver fluid properties plot.
     
@@ -136,10 +151,10 @@ def unsteady_solver_new_fluid_plot(frame=1, parameter='VELOCITY', name='Plot_Nam
     script.append_lines(lines)
     return
 
-def unsteady_solver_export_plots(export_filepath):
+def unsteady_solver_export_plots(export_filepath: str):
     """
     Appends lines to script state to export all unsteady solver plots.
-    
+
 
     :param export_filepath: Path where plots should be exported.
     
@@ -182,7 +197,13 @@ def unsteady_solver_delete_all_plots():
     script.append_lines(lines)
     return
 
-def unsteady_solver_animation(enable_disable, folder, filetype, frequency, volume_sections):
+def unsteady_solver_animation(
+    enable_disable: RunOptions,
+    folder: str,
+    filetype: str,
+    frequency: int,
+    volume_sections: str
+):
     """
     Appends lines to script state to configure the unsteady solver animation.
 
@@ -193,10 +214,6 @@ def unsteady_solver_animation(enable_disable, folder, filetype, frequency, volum
     :param volume_sections: 'ENABLE' or 'DISABLE' the export of volume section output files.
     """
     
-    # Validate input parameters
-    if enable_disable not in ['ENABLE', 'DISABLE']:
-        raise ValueError("`enable_disable` must be 'ENABLE' or 'DISABLE'.")
-
     if not isinstance(folder, str):
         raise ValueError("`folder` must be a string indicating the path.")
 
@@ -227,7 +244,7 @@ def unsteady_solver_animation(enable_disable, folder, filetype, frequency, volum
     script.append_lines(lines)
     return
 
-def boundary_layer_type(type_value='TRANSITIONAL'):
+def boundary_layer_type(type_value: str = 'TRANSITIONAL'):
     """
     Appends lines to script state to set the surface boundary layer type.
     
@@ -254,7 +271,7 @@ def boundary_layer_type(type_value='TRANSITIONAL'):
     script.append_lines(lines)
     return
 
-def surface_roughness(roughness_height=23.5):
+def surface_roughness(roughness_height: float = 23.5):
     """
     Appends lines to script state to set the surface roughness height.
     
@@ -280,7 +297,7 @@ def surface_roughness(roughness_height=23.5):
     script.append_lines(lines)
     return
 
-def viscous_coupling(mode='ENABLE'):
+def viscous_coupling(mode: RunOptions = 'ENABLE'):
     """
     Appends lines to script state to set the solver viscous coupling.
 
@@ -290,11 +307,6 @@ def viscous_coupling(mode='ENABLE'):
     Example usage:
     viscous_coupling()
     """
-
-    # Type and value checking
-    valid_modes = ['ENABLE', 'DISABLE']
-    if mode not in valid_modes:
-        raise ValueError(f"Mode should be one of {valid_modes}")
 
     lines = [
         "#************************************************************************",
@@ -307,7 +319,7 @@ def viscous_coupling(mode='ENABLE'):
     script.append_lines(lines)
     return
 
-def viscous_excluded_boundaries(num_boundaries, boundaries):
+def viscous_excluded_boundaries(num_boundaries: int, boundaries: list):
     """
     Appends lines to script state to set the viscous exclusion boundary list.
 
@@ -357,17 +369,13 @@ def delete_viscous_excluded_boundaries():
     script.append_lines(lines)
     return
 
-def unsteady_viscous_coupling_iteration(num_iteration):
+def unsteady_viscous_coupling_iteration(num_iteration: int):
     """
     Appends a line to script state to set the unsteady solver viscous-coupling iteration.
 
     :param num_iteration: The unsteady solver time-stepping iteration where the viscous-coupling is to be enabled.
     """
-    
-    # Type and value checking
-    if not isinstance(num_iteration, int):
-        raise ValueError("`num_iteration` should be an integer value.")
-    
+        
     # Create command line
     line = [
         "#************************************************************************",
@@ -380,7 +388,7 @@ def unsteady_viscous_coupling_iteration(num_iteration):
     script.append_lines(line)
     return
 
-def set_axial_separation_boundaries(boundary_indices):
+def set_axial_separation_boundaries(boundary_indices: list):
     """
     Appends lines to script state to set axial separation boundaries based on given indices.
 
@@ -425,7 +433,7 @@ def delete_axial_separation_boundaries():
     script.append_lines(lines)
     return
 
-def set_crossflow_separation_boundaries(boundary_indices):
+def set_crossflow_separation_boundaries(boundary_indices: list):
     """
     Appends lines to script state to set cross-flow separation boundaries.
 
@@ -468,7 +476,7 @@ def delete_crossflow_separation_boundaries():
     script.append_lines(lines)
     return
 
-def set_crossflow_separation_cp(mean_diameter):
+def set_crossflow_separation_cp(mean_diameter: float):
     """
     Appends lines to script state to set the cross-flow separation pressure coefficient based on mean diameter.
 
@@ -493,12 +501,12 @@ def set_crossflow_separation_cp(mean_diameter):
     script.append_lines(lines)
     return
 
-def solver_settings(angle_of_attack=0., sideslip_angle=0., 
-                    freestream_velocity=100., iterations=500, 
-                    convergence_limit=1e-5, forced_run='DISABLE', 
-                     reference_velocity=100., 
-                    reference_area=1., reference_length=1., processors=2, 
-                    wake_size=1000):
+def solver_settings(angle_of_attack: float = 0., sideslip_angle: float = 0., 
+                    freestream_velocity: float = 100., iterations: int = 500, 
+                    convergence_limit: float = 1e-5, forced_run: RunOptions = 'DISABLE', 
+                    reference_velocity: float = 100., 
+                    reference_area: float = 1., reference_length: float = 1., processors: int = 2, 
+                    wake_size: float = 1000):
     """
     Appends lines to script state to set the solver settings.
     
@@ -517,10 +525,6 @@ def solver_settings(angle_of_attack=0., sideslip_angle=0.,
     
     if not isinstance(iterations, int):
         raise ValueError("`iterations` should be an integer value.")
-    
-    valid_run = ['ENABLE', 'DISABLE']
-    if forced_run not in valid_run not in valid_run:
-        raise ValueError(f"`forced_run` should be one of {valid_run}")
     
     if not isinstance(reference_velocity, (int, float)):
         raise ValueError("`reference_velocity` should be a number.")
@@ -559,7 +563,7 @@ def solver_settings(angle_of_attack=0., sideslip_angle=0.,
     script.append_lines(lines)
     return
 
-def aoa(angle):
+def aoa(angle: float):
     """
     Appends lines to script state to set the solver AOA.
     
@@ -569,10 +573,7 @@ def aoa(angle):
     Example usage:
     set_aoa(, -5.0)
     """
-    
-    # Type and value checking
-    if not isinstance(angle, (int, float)):
-        raise ValueError("`angle` should be an integer or float value.")
+
     if abs(angle) >= 90:
         raise ValueError("`angle` must be less than 90 in magnitude.")
     
@@ -587,7 +588,7 @@ def aoa(angle):
     script.append_lines(lines)
     return
 
-def sideslip(angle):
+def sideslip(angle: float):
     """
     Appends lines to script state to set the solver Side-slip angle.
     
@@ -598,9 +599,6 @@ def sideslip(angle):
     set_sideslip(, 5.0)
     """
     
-    # Type and value checking
-    if not isinstance(angle, (int, float)):
-        raise ValueError("`angle` should be an integer or float value.")
     if abs(angle) >= 90:
         raise ValueError("`angle` must be less than 90 in magnitude.")
     
@@ -615,7 +613,7 @@ def sideslip(angle):
     script.append_lines(lines)
     return
 
-def velocity(velocity=30.0):
+def velocity(velocity: float = 30.0):
     """
     Appends lines to script state to set the solver free-stream velocity.
     
@@ -626,9 +624,6 @@ def velocity(velocity=30.0):
     set_velocity(30.)
     """
     
-    # Type and value checking
-    if not isinstance(velocity, (int, float)):
-        raise ValueError("`velocity` should be an integer or float value.")
     
     lines = [
         "#************************************************************************",
@@ -641,7 +636,7 @@ def velocity(velocity=30.0):
     script.append_lines(lines)
     return
 
-def mach_number(mach=3.0):
+def mach_number(mach: float = 3.0):
     """
     Appends lines to script state to set the solver Mach number.
     
@@ -652,10 +647,7 @@ def mach_number(mach=3.0):
     mach_number(3.)
     """
     
-    # Type and value checking
-    if not isinstance(mach, (int, float)):
-        raise ValueError("`mach number` should be an integer or float value.")
-    
+
     lines = [
         "#************************************************************************",
         "#************** Set the solver Mach number ******************************",
@@ -667,7 +659,7 @@ def mach_number(mach=3.0):
     script.append_lines(lines)
     return
 
-def iterations(num_iterations=500):
+def iterations(num_iterations: int = 500):
     """
     Appends lines to script state to set the solver iterations.
     
@@ -678,10 +670,7 @@ def iterations(num_iterations=500):
     set_iterations()
     """
     
-    # Type and value checking
-    if not isinstance(num_iterations, int) or num_iterations <= 0:
-        raise ValueError("`num_iterations` should be a positive integer value.")
-    
+
     lines = [
         "#************************************************************************",
         "#****************** Set the solver iterations ***************************",
@@ -693,7 +682,7 @@ def iterations(num_iterations=500):
     script.append_lines(lines)
     return
 
-def convergence(threshold=1E-5):
+def convergence(threshold: float = 1E-5):
     """
     Appends lines to script state to set the solver convergence threshold.
     
@@ -704,10 +693,7 @@ def convergence(threshold=1E-5):
     set_convergence()
     """
     
-    # Type and value checking
-    if not isinstance(threshold, (int, float)):
-        raise ValueError("`threshold` should be an integer or float value.")
-    
+
     lines = [
         "#************************************************************************",
         "#****************** Set the solver convergence threshold ****************",
@@ -719,7 +705,7 @@ def convergence(threshold=1E-5):
     script.append_lines(lines)
     return
 
-def forced_iterations(mode='ENABLE'):
+def forced_iterations(mode: RunOptions = 'ENABLE'):
     """
     Appends lines to script state to enable or disable solver forced iterations mode.
     
@@ -730,11 +716,7 @@ def forced_iterations(mode='ENABLE'):
     set_forced_iterations()
     """
     
-    # Value checking
-    valid_modes = ['ENABLE', 'DISABLE']
-    if mode not in valid_modes:
-        raise ValueError(f"`mode` should be one of {valid_modes}")
-    
+
     lines = [
         "#************************************************************************",
         "#****************** Enable solver forced iterations mode ****************",
@@ -746,7 +728,7 @@ def forced_iterations(mode='ENABLE'):
     script.append_lines(lines)
     return
 
-def ref_velocity(value=100.):
+def ref_velocity(value: float = 100.):
     """
     Appends lines to script state to set the solver reference velocity.
     
@@ -757,10 +739,7 @@ def ref_velocity(value=100.):
     set_ref_velocity()
     """
     
-    # Type and value checking
-    if not isinstance(value, (int, float)) or value <= 0.0:
-        raise ValueError("`value` should be a positive number (int or float).")
-    
+
     lines = [
         "#************************************************************************",
         "#********* Set the solver reference velocity ****************************",
@@ -772,7 +751,7 @@ def ref_velocity(value=100.):
     script.append_lines(lines)
     return
 
-def ref_mach_number(mach=3.0):
+def ref_mach_number(mach: float = 3.0):
     """
     Appends lines to script state to set the solver reference Mach number.
     
@@ -782,10 +761,6 @@ def ref_mach_number(mach=3.0):
     Example usage:
     ref_mach_number(3.)
     """
-    
-    # Type and value checking
-    if not isinstance(mach, (int, float)):
-        raise ValueError("`mach number` should be an integer or float value.")
     
     lines = [
         "#************************************************************************",
@@ -798,7 +773,7 @@ def ref_mach_number(mach=3.0):
     script.append_lines(lines)
     return
 
-def ref_area(value=1.):
+def ref_area(value: float = 1.):
     """
     Appends lines to script state to set the solver reference area.
     
@@ -808,10 +783,6 @@ def ref_area(value=1.):
     Example usage:
     set_ref_area()
     """
-    
-    # Type and value checking
-    if not isinstance(value, (int, float)) or value <= 0.0:
-        raise ValueError("`value` should be a positive number (int or float).")
     
     lines = [
         "#************************************************************************",
@@ -824,7 +795,7 @@ def ref_area(value=1.):
     script.append_lines(lines)
     return
 
-def ref_length(length=1.):
+def ref_length(length: float = 1.):
     """
     Appends lines to script state to set the solver reference length.
     
@@ -835,10 +806,6 @@ def ref_length(length=1.):
     set_ref_length(, length=2.5)
     """
 
-    # Type and value checking
-    if not isinstance(length, (int, float)) or length <= 0:
-        raise ValueError("`length` should be a positive integer or float value.")
-    
     lines = [
         "#************************************************************************",
         "#********* Set the solver reference length ******************************",
@@ -850,7 +817,7 @@ def ref_length(length=1.):
     script.append_lines(lines)
     return
 
-def solver_minimum_cp(CP=-100):
+def solver_minimum_cp(CP: float = -100):
     """
     Appends lines to script state to set the solver minimum coefficient of pressure.
 
@@ -871,34 +838,7 @@ def solver_minimum_cp(CP=-100):
     script.append_lines(lines)
     return
 
-def compressibility(compressibility='ENABLE'):
-    """
-    Appends lines to script state to set the solver compressibility.
-    
-
-    :param compressibility: Either 'ENABLE' or 'DISABLE'.
-    
-    Example usage:
-    set_compressibility(, compressibility='DISABLE')
-    """
-
-    # Type and value checking
-    valid_options = ['ENABLE', 'DISABLE']
-    if compressibility not in valid_options:
-        raise ValueError(f"`compressibility` should be one of {valid_options}")
-    
-    lines = [
-        "#************************************************************************",
-        "#********* Set the solver compressibility *******************************",
-        "#************************************************************************",
-        "#",
-        f"SOLVER_SET_COMPRESSIBILITY {compressibility}"
-    ]
-
-    script.append_lines(lines)
-    return
-
-def set_max_parallel_threads(num_cores=16):
+def set_max_parallel_threads(num_cores: int = 16):
     """
     Appends lines to script state to set the number of solver parallel cores.
     
@@ -907,10 +847,6 @@ def set_max_parallel_threads(num_cores=16):
     
     :param num_cores: Number of parallel cores.
     """
-    
-    # Type and value checking
-    if not isinstance(num_cores, int):
-        raise ValueError("`num_cores` should be an integer value.")
     
     lines = [
         "#************************************************************************",
@@ -923,7 +859,7 @@ def set_max_parallel_threads(num_cores=16):
     script.append_lines(lines)
     return
 
-def mesh_induced_wake_velocity(enable=True):
+def mesh_induced_wake_velocity(enable: bool = True):
     """
     Appends lines to script state to set the solver mesh induced wake velocity.
     
@@ -933,10 +869,6 @@ def mesh_induced_wake_velocity(enable=True):
 
     :param enable: Boolean to either enable or disable the feature.
     """
-    
-    # Type and value checking
-    if not isinstance(enable, bool):
-        raise ValueError("`enable` should be a boolean value (True/False).")
     
     status = "ENABLE" if enable else "DISABLE"
     
@@ -951,7 +883,7 @@ def mesh_induced_wake_velocity(enable=True):
     script.append_lines(lines)
     return
 
-def adverse_gradient_boundary_layer(mode='ENABLE'):
+def adverse_gradient_boundary_layer(mode: RunOptions = 'ENABLE'):
     """
     Appends lines to script state to set the adverse pressure gradient boundary layer mode.
 
@@ -961,11 +893,6 @@ def adverse_gradient_boundary_layer(mode='ENABLE'):
     Example usage:
     set_adverse_gradient_boundary_layer(, 'DISABLE')
     """
-    
-    # Type and value checking
-    valid_modes = ['ENABLE', 'DISABLE']
-    if mode not in valid_modes:
-        raise ValueError(f"`mode` should be one of {valid_modes}")
     
     lines = [
         "#************************************************************************",
@@ -978,7 +905,7 @@ def adverse_gradient_boundary_layer(mode='ENABLE'):
     script.append_lines(lines)
     return
 
-def farfield_layers(value=3):
+def farfield_layers(value: int = 3):
     """
     Appends lines to script state to set the solver far-field agglomeration layers.
 
@@ -988,10 +915,6 @@ def farfield_layers(value=3):
     Example usage:
     set_farfield_layers(, 4)
     """
-    
-    # Type and value checking
-    if not isinstance(value, int):
-        raise ValueError("`value` should be an integer.")
     
     if not (1 <= value <= 5):
         raise ValueError("`value` should be between 1 and 5, inclusive.")
@@ -1007,7 +930,7 @@ def farfield_layers(value=3):
     script.append_lines(lines)
     return
 
-def solver_unsteady_pressure_and_kutta(status='ENABLE'):
+def solver_unsteady_pressure_and_kutta(status: RunOptions = 'ENABLE'):
     """
     Appends lines to script state to enable or disable solver unsteady Bernoulli and Kutta terms.
     
@@ -1017,10 +940,6 @@ def solver_unsteady_pressure_and_kutta(status='ENABLE'):
     Example usage:
     solver_unsteady_pressure_and_kutta(, status='ENABLE')
     """
-    
-    # Type and value checking
-    if status not in ['ENABLE', 'DISABLE']:
-        raise ValueError("`status` should be either 'ENABLE' or 'DISABLE'")
     
     lines = [
         "#************************************************************************",
@@ -1033,7 +952,7 @@ def solver_unsteady_pressure_and_kutta(status='ENABLE'):
     script.append_lines(lines)
     return
 
-def solver_vortex_ring_normalization(status='ENABLE'):
+def solver_vortex_ring_normalization(status: RunOptions = 'ENABLE'):
     """
     Appends lines to script state to enable or disable solver vortex ring normalization.
     
@@ -1043,10 +962,6 @@ def solver_vortex_ring_normalization(status='ENABLE'):
     Example usage:
     solver_vortex_ring_normalization(, status='ENABLE')
     """
-    
-    # Type and value checking
-    if status not in ['ENABLE', 'DISABLE']:
-        raise ValueError("`status` should be either 'ENABLE' or 'DISABLE'")
     
     lines = [
         "#************************************************************************",
@@ -1059,7 +974,7 @@ def solver_vortex_ring_normalization(status='ENABLE'):
     script.append_lines(lines)
     return
 
-def convergence_iterations(value=500):
+def convergence_iterations(value: int = 500):
     """
     Appends lines to script state to set the solver convergence iterations.
     
@@ -1069,10 +984,6 @@ def convergence_iterations(value=500):
     Example usage:
     convergence_iterations()
     """
-    
-    # Type and value checking
-    if not isinstance(value, int):
-        raise ValueError("`value` should be an integer value.")
     
     lines = [
         "#************************************************************************************",
@@ -1085,7 +996,7 @@ def convergence_iterations(value=500):
     script.append_lines(lines)
     return
 
-def wake_streamwise_agglomeration(enable=True):
+def wake_streamwise_agglomeration(enable: bool = True):
     """
     Appends lines to script state to enable/disable the wake-->streamwise agglomeration feature.
     
@@ -1095,10 +1006,6 @@ def wake_streamwise_agglomeration(enable=True):
     Example usage:
     set_wake_streamwise_agglomeration()
     """
-    
-    # Type and value checking
-    if not isinstance(enable, bool):
-        raise ValueError("`enable` should be a boolean value.")
     
     status = "ENABLE" if enable else "DISABLE"
     
@@ -1113,16 +1020,12 @@ def wake_streamwise_agglomeration(enable=True):
     script.append_lines(lines)
     return
 
-def wake_termination_time_steps(value):
+def wake_termination_time_steps(value: int):
     """
     Sets the number of time steps after which a wake vortex filament edge loses all of its strength and is removed from the simulation.
 
     :param value: Integer representing the number of time steps for wake termination.
     """
-    
-    # Type and value checking
-    if not isinstance(value, int):
-        raise ValueError("`value` should be an integer.")
     
     # Command generation
     lines = [
@@ -1137,16 +1040,12 @@ def wake_termination_time_steps(value):
     script.append_lines(lines)
     return
 
-def wake_relaxation(enable):
+def wake_relaxation(enable: bool):
     """
     Appends lines to script state to set the wake-relaxation feature either to ENABLE or DISABLE.
 
     :param enable: Boolean value; True to ENABLE, False to DISABLE the wake-relaxation feature.
     """
-    
-    # Type checking for boolean input
-    if not isinstance(enable, bool):
-        raise ValueError("`enable` should be a boolean value indicating whether to enable or disable the feature.")
     
     # Determine the setting based on the boolean value
     setting = "ENABLE" if enable else "DISABLE"

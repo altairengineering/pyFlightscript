@@ -1,10 +1,6 @@
 from .utils import *    
 from .script import script
-from typing import Literal
-
-RunOptions = Literal['ENABLE', 'DISABLE']
-ValidUnits = Literal["INCH", "MILLIMETER", "OTHER", "FEET", "MILE", "METER", "KILOMETER", 
-                   "MILS", "MICRON", "CENTIMETER", "MICROINCH"]
+from .types import RunOptions, ValidUnits, VALID_RUN_OPTIONS, VALID_UNITS_LIST, VALID_FORCE_UNITS_LIST
 
 def open_fsm(fsm_filepath: str, reset_parallel_cores: RunOptions = 'DISABLE', load_solver_initialization: RunOptions = 'ENABLE') -> None:
     """
@@ -15,11 +11,11 @@ def open_fsm(fsm_filepath: str, reset_parallel_cores: RunOptions = 'DISABLE', lo
         reset_parallel_cores (str): 'ENABLE' to reset parallel core count, 'DISABLE' to use existing. Defaults to 'DISABLE'.
         load_solver_initialization (str): 'ENABLE' to load solver initialization from file, 'DISABLE' to skip. Defaults to 'ENABLE'.
     """
-    if reset_parallel_cores not in RunOptions:
-        raise ValueError(f"`reset_parallel_cores` should be one of {RunOptions}")
+    if reset_parallel_cores not in VALID_RUN_OPTIONS:
+        raise ValueError(f"`reset_parallel_cores` should be one of {VALID_RUN_OPTIONS}")
 
-    if load_solver_initialization not in RunOptions:
-        raise ValueError(f"`load_solver_initialization` should be one of {RunOptions}")
+    if load_solver_initialization not in VALID_RUN_OPTIONS:
+        raise ValueError(f"`load_solver_initialization` should be one of {VALID_RUN_OPTIONS}")
         
     lines = [
         "#************************************************************************",
@@ -141,8 +137,8 @@ def set_simulation_length_units(units: ValidUnits = 'METER'):
     :param units: Desired simulation length unit.
     :raises ValueError: If the provided unit is not valid.
     """
-    if units not in ValidUnits:
-        raise ValueError(f"`units` should be one of {ValidUnits}")
+    if units not in VALID_UNITS_LIST:
+        raise ValueError(f"`units` should be one of {VALID_UNITS_LIST}")
 
     lines = [
         "#************************************************************************",
