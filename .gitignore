@@ -7,6 +7,7 @@ pyFlightscript/__pycache__/
 *.rej
 *.orig
 *.swp
+gemini.md
 .windsurf*
 # Sphinx generated files
 .sphinx-build/
