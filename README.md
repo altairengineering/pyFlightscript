@@ -8,10 +8,7 @@ pyFlightscript contains all of the traditional scripting functions found in Flig
 submodules categorized by function. for example `pyFlighscript.initialize_solver() `
 
 
-## To read/generate new docs
-
-run the index.html file in your browser.
-HTML documentation can be found: https://altairengineering.github.io/pyFlightscript/
+## [Full Documentation is available here.](https://altairengineering.github.io/pyFlightscript/)
 
 ## Installation
 Download the repo
