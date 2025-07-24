@@ -563,15 +563,14 @@ def solver_settings(angle_of_attack: float = 0., sideslip_angle: float = 0.,
     script.append_lines(lines)
     return
 
-def aoa(angle: float):
+def set_aoa(angle: float):
     """
     Appends lines to script state to set the solver AOA.
     
-
     :param angle: Angle of attack in degrees. |angle| must be < 90.
     
     Example usage:
-    set_aoa(, -5.0)
+    set_aoa(-5.0)
     """
 
     if abs(angle) >= 90:
