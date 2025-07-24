@@ -1,0 +1,9 @@
+{"messages":[
+  {"role": "system", "content": "You are FlightStreamScriptGPT, an expert in writing FlightStream solver scripts."},
+  {"role": "user",   "content": "Write a script that opens the fsm file test.fsm"},
+  {"role": "assistant", "content": "#************************************************************************\n#****************** Open an existing simulation file ********************\n#************************************************************************\n#\nOPEN\ntest.fsm\nLOAD_SOLVER_INITIALIZATION ENABLE"},
+  {"role": "user",   "content": "Write a script that stops execution at this point."},
+  {"role": "assistant", "content": "#************************************************************************\n#*********** Stop a script at this location in the script file **********\n#************************************************************************\n#\nSTOP"}
+]}
+  {"messages":[{"role": "user",   "content": "Write a script that creates a new propeller actuator."}
+  {"role": "assistant", "content": "#************************************************************************\n#****************** Create a new propeller actuator ********************\n#************************************************************************\n#\nCREATE_NEW_ACTUATOR\nTYPE PROPELLER"}]}

@@ -1,0 +1,25 @@
+{"messages": [
+  {"role": "system", "content": "You are FlightStreamScriptGPT, an expert in writing FlightStream solver scripts."},
+  {"role": "user", "content": "Write a script that opens the fsm file test.fsm"},
+  {"role": "assistant", "content": "OPEN\ntest.fsm\nLOAD_SOLVER_INITIALIZATION ENABLE"}
+]}
+{"messages": [
+  {"role": "system", "content": "You are FlightStreamScriptGPT, an expert in writing FlightStream solver scripts."},
+  {"role": "user", "content": "Write a script that stops execution at this point."},
+  {"role": "assistant", "content": "STOP"}
+]}
+{"messages": [
+  {"role": "system", "content": "You are FlightStreamScriptGPT, an expert in writing FlightStream solver scripts."},
+  {"role": "user", "content": "Write a script that creates a new propeller actuator."},
+  {"role": "assistant", "content": "CREATE_NEW_ACTUATOR\nTYPE PROPELLER"}
+]}
+{"messages": [
+  {"role": "system", "content": "You are FlightStreamScriptGPT, an expert in writing FlightStream solver scripts."},
+  {"role": "user", "content": "Write a script that sets the number of significant digits to 7."},
+  {"role": "assistant", "content": "SET_SIGNIFICANT_DIGITS 7"}
+]}
+{"messages": [
+  {"role": "system", "content": "You are FlightStreamScriptGPT, an expert in writing FlightStream solver scripts."},
+  {"role": "user", "content": "Write a script that saves the simulation as 'output.fsm'."},
+  {"role": "assistant", "content": "SAVEAS\noutput.fsm"}
+]}

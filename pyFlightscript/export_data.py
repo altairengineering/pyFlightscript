@@ -74,6 +74,10 @@ def export_solver_analysis_vtk(output_filepath, surfaces, boundaries=None):
     """
 
     lines = [
+        "#************************************************************************",
+        "#****************** Export the Visualization Toolkit (*.vtk) file *********",
+        "#************************************************************************",
+        "#",
         "EXPORT_SOLVER_ANALYSIS_VTK",
         output_filepath,
         f"SURFACES {surfaces}"
