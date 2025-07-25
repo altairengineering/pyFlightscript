@@ -2,14 +2,17 @@ from .utils import *
 from .script import script
 from .types import *    
 
-def start_solver():
+def start_solver() -> None:
     """
-    Appends lines to script state to start the solver.
-    
+    Start the solver.
 
+    This function appends a command to the script state to begin the
+    solver execution.
 
-    Example usage:
-    start_solver()
+    Examples
+    --------
+    >>> # Start the solver
+    >>> start_solver()
     """
     
     lines = [
@@ -23,14 +26,17 @@ def start_solver():
     script.append_lines(lines)
     return
 
-def clear_solution():
+def clear_solution() -> None:
     """
-    Appends lines to script state to clear the existing solution.
-    
+    Clear the existing solution.
 
+    This function appends a command to the script state to clear the
+    current solution data.
 
-    Example usage:
-    clear_solution()
+    Examples
+    --------
+    >>> # Clear the solution
+    >>> clear_solution()
     """
     
     lines = [
@@ -44,14 +50,17 @@ def clear_solution():
     script.append_lines(lines)
     return
 
-def close_flightstream():
+def close_flightstream() -> None:
     """
     Appends lines to script state to close FlightStream and exit.
 
+    This function appends a command to the script state to close FlightStream
+    and exit the application.
 
-
-    Example usage:
-        close_flightstream()
+    Examples
+    --------
+    >>> # Close FlightStream and exit
+    >>> close_flightstream()
     """
     
     lines = [
