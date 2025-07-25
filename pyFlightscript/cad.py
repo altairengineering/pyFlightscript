@@ -1,13 +1,37 @@
 from .utils import *    
 from .script import script
+from .types import *
+from typing import Union, Optional, Literal, List
 
-def cad_create_initialize(model_index=1):
+def cad_create_initialize(model_index: int = 1) -> None:
     """
-    Appends lines to script state to initialize the CAD-->Create pane window.
-    
+    Initialize the CAD->Create pane window.
 
-    :param model_index: Input model_index for CAD_CREATE_INITIALIZE to which the CAD-->Create pane is linked.
+    This function appends a command to the script state to initialize the
+    CAD->Create pane window and link it to a specified model index.
+
+    Parameters
+    ----------
+    model_index : int, optional
+        The model index to which the CAD->Create pane is linked.
+        Defaults to 1.
+
+    Raises
+    ------
+    ValueError
+        If `model_index` is not a positive integer.
+
+    Examples
+    --------
+    >>> # Initialize the CAD->Create pane for model index 2
+    >>> cad_create_initialize(model_index=2)
+
+    >>> # Initialize the CAD->Create pane with the default model index
+    >>> cad_create_initialize()
     """
+    if not isinstance(model_index, int) or model_index <= 0:
+        raise ValueError("`model_index` should be a positive integer value.")
+        
     lines = [
         "#************************************************************************",
         "#****************** Initialize the CAD-->Create pane window *************",
@@ -19,30 +43,66 @@ def cad_create_initialize(model_index=1):
     script.append_lines(lines)
     return
 
-def cad_create_import_curve_txt(txt_filepath, units='METER', dimension='2D', frame=1, plane='YZ'):
+def cad_create_import_curve_txt(
+    txt_filepath: str,
+    units: ValidUnits = 'METER',
+    dimension: ValidDimensions = '2D',
+    frame: int = 1,
+    plane: ValidPlanes = 'YZ'
+) -> None:
     """
-    Appends lines to script state to import a CAD-->Create drawing curve from a txt file.
-    
+    Import a CAD->Create drawing curve from a text file.
 
-    :param units: Units for CAD_CREATE_IMPORT_CURVE_TXT (must be one of the specified units).
-    :param dimension: Dimension (either "2D" or "3D").
-    :param frame: Frame as an integer.
-    :param plane: Plane orientation (one of "YZ", "XZ", "XY").
-    :param filepath: Path to the txt file to import.
+    This function appends a command to the script state to import a drawing
+    curve from a specified text file with given parameters.
+
+    Parameters
+    ----------
+    txt_filepath : str
+        The absolute path to the text file to import.
+    units : ValidUnits, optional
+        The units for the imported curve. Defaults to 'METER'.
+    dimension : ValidDimensions, optional
+        The dimension of the curve, either '2D' or '3D'. Defaults to '2D'.
+    frame : int, optional
+        The coordinate system frame index. Defaults to 1.
+    plane : ValidPlanes, optional
+        The plane orientation for 2D curves ('XY', 'XZ', 'YZ').
+        Defaults to 'YZ'.
+
+    Raises
+    ------
+    FileNotFoundError
+        If `txt_filepath` does not exist.
+    ValueError
+        If `units`, `dimension`, or `plane` are not valid options, or if
+        `frame` is not a positive integer.
+
+    Examples
+    --------
+    >>> # Import a 2D curve from a text file with default parameters
+    >>> cad_create_import_curve_txt(txt_filepath='C:/path/to/curve.txt')
+
+    >>> # Import a 3D curve with specified units
+    >>> cad_create_import_curve_txt(
+    ...     txt_filepath='C:/path/to/3d_curve.txt',
+    ...     units='INCH',
+    ...     dimension='3D'
+    ... )
     """
     check_file_existence(txt_filepath)
 
+    if units not in VALID_UNITS_LIST:
+        raise ValueError(f"Invalid units: {units}. Must be one of {VALID_UNITS_LIST}.")
     
-    valid_dimensions = ["2D", "3D"]
-    valid_planes = ["YZ", "XZ", "XY"]
+    if dimension not in VALID_DIMENSIONS_LIST:
+        raise ValueError(f"Invalid dimension: {dimension}. Must be one of {VALID_DIMENSIONS_LIST}.")
     
-    check_valid_length_units(units)
-    
-    if dimension not in valid_dimensions:
-        raise ValueError(f"Invalid dimension: {dimension}. Must be one of {', '.join(valid_dimensions)}.")
-    
-    if plane not in valid_planes:
-        raise ValueError(f"Invalid plane: {plane}. Must be one of {', '.join(valid_planes)}.")
+    if plane not in VALID_PLANE_LIST:
+        raise ValueError(f"Invalid plane: {plane}. Must be one of {VALID_PLANE_LIST}.")
+
+    if not isinstance(frame, int) or frame <= 0:
+        raise ValueError("`frame` must be a positive integer.")
 
     lines = [
         "#************************************************************************",
@@ -56,12 +116,27 @@ def cad_create_import_curve_txt(txt_filepath, units='METER', dimension='2D', fra
     script.append_lines(lines)
     return
 
-def cad_create_import_ccs(ccs_filepath):
+def cad_create_import_ccs(ccs_filepath: str) -> None:
     """
-    Appends lines to script state to import a CAD-->Create drawing curve from a csv file.
-    
+    Import a CAD->Create drawing curve from a CCS file.
 
-    :param ccs_filepath: Path to the csv file to import.
+    This function appends a command to the script state to import a drawing
+    curve from a specified CCS (Curve-Curve-Section) file.
+
+    Parameters
+    ----------
+    ccs_filepath : str
+        The absolute path to the CCS file to import.
+
+    Raises
+    ------
+    FileNotFoundError
+        If `ccs_filepath` does not exist.
+
+    Examples
+    --------
+    >>> # Import a curve from a CCS file
+    >>> cad_create_import_ccs(ccs_filepath='C:/path/to/curve.ccs')
     """
     check_file_existence(ccs_filepath)
     
@@ -77,35 +152,67 @@ def cad_create_import_ccs(ccs_filepath):
     script.append_lines(lines)
     return
 
-def cad_create_auto_cross_sections(frame=1, axis='Y', sections=20, body_index=1, 
-                               growth_scheme=3, growth_rate=1.2, symmetry='NONE', cad_mesh='MESH'):
+def cad_create_auto_cross_sections(
+    frame: int = 1,
+    axis: ValidAxis = 'Y',
+    sections: int = 20,
+    body_index: int = 1,
+    growth_scheme: ValidGrowthScheme = 3,
+    growth_rate: float = 1.2,
+    symmetry: ValidSymmetryPlanes = 'NONE',
+    cad_mesh: ValidCadMesh = 'MESH'
+) -> None:
     """
-    Appends lines to script state to create a series of automatic cross-sections from mesh body or CAD body.
-    
+    Create automatic cross-sections from a mesh or CAD body.
 
-    :param frame: Index of coordinate system to be used. Use value of 1 for reference coordinate system. Defaults to 1.
-    :param axis: Sweep direction for creating cross-section curves. One of the following: X, Y or Z. Defaults to 'Y'.
-    :param sections: Number of cross-sections requested (> 1). Defaults to 20.
-    :param body_index: Index of the mesh body to be used for creating cross-sections (> 0). Defaults to 1.
-    :param growth_scheme: Clustering scheme to be used when positioning cross-sections along the sweep axis. 
-                          One of the following: 1: Uniform, 2:Successive, 3:Dual-successive, 4: Reverse-successive. Defaults to 3.
-    :param growth_rate: Growth rate to be used with the selected growth_scheme. Use value of 1.0 for uniform spacing of cross-sections. Defaults to 1.2.
-    :param symmetry: Specify which symmetry plane (if any) to be used for creating half-section curves. 
-                     Use one of the following: YZ, XZ or XY. If full section is desired instead, use NONE. Defaults to 'NONE'.
-    :param cad_mesh: Specify whether the CAD body or mesh body with specified index should be used for generation of cross sections. 
-                     Use 'CAD' for CAD body or 'MESH' for mesh body. Defaults to 'MESH'.
-    
-    Example usage:
-        pyfs.cad_create_auto_cross_sections(1, 'Y', 20, 1, 3, 1.2, 'NONE', 'MESH')
+    This function appends a command to the script state to create a series
+    of automatic cross-sections from a specified mesh or CAD body.
+
+    Parameters
+    ----------
+    frame : int, optional
+        Index of the coordinate system to be used. Defaults to 1.
+    axis : ValidAxis, optional
+        Sweep direction for creating cross-section curves ('X', 'Y', 'Z').
+        Defaults to 'Y'.
+    sections : int, optional
+        Number of cross-sections to create (> 1). Defaults to 20.
+    body_index : int, optional
+        Index of the mesh or CAD body to use. Defaults to 1.
+    growth_scheme : ValidGrowthScheme, optional
+        Clustering scheme for positioning cross-sections.
+        1: Uniform, 2: Successive, 3: Dual-successive, 4: Reverse-successive.
+        Defaults to 3.
+    growth_rate : float, optional
+        Growth rate for the selected growth scheme. Defaults to 1.2.
+    symmetry : ValidSymmetryPlanes, optional
+        Symmetry plane ('XY', 'XZ', 'YZ') for half-sections, or 'NONE' for
+        full sections. Defaults to 'NONE'.
+    cad_mesh : ValidCadMesh, optional
+        Specifies whether to use the 'CAD' or 'MESH' body. Defaults to 'MESH'.
+
+    Raises
+    ------
+    ValueError
+        If any of the input parameters are invalid.
+
+    Examples
+    --------
+    >>> # Create default automatic cross-sections
+    >>> cad_create_auto_cross_sections()
+
+    >>> # Create 50 cross-sections along the X-axis with uniform growth
+    >>> cad_create_auto_cross_sections(
+    ...     axis='X', sections=50, growth_scheme=1, growth_rate=1.0
+    ... )
     """
     
     # Type and value checking
     if not isinstance(frame, int) or frame <= 0:
         raise ValueError("`frame` should be a positive integer value.")
     
-    valid_axes = ['X', 'Y', 'Z']
-    if axis not in valid_axes:
-        raise ValueError(f"`axis` should be one of {valid_axes}. Received: {axis}")
+    if axis not in VALID_AXIS_LIST:
+        raise ValueError(f"`axis` should be one of {VALID_AXIS_LIST}. Received: {axis}")
     
     if not isinstance(sections, int) or sections <= 1:
         raise ValueError("`sections` should be an integer greater than 1.")
@@ -113,20 +220,17 @@ def cad_create_auto_cross_sections(frame=1, axis='Y', sections=20, body_index=1,
     if not isinstance(body_index, int) or body_index <= 0:
         raise ValueError("`body_index` should be a positive integer value.")
     
-    valid_growth_schemes = [1, 2, 3, 4]
-    if growth_scheme not in valid_growth_schemes:
-        raise ValueError(f"`growth_scheme` should be one of {valid_growth_schemes}. Received: {growth_scheme}")
+    if growth_scheme not in VALID_GROWTH_SCHEME_LIST:
+        raise ValueError(f"`growth_scheme` should be one of {VALID_GROWTH_SCHEME_LIST}. Received: {growth_scheme}")
     
     if not isinstance(growth_rate, (int, float)) or growth_rate <= 0:
         raise ValueError("`growth_rate` should be a positive numeric value.")
     
-    valid_symmetry = ['YZ', 'XZ', 'XY', 'NONE']
-    if symmetry not in valid_symmetry:
-        raise ValueError(f"`symmetry` should be one of {valid_symmetry}. Received: {symmetry}")
+    if symmetry not in VALID_SYMMETRY_PLANE_LIST:
+        raise ValueError(f"`symmetry` should be one of {VALID_SYMMETRY_PLANE_LIST}. Received: {symmetry}")
     
-    valid_cad_mesh = ['CAD', 'MESH']
-    if cad_mesh not in valid_cad_mesh:
-        raise ValueError(f"`cad_mesh` should be one of {valid_cad_mesh}. Received: {cad_mesh}")
+    if cad_mesh not in VALID_CAD_MESH_LIST:
+        raise ValueError(f"`cad_mesh` should be one of {VALID_CAD_MESH_LIST}. Received: {cad_mesh}")
     
     lines = [
         "#************************************************************************",
@@ -139,30 +243,58 @@ def cad_create_auto_cross_sections(frame=1, axis='Y', sections=20, body_index=1,
     script.append_lines(lines)
     return
 
-def cad_create_cross_section(frame=1, plane='XZ', offset=0.0, body_index=1, quadrant=3):
+def cad_create_cross_section(
+    frame: int = 1,
+    plane: ValidPlanes = 'XZ',
+    offset: float = 0.0,
+    body_index: int = 1,
+    quadrant: ValidQuadrant = 3
+) -> None:
     """
-    Appends lines to script state to create a cross-section from an existing mesh body.
-    
+    Create a cross-section from an existing mesh body.
 
-    :param frame: Index of coordinate system to be used. Defaults to 1.
-    :param plane: Plane of the selected coordinate system to use for slicing the mesh faces (YZ, XZ, XY). Defaults to 'XZ'.
-    :param offset: Offset distance of the selected plane along the normal axis of the plane. Defaults to 0.0.
-    :param body_index: Index of the mesh body to be used for creating cross-section. Defaults to 1.
-    :param quadrant: Quadrant information for creating cross-section.
+    This function appends a command to the script state to create a
+    cross-section from an existing mesh body with specified parameters.
 
-    Value YZ  XZ  XY 
-        1 +Y +X +X
-        2 -Y -X -X
-        3 +Z +Z +Y
-        4 -Z -Z -Y   
+    Parameters
+    ----------
+    frame : int, optional
+        Index of the coordinate system to be used. Defaults to 1.
+    plane : ValidPlanes, optional
+        Plane of the coordinate system for slicing ('XY', 'XZ', 'YZ').
+        Defaults to 'XZ'.
+    offset : float, optional
+        Offset distance of the plane along its normal axis. Defaults to 0.0.
+    body_index : int, optional
+        Index of the mesh body to use for creating the cross-section.
+        Defaults to 1.
+    quadrant : ValidQuadrant, optional
+        Quadrant information for creating the cross-section.
+        - YZ plane: 1 (+Y), 2 (-Y), 3 (+Z), 4 (-Z)
+        - XZ plane: 1 (+X), 2 (-X), 3 (+Z), 4 (-Z)
+        - XY plane: 1 (+X), 2 (-X), 3 (+Y), 4 (-Y)
+        Defaults to 3.
+
+    Raises
+    ------
+    ValueError
+        If any of the input parameters are invalid.
+
+    Examples
+    --------
+    >>> # Create a default cross-section
+    >>> cad_create_cross_section()
+
+    >>> # Create a cross-section on the YZ plane with a specific offset
+    >>> cad_create_cross_section(plane='YZ', offset=5.0, quadrant=1)
     """
     
     # Type checks and validations
     if not isinstance(frame, int) or frame <= 0:
         raise ValueError("Frame should be an integer greater than 0.")
     
-    if plane not in ['YZ', 'XZ', 'XY']:
-        raise ValueError("Invalid plane value. Allowed values: YZ, XZ, XY.")
+    if plane not in VALID_PLANE_LIST:
+        raise ValueError(f"Invalid plane value. Allowed values: {VALID_PLANE_LIST}.")
     
     if not isinstance(offset, (int, float)):
         raise ValueError("Offset should be a numeric value.")
@@ -170,8 +302,8 @@ def cad_create_cross_section(frame=1, plane='XZ', offset=0.0, body_index=1, quad
     if not isinstance(body_index, int) or body_index <= 0:
         raise ValueError("Body index should be an integer greater than 0.")
     
-    if not isinstance(quadrant, int) or quadrant not in [1, 2, 3, 4]:
-        raise ValueError("Quadrant should be one of the following integer values: 1, 2, 3, 4.")
+    if quadrant not in VALID_QUADRANT_LIST:
+        raise ValueError(f"Quadrant should be one of the following integer values: {VALID_QUADRANT_LIST}.")
     
     lines = [
         "#************************************************************************",
@@ -184,25 +316,39 @@ def cad_create_cross_section(frame=1, plane='XZ', offset=0.0, body_index=1, quad
     script.append_lines(lines)
     return
 
-def cad_create_point_curve(x=0.0, y=1.0, z=0.0):
+def cad_create_point_curve(x: float = 0.0, y: float = 1.0, z: float = 0.0) -> None:
     """
-    Appends lines to script state to create a singular point curve in 3D.
-    
+    Create a singular point curve in 3D space.
 
-    :param x: X coordinate of the point curve.
-    :param y: Y coordinate of the point curve.
-    :param z: Z coordinate of the point curve.
+    This function appends a command to the script state to create a single
+    point curve at the specified 3D coordinates.
+
+    Parameters
+    ----------
+    x : float, optional
+        The X-coordinate of the point curve. Defaults to 0.0.
+    y : float, optional
+        The Y-coordinate of the point curve. Defaults to 1.0.
+    z : float, optional
+        The Z-coordinate of the point curve. Defaults to 0.0.
+
+    Raises
+    ------
+    ValueError
+        If any of the coordinates are not numeric values.
+
+    Examples
+    --------
+    >>> # Create a point curve at the default coordinates
+    >>> cad_create_point_curve()
+
+    >>> # Create a point curve at a custom location
+    >>> cad_create_point_curve(x=10.5, y=-5.2, z=2.0)
     """
     
     # Type checks and validations
-    if not isinstance(x, (int, float)):
-        raise ValueError("X should be a numeric value.")
-    
-    if not isinstance(y, (int, float)):
-        raise ValueError("Y should be a numeric value.")
-    
-    if not isinstance(z, (int, float)):
-        raise ValueError("Z should be a numeric value.")
+    if not all(isinstance(coord, (int, float)) for coord in [x, y, z]):
+        raise ValueError("All coordinates (x, y, z) must be numeric values.")
     
     lines = [
         "#************************************************************************",
@@ -215,14 +361,45 @@ def cad_create_point_curve(x=0.0, y=1.0, z=0.0):
     script.append_lines(lines)
     return
 
-def cad_create_curve_arc(x0=0.0, y0=0.0, z0=0.0, x1=-1.0, y1=0.0, z1=0.0, x2=0.0, y2=1.0, z2=0.0):
+def cad_create_curve_arc(
+    x0: float = 0.0, y0: float = 0.0, z0: float = 0.0,
+    x1: float = -1.0, y1: float = 0.0, z1: float = 0.0,
+    x2: float = 0.0, y2: float = 1.0, z2: float = 0.0
+) -> None:
     """
-    Appends lines to script state to create a circular arc curve in 3D.
-    
+    Create a circular arc curve in 3D space.
 
-    :param x0, y0, z0: Vertex coordinates of the origin of the circular arc.
-    :param x1, y1, z1: Vertex coordinates of the first vertex of the circular arc curve.
-    :param x2, y2, z2: Vertex coordinates of the second vertex of the circular arc curve.
+    This function appends a command to the script state to create a circular
+    arc curve defined by an origin, a first vertex, and a second vertex.
+
+    Parameters
+    ----------
+    x0, y0, z0 : float, optional
+        Coordinates of the origin of the circular arc.
+        Defaults to (0.0, 0.0, 0.0).
+    x1, y1, z1 : float, optional
+        Coordinates of the first vertex of the circular arc.
+        Defaults to (-1.0, 0.0, 0.0).
+    x2, y2, z2 : float, optional
+        Coordinates of the second vertex of the circular arc.
+        Defaults to (0.0, 1.0, 0.0).
+
+    Raises
+    ------
+    ValueError
+        If any of the coordinates are not numeric values.
+
+    Examples
+    --------
+    >>> # Create a default circular arc
+    >>> cad_create_curve_arc()
+
+    >>> # Create a custom circular arc
+    >>> cad_create_curve_arc(
+    ...     x0=1, y0=1, z0=0,
+    ...     x1=2, y1=1, z1=0,
+    ...     x2=1, y2=2, z2=0
+    ... )
     """
     
     # Type checks and validations
@@ -241,16 +418,31 @@ def cad_create_curve_arc(x0=0.0, y0=0.0, z0=0.0, x1=-1.0, y1=0.0, z1=0.0, x2=0.0
     script.append_lines(lines)
     return
 
-def cad_create_curve_select(curve_index=1):
+def cad_create_curve_select(curve_index: int = 1) -> None:
     """
-    Appends lines to script state to select one of the CAD-->Create drawing curves.
-    
+    Select a CAD->Create drawing curve.
 
-    :param curve_index: Index of the drawing curve to be selected.
-    
-    Example usage:
-    cad_create_curve_select(, 2)
-    cad_create_curve_select(, -1)  # To select ALL curves
+    This function appends a command to the script state to select one or all
+    of the CAD->Create drawing curves.
+
+    Parameters
+    ----------
+    curve_index : int, optional
+        The index of the drawing curve to be selected. A value of -1 selects
+        all curves. Must be a non-zero integer. Defaults to 1.
+
+    Raises
+    ------
+    ValueError
+        If `curve_index` is 0.
+
+    Examples
+    --------
+    >>> # Select curve with index 2
+    >>> cad_create_curve_select(curve_index=2)
+
+    >>> # Select all curves
+    >>> cad_create_curve_select(curve_index=-1)
     """
     
     # Type and value checking
@@ -268,16 +460,31 @@ def cad_create_curve_select(curve_index=1):
     script.append_lines(lines)
     return
 
-def cad_create_curve_unselect(curve_index=1):
+def cad_create_curve_unselect(curve_index: int = 1) -> None:
     """
-    Appends lines to script state to unselect one of the CAD-->Create drawing curves.
-    
+    Unselect a CAD->Create drawing curve.
 
-    :param curve_index: Index of the drawing curve to be unselected.
-    
-    Example usage:
-    cad_create_curve_unselect(, 1)
-    cad_create_curve_unselect(, -1)  # To unselect ALL curves
+    This function appends a command to the script state to unselect one or
+    all of the CAD->Create drawing curves.
+
+    Parameters
+    ----------
+    curve_index : int, optional
+        The index of the drawing curve to be unselected. A value of -1
+        unselects all curves. Must be a non-zero integer. Defaults to 1.
+
+    Raises
+    ------
+    ValueError
+        If `curve_index` is 0.
+
+    Examples
+    --------
+    >>> # Unselect curve with index 1
+    >>> cad_create_curve_unselect(curve_index=1)
+
+    >>> # Unselect all curves
+    >>> cad_create_curve_unselect(curve_index=-1)
     """
     
     # Type and value checking
@@ -295,49 +502,59 @@ def cad_create_curve_unselect(curve_index=1):
     script.append_lines(lines)
     return
 
-def cad_create_curve_reverse(curve_index=1):
+def cad_create_curve_reverse(curve_index: int = 1) -> None:
     """
-    Appends lines to script state to reverse CAD->Create drawing curves by index.
+    Reverse a CAD->Create drawing curve.
 
+    This function appends a command to the script state to reverse the
+    direction of a specified CAD->Create drawing curve.
 
-    :param curve_index: Index of the drawing curve to be reversed.
+    Parameters
+    ----------
+    curve_index : int, optional
+        The index of the drawing curve to be reversed. A value of -1 reverses
+        all curves. Defaults to 1.
 
-    Example usage:
-    cad_create_curve_reverse(, 2)
+    Raises
+    ------
+    ValueError
+        If `curve_index` is not an integer.
+
+    Examples
+    --------
+    >>> # Reverse curve with index 2
+    >>> cad_create_curve_reverse(curve_index=2)
+
+    >>> # Reverse all curves
+    >>> cad_create_curve_reverse(curve_index=-1)
     """
 
     # Type and value checking
     if not isinstance(curve_index, int):
         raise ValueError("`curve_index` should be an integer value.")
 
-    if curve_index == -1:
-        lines = [
-            "#************************************************************************",
-            "#********** Reverse ALL of the CAD-->Create drawing curves **************",
-            "#************************************************************************",
-            "#",
-            "CAD_CREATE_CURVE_REVERSE -1"
-        ]
-    else:
-        lines = [
-            "#************************************************************************",
-            "#********** Reverse specific CAD-->Create drawing curves by index *******",
-            "#************************************************************************",
-            "#",
-            f"CAD_CREATE_CURVE_REVERSE {curve_index}"
-        ]
+    lines = [
+        "#************************************************************************",
+        f"#********** Reverse {'ALL' if curve_index == -1 else 'specific'} CAD-->Create drawing curves{' by index' if curve_index != -1 else ''} *******",
+        "#************************************************************************",
+        "#",
+        f"CAD_CREATE_CURVE_REVERSE {curve_index}"
+    ]
 
     script.append_lines(lines)
     return
 
-def cad_create_curve_delete_all():
+def cad_create_curve_delete_all() -> None:
     """
-    Appends lines to script state to delete all CAD->Create drawing curves.
+    Delete all CAD->Create drawing curves.
 
+    This function appends a command to the script state to delete all
+    existing CAD->Create drawing curves.
 
-
-    Example usage:
-    cad_create_curve_delete_all()
+    Examples
+    --------
+    >>> # Delete all drawing curves
+    >>> cad_create_curve_delete_all()
     """
 
     lines = [
@@ -351,14 +568,17 @@ def cad_create_curve_delete_all():
     script.append_lines(lines)
     return
 
-def cad_create_curve_delete_selected():
+def cad_create_curve_delete_selected() -> None:
     """
-    Appends lines to script state to delete only selected CAD-->Create drawing curves.
+    Delete selected CAD->Create drawing curves.
 
+    This function appends a command to the script state to delete only the
+    selected CAD->Create drawing curves.
 
-    
-    Example usage:
-    cad_create_curve_delete_selected()
+    Examples
+    --------
+    >>> # Delete all selected drawing curves
+    >>> cad_create_curve_delete_selected()
     """
     
     lines = [
@@ -372,14 +592,17 @@ def cad_create_curve_delete_selected():
     script.append_lines(lines)
     return
 
-def cad_create_curve_delete_unselected():
+def cad_create_curve_delete_unselected() -> None:
     """
-    Appends lines to script state to delete only unselected CAD-->Create drawing curves.
+    Delete unselected CAD->Create drawing curves.
 
+    This function appends a command to the script state to delete only the
+    unselected CAD->Create drawing curves.
 
-    
-    Example usage:
-    cad_create_curve_delete_unselected()
+    Examples
+    --------
+    >>> # Delete all unselected drawing curves
+    >>> cad_create_curve_delete_unselected()
     """
     
     lines = [
@@ -393,15 +616,27 @@ def cad_create_curve_delete_unselected():
     script.append_lines(lines)
     return
 
-def cad_create_curve_export_ccs(file_path):
+def cad_create_curve_export_ccs(file_path: str) -> None:
     """
-    Appends lines to script state to export selected CAD-->Create drawing curves to CSV file.
+    Export selected CAD->Create drawing curves to a CCS file.
 
+    This function appends a command to the script state to export the
+    selected CAD->Create drawing curves to a specified CCS file.
 
-    :param file_path: File name with the path to the file.
-    
-    Example usage:
-    cad_create_curve_export_ccs(, 'C:\\Users\\Desktop\\Geometries\\sample_CCS_export.csv')
+    Parameters
+    ----------
+    file_path : str
+        The absolute path to the output CCS file.
+
+    Raises
+    ------
+    ValueError
+        If `file_path` is not a string.
+
+    Examples
+    --------
+    >>> # Export selected curves to a file
+    >>> cad_create_curve_export_ccs(file_path='C:/path/to/exported_curves.ccs')
     """
     
     # Type and value checking
@@ -420,16 +655,29 @@ def cad_create_curve_export_ccs(file_path):
     script.append_lines(lines)
     return
 
-def cad_import_cad(cad_filepath):
+def cad_import_cad(cad_filepath: str) -> None:
     """
-    Appends lines to script state to import a CAD geometry into the simulation.
-    
+    Import a CAD geometry into the simulation.
 
-    :param cad_filepath: Path to the CAD file.
-    
-    Example usage:
-    cad_import_cad('C:\\Users\\Desktop\\Geometries\\sample.igs')
+    This function appends a command to the script state to import a CAD
+    geometry from a specified file path.
+
+    Parameters
+    ----------
+    cad_filepath : str
+        The absolute path to the CAD file.
+
+    Raises
+    ------
+    FileNotFoundError
+        If `cad_filepath` does not exist.
+
+    Examples
+    --------
+    >>> # Import a CAD file
+    >>> cad_import_cad(cad_filepath='C:/path/to/geometry.igs')
     """
+    check_file_existence(cad_filepath)
 
     lines = [
         "#************************************************************************",
@@ -443,21 +691,33 @@ def cad_import_cad(cad_filepath):
     script.append_lines(lines)
     return
 
-def convert_cad_to_mesh(model_index):
+def convert_cad_to_mesh(model_index: int) -> None:
     """
-    Appends lines to script state to transfer CAD model mesh to the 
-    Mesh node of the simulation.
-    
+    Transfer a CAD model mesh to the Mesh node of the simulation.
 
-    :param model_index: Index of the CAD model to be transferred to the mesh node.
-    
-    Example usage:
-    convert_cad_to_mesh(, 1)
+    This function appends a command to the script state to transfer the mesh
+    of a specified CAD model to the Mesh node of the simulation.
+
+    Parameters
+    ----------
+    model_index : int
+        The index of the CAD model to be transferred. Must be a positive
+        integer.
+
+    Raises
+    ------
+    ValueError
+        If `model_index` is not a positive integer.
+
+    Examples
+    --------
+    >>> # Convert CAD model with index 1 to a mesh
+    >>> convert_cad_to_mesh(model_index=1)
     """
     
     # Type and value checking
-    if not isinstance(model_index, int):
-        raise ValueError("`model_index` should be an integer value.")
+    if not isinstance(model_index, int) or model_index <= 0:
+        raise ValueError("`model_index` should be a positive integer value.")
     
     lines = [
         "#************************************************************************",
@@ -471,17 +731,39 @@ def convert_cad_to_mesh(model_index):
     return
 
 
-def cad_create_auto_annular_cross_sections(frame=1, sections=20, body_index=1):
+def cad_create_auto_annular_cross_sections(
+    frame: int = 1,
+    sections: int = 20,
+    body_index: int = 1
+) -> None:
     """
-    Appends lines to script state to create a series of automatic annular cross-sections.
-    
-    Args:
-        frame (int): Index of coordinate system to be used. Use value of 1 for reference coordinate system. Defaults to 1.
-        sections (int): Number of cross-sections requested (> 1). Defaults to 20.
-        body_index (int): Index of the mesh body to be used for creating cross-sections (> 0). Defaults to 1.
-    
-    Example usage:
-    cad_create_auto_annular_cross_sections(1, 20, 2)
+    Create a series of automatic annular cross-sections.
+
+    This function appends a command to the script state to create a series
+    of automatic annular cross-sections from a specified mesh body.
+
+    Parameters
+    ----------
+    frame : int, optional
+        Index of the coordinate system to be used. Defaults to 1.
+    sections : int, optional
+        Number of cross-sections to create (> 1). Defaults to 20.
+    body_index : int, optional
+        Index of the mesh body to use for creating cross-sections.
+        Defaults to 1.
+
+    Raises
+    ------
+    ValueError
+        If `frame`, `sections`, or `body_index` are not valid integers.
+
+    Examples
+    --------
+    >>> # Create default annular cross-sections
+    >>> cad_create_auto_annular_cross_sections()
+
+    >>> # Create 30 annular cross-sections for body index 2
+    >>> cad_create_auto_annular_cross_sections(sections=30, body_index=2)
     """
     
     # Type and value checking

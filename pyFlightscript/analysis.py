@@ -327,18 +327,36 @@ def vorticity_lift_model(enable: bool = True) -> None:
     script.append_lines(lines)
     return
 
-def loads_and_moments_units(unit_type='NEWTONS'):
+def loads_and_moments_units(unit_type: ValidForceUnits = 'NEWTONS') -> None:
     """
-    Appends lines to script state to set the loads and moments units.
+    Set the units for loads and moments in the analysis.
 
+    This function appends a command to the script state to specify the
+    units used for evaluating aerodynamic loads and moments.
 
-    :param unit_type: Unit type for loads and moments.
+    Parameters
+    ----------
+    unit_type : ValidForceUnits, optional
+        The unit type for loads and moments. Can be one of 'COEFFICIENTS',
+        'NEWTONS', 'KILO-NEWTONS', 'POUND-FORCE', or 'KILOGRAM-FORCE'.
+        Defaults to 'NEWTONS'.
 
-    Example usage:
-    set_loads_and_moments_units()
+    Raises
+    ------
+    ValueError
+        If `unit_type` is not a valid force unit.
+
+    Examples
+    --------
+    >>> # Set the loads and moments units to pound-force
+    >>> loads_and_moments_units(unit_type='POUND-FORCE')
+
+    >>> # Use the default units (Newtons)
+    >>> loads_and_moments_units()
     """
     
-    check_valid_force_units(unit_type)
+    if unit_type not in VALID_FORCE_UNITS_LIST:
+        raise ValueError(f"`unit_type` must be one of {VALID_FORCE_UNITS_LIST}")
 
     lines = [
         "#************************************************************************",
@@ -350,23 +368,42 @@ def loads_and_moments_units(unit_type='NEWTONS'):
     script.append_lines(lines)
     return
 
-def analysis_boundaries(num_boundaries, boundaries_list=[]):
+def analysis_boundaries(num_boundaries: int, boundaries_list: List[int]) -> None:
     """
-    Appends lines to script state to set the solver analysis boundaries.
+    Set the solver analysis boundaries.
 
+    This function appends a command to the script state to specify which
+    boundaries are used in the solver analysis.
 
-    :param num_boundaries: Number of solver boundaries being enabled.
-    :param boundaries_list: List of solver boundaries to be enabled.
+    Parameters
+    ----------
+    num_boundaries : int
+        The number of solver boundaries being enabled. Must be a positive integer.
+    boundaries_list : List[int]
+        A list of solver boundary indices to be enabled. The length of this list
+        must match `num_boundaries`.
 
-    Example usage:
-    analysis_boundaries(, 5, [1, 2, 4, 5, 7])
+    Raises
+    ------
+    ValueError
+        If `num_boundaries` is not a positive integer, if `boundaries_list` is
+        not a list of integers, or if the length of `boundaries_list` does not
+        match `num_boundaries`.
+
+    Examples
+    --------
+    >>> # Set boundaries 1, 2, 4, 5, and 7 for the analysis.
+    >>> analysis_boundaries(num_boundaries=5, boundaries_list=[1, 2, 4, 5, 7])
     """
     
     if not isinstance(num_boundaries, int) or num_boundaries <= 0:
         raise ValueError("`num_boundaries` should be a positive integer value.")
 
+    if not isinstance(boundaries_list, list) or not all(isinstance(i, int) for i in boundaries_list):
+        raise ValueError("`boundaries_list` must be a list of integers.")
+
     if len(boundaries_list) != num_boundaries:
-        raise ValueError("Mismatch in number of boundaries and provided list size.")
+        raise ValueError("The length of `boundaries_list` must match `num_boundaries`.")
 
     boundaries_str = ','.join(map(str, boundaries_list))
     lines = [
@@ -381,11 +418,31 @@ def analysis_boundaries(num_boundaries, boundaries_list=[]):
     script.append_lines(lines)
     return
 
-def set_inviscid_loads(enable):
+def set_inviscid_loads(enable: bool) -> None:
     """
-    Enables or disables the computation of inviscid loads and moments only.
+    Enable or disable the computation of inviscid loads and moments only.
 
-    :param enable: Boolean to enable (True) or disable (False) the feature.
+    This function appends a command to the script state to control whether
+    the analysis should compute only inviscid loads and moments.
+
+    Parameters
+    ----------
+    enable : bool
+        If True, enables the computation of inviscid loads and moments only.
+        If False, disables it.
+
+    Raises
+    ------
+    ValueError
+        If `enable` is not a boolean value.
+
+    Examples
+    --------
+    >>> # Enable inviscid loads and moments only
+    >>> set_inviscid_loads(enable=True)
+
+    >>> # Disable inviscid loads and moments only
+    >>> set_inviscid_loads(enable=False)
     """
     
     # Type checking

@@ -1,28 +1,56 @@
 import os
 from .utils import *    
 from .script import script
+from .types import *
+from typing import Union, Optional, Literal, List
 
-def create_new_base_region(surface, base_type='EMPIRICAL', base_pressure_coefficient=-0.2):
+def create_new_base_region(
+    surface: int,
+    base_type: str = 'EMPIRICAL',
+    base_pressure_coefficient: float = -0.2
+) -> None:
     """
-    Appends lines to script state to create a new base region.
+    Create a new base region.
 
-    :param surface: Index of the boundary surface to be marked as base region boundary.
-    :param base_type: Type of base region calculation. Options are 'EMPIRICAL' or 'CONSTANT'. Defaults to 'EMPIRICAL'.
-    :param base_pressure_coefficient: Pressure coefficient to be applied in base regions. Defaults to -0.2.
+    This function appends a command to the script state to create a new base
+    region with a specified surface, base type, and pressure coefficient.
 
-    Example usage:
-    create_new_base_region(3, base_type='EMPIRICAL', base_pressure_coefficient=-0.2)
+    Parameters
+    ----------
+    surface : int
+        The index of the boundary surface to be marked as a base region boundary.
+        Must be an integer greater than 0.
+    base_type : str, optional
+        The type of base region calculation. Can be either 'EMPIRICAL' or
+        'CONSTANT'. Defaults to 'EMPIRICAL'.
+    base_pressure_coefficient : float, optional
+        The pressure coefficient to be applied in the base regions.
+        Defaults to -0.2.
+
+    Raises
+    ------
+    ValueError
+        If `surface` is not a positive integer, if `base_type` is not a
+        valid base region type, or if `base_pressure_coefficient` is not a
+        numeric value.
+
+    Examples
+    --------
+    >>> # Create a new base region with default parameters
+    >>> create_new_base_region(surface=3)
+
+    >>> # Create a new base region with a constant base type
+    >>> create_new_base_region(surface=4, base_type='CONSTANT', base_pressure_coefficient=-0.15)
     """
     
     # Type and value checking
     if not isinstance(surface, int) or surface <= 0:
         raise ValueError("`surface` should be an integer value greater than 0.")
     
-    if not isinstance(base_pressure_coefficient, (int, float)):
-        raise ValueError("`base_pressure_coefficient` should be an integer or float value.")
     
-    if base_type not in ['EMPIRICAL', 'CONSTANT']:
-        raise ValueError("`base_type` should be either 'EMPIRICAL' or 'CONSTANT'.")
+        
+    if not isinstance(base_pressure_coefficient, (int, float)):
+        raise ValueError("`base_pressure_coefficient` should be a numeric value.")
     
     lines = [
         "#************************************************************************",
@@ -39,9 +67,9 @@ def auto_detect_base_regions():
     """
     Appends lines to script state to auto-detect base regions on the geometry.
 
-    Example usage:
-    auto_detect_base_regions()
-
+    Examples
+    --------
+    >>> #auto_detect_base_regions()
 
     """
     
@@ -56,15 +84,31 @@ def auto_detect_base_regions():
     script.append_lines(lines)
     return
 
-def detect_base_regions_by_surface(boundary_index=1):
+def detect_base_regions_by_surface(boundary_index: int = 1) -> None:
     """
-    Example usage:
-    detect_base_regions_by_surface()
-    
-    Appends lines to script state to detect base regions by surface index.
-    
+    Detect base regions by surface index.
 
-    :param boundary_index: Index of the mesh boundary to use for marking base regions.
+    This function appends a command to the script state to detect base regions
+    using a specified mesh boundary index.
+
+    Parameters
+    ----------
+    boundary_index : int, optional
+        The index of the mesh boundary to use for marking base regions.
+        Must be a positive integer. Defaults to 1.
+
+    Raises
+    ------
+    ValueError
+        If `boundary_index` is not an integer greater than 0.
+
+    Examples
+    --------
+    >>> # Detect base regions using boundary index 2
+    >>> detect_base_regions_by_surface(boundary_index=2)
+
+    >>> # Detect base regions using the default boundary index
+    >>> detect_base_regions_by_surface()
     """
     
     # Type and value checking
@@ -82,22 +126,39 @@ def detect_base_regions_by_surface(boundary_index=1):
     script.append_lines(lines)
     return
 
-def set_base_region_trailing_edges(base_region_boundary=-1):
+def set_base_region_trailing_edges(base_region_boundary: int = -1) -> None:
     """
-    Example usage:
-    set_base_region_trailing_edges()
+    Set base region trailing edges.
 
-    Appends lines to script state to set base region trailing edges.
+    This function appends a command to the script state to set the trailing
+    edges for a specified base region boundary.
 
+    Parameters
+    ----------
+    base_region_boundary : int, optional
+        The index of the base region boundary to use for marking trailing edges.
+        A value of -1 indicates all base region boundaries. Must not be 0.
+        Defaults to -1.
 
-    :param base_region_boundary: Index of the base region boundary to use for marking trailing edges.
+    Raises
+    ------
+    ValueError
+        If `base_region_boundary` is not an integer or is equal to 0.
+
+    Examples
+    --------
+    >>> # Set trailing edges for base region boundary 3
+    >>> set_base_region_trailing_edges(base_region_boundary=3)
+
+    >>> # Set trailing edges for all base region boundaries
+    >>> set_base_region_trailing_edges()
     """
     
     # Type and value checking
     if not isinstance(base_region_boundary, int):
         raise ValueError("`base_region_boundary` should be an integer value.")
     if base_region_boundary == 0:
-        raise ValueError("`base_region_boundary` should be greater than 0 or -1.")
+        raise ValueError("`base_region_boundary` cannot be 0. It must be a positive integer or -1.")
     
     lines = [
         "#************************************************************************",
@@ -110,15 +171,27 @@ def set_base_region_trailing_edges(base_region_boundary=-1):
     script.append_lines(lines)
     return
 
-def delete_base_region(base_region_index):
+def delete_base_region(base_region_index: int) -> None:
     """
-    Example usage:
-    delete_base_region(2)
-    
-    Appends lines to script state to delete an existing base region.
-    
+    Delete an existing base region.
 
-    :param base_region_index: Index of the base region boundary to be deleted.
+    This function appends a command to the script state to delete an existing
+    base region by its index.
+
+    Parameters
+    ----------
+    base_region_index : int
+        The index of the base region to be deleted. Must be a positive integer.
+
+    Raises
+    ------
+    ValueError
+        If `base_region_index` is not an integer greater than 0.
+
+    Examples
+    --------
+    >>> # Delete the base region with index 2
+    >>> delete_base_region(base_region_index=2)
     """
     
     # Type and value checking
@@ -136,14 +209,27 @@ def delete_base_region(base_region_index):
     script.append_lines(lines)
     return
 
-def select_base_region(base_region_index):
+def select_base_region(base_region_index: int) -> None:
     """
-    Example usage:
-    select_base_region(2)
-    
-    Appends lines to script state to select an existing base region.
-    
-    :param base_region_index: Index of the base region boundary to be deleted.
+    Select an existing base region.
+
+    This function appends a command to the script state to select the faces
+    of an existing base region by its index.
+
+    Parameters
+    ----------
+    base_region_index : int
+        The index of the base region to be selected. Must be a positive integer.
+
+    Raises
+    ------
+    ValueError
+        If `base_region_index` is not an integer greater than 0.
+
+    Examples
+    --------
+    >>> # Select the base region with index 2
+    >>> select_base_region(base_region_index=2)
     """
     
     # Type and value checking
