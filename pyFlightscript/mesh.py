@@ -1,5 +1,6 @@
 from .utils import *    
 from .script import script
+from .types import *
 import numpy as np
 
 def import_mesh( geometry_filepath, units='METER', file_type='STL', clear=True):

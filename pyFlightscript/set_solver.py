@@ -1,5 +1,6 @@
 from .utils import *    
 from .script import script
+from .types import *
 from .types import ValidForceUnits, VALID_FORCE_UNITS_LIST, RunOptions
 
 def steady():

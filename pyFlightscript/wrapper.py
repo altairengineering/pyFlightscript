@@ -1,5 +1,6 @@
 from .utils import *    
 from .script import script
+from .types import *
 
 def wrapper_set_input(num_surfaces, surface_indices):
     """

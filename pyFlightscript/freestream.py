@@ -1,6 +1,7 @@
 import os
 from .utils import *    
 from .script import script
+from .types import *
 
 def set_freestream(
     freestream_type: str,

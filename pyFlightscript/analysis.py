@@ -1,6 +1,6 @@
 from .utils import *    
-from .script import script    
-from .types import *
+from .script import script
+from .types import *    
 from typing import Union, Optional, Literal, List
 
 def scene_contour(variable: int = 4) -> None:

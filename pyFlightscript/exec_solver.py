@@ -1,5 +1,6 @@
 from .utils import *    
-from .script import script    
+from .script import script
+from .types import *    
 
 def start_solver():
     """

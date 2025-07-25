@@ -1,5 +1,6 @@
 from .utils import *    
 from .script import script
+from .types import *
 
 def execute_solver_sweeper(results_filename, surface_results_path='', 
                            angle_of_attack='ENABLE', side_slip_angle='DISABLE', 

@@ -1,6 +1,7 @@
 import os
 from .utils import *    
 from .script import script
+from .types import *
 
 def boolean_unite_mesh(num_bodies, bodies_info=None):
     """

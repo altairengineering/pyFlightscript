@@ -1,6 +1,6 @@
 from .utils import *    
-from .script import script    
-from .types import *
+from .script import script
+from .types import *    
 
 def acoustic_sources(enable: bool = True) -> None:
     """

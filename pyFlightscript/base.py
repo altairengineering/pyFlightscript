@@ -2,6 +2,7 @@ import os
 from .utils import *    
 from .script import script
 from .types import *
+from .types import *
 from typing import Union, Optional, Literal, List
 
 def create_new_base_region(

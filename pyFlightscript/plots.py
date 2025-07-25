@@ -1,5 +1,6 @@
 from .utils import *    
 from .script import script
+from .types import *
 
 def set_plot_type(plot_type):
     """

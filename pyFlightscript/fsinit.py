@@ -1,5 +1,6 @@
 from .utils import *    
 from .script import script
+from .types import *
 from .types import RunOptions, ValidUnits, VALID_RUN_OPTIONS, VALID_UNITS_LIST, VALID_FORCE_UNITS_LIST
 
 def open_fsm(fsm_filepath: str, reset_parallel_cores: RunOptions = 'DISABLE', load_solver_initialization: RunOptions = 'ENABLE') -> None:

@@ -1,6 +1,7 @@
 import os
 from .utils import *    
 from .script import script
+from .types import *
 
 def physics(auto_trail_edges=False, auto_wake_nodes=False, end=True):
     """

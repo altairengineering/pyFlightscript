@@ -1,5 +1,6 @@
 from .utils import *    
 from .script import script
+from .types import *
 
 def clear():
     """
