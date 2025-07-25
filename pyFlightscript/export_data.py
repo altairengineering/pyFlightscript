@@ -1,16 +1,32 @@
 from .utils import *    
 from .script import script
 from .types import *
+from typing import Optional, List
 
-def export_solver_analysis_spreadsheet(output_file):
+def export_solver_analysis_spreadsheet(output_file: str) -> None:
     """
-    Appends lines to script state to export the aerodynamic results to the specified file.
-    
+    Export aerodynamic results to a spreadsheet file.
 
-    :param output_file: Path to the output file where the aerodynamic results will be stored.
-    
-    Example usage:
-    export_solver_analysis_spreadsheet(, 'C:\\Users\\Desktop\\Models\\scripting_test_output_data.txt')
+    This function appends a command to the script state to export the
+    aerodynamic results to a specified output file.
+
+    Parameters
+    ----------
+    output_file : str
+        The absolute path to the output file where the aerodynamic results
+        will be stored.
+
+    Raises
+    ------
+    ValueError
+        If `output_file` is not a string representing a valid file path.
+
+    Examples
+    --------
+    >>> # Export aerodynamic results to a text file
+    >>> export_solver_analysis_spreadsheet(
+    ...     output_file='C:/path/to/results.txt'
+    ... )
     """
     
     # Checking for valid file path
@@ -29,15 +45,30 @@ def export_solver_analysis_spreadsheet(output_file):
     script.append_lines(lines)
     return
 
-def export_solver_analysis_tecplot(output_file):
+def export_solver_analysis_tecplot(output_file: str) -> None:
     """
-    Appends lines to script state to export the Tecplot data based on the solver results for all initialized boundaries to the specified file.
-    
+    Export Tecplot data based on solver results.
 
-    :param output_file: Path to the output file where the Tecplot data will be stored.
-    
-    Example usage:
-    export_solver_analysis_tecplot(, 'C:\\Users\\Desktop\\Models\\scripting_test_output_data.dat')
+    This function appends a command to the script state to export Tecplot
+    data for all initialized boundaries to a specified file.
+
+    Parameters
+    ----------
+    output_file : str
+        The absolute path to the output file where the Tecplot data will be
+        stored.
+
+    Raises
+    ------
+    ValueError
+        If `output_file` is not a string representing a valid file path.
+
+    Examples
+    --------
+    >>> # Export Tecplot data to a .dat file
+    >>> export_solver_analysis_tecplot(
+    ...     output_file='C:/path/to/tecplot_data.dat'
+    ... )
     """
     
     # Checking for valid file path
@@ -56,23 +87,53 @@ def export_solver_analysis_tecplot(output_file):
     script.append_lines(lines)
     return
 
-def export_solver_analysis_vtk(output_filepath, surfaces, boundaries=None):
+def export_solver_analysis_vtk(
+    output_filepath: str,
+    surfaces: int,
+    boundaries: Optional[List[int]] = None
+) -> None:
     """
-    Appends lines to script state to export the Visualization Toolkit (*.vtk) 
-    file based on the solver results for the specified boundaries.
-    
+    Export a Visualization Toolkit (VTK) file based on solver results.
 
-    :param output_filepath: File name with path to output file.
-    :param surfaces: Number of boundaries that need to be exported, or -1 if all boundaries 
-    need to be exported.
-    :param boundaries: List of boundary indices to be exported, if applicable.
-    
-    Example usage:
-    # Export the first two solver boundaries in VTK file
-    export_solver_analysis_vtk(, 'C:\\Users\\Desktop\\Models\\scripting_test_output_data.vtk', 2, [1, 2])
-    # Export ALL solver boundaries in VTK file
-    export_solver_analysis_vtk(, 'C:\\Users\\Desktop\\Models\\scripting_test_output_data.vtk', -1)
+    This function appends a command to the script state to export a VTK file
+    for specified boundaries based on the solver results.
+
+    Parameters
+    ----------
+    output_filepath : str
+        The absolute path to the output VTK file.
+    surfaces : int
+        The number of boundaries to export. Use -1 to export all boundaries.
+    boundaries : Optional[List[int]], optional
+        A list of boundary indices to be exported. Required if `surfaces`
+        is not -1. Defaults to None.
+
+    Raises
+    ------
+    ValueError
+        If `surfaces` is not -1 and `boundaries` is not provided, or if the
+        length of `boundaries` does not match `surfaces`.
+
+    Examples
+    --------
+    >>> # Export the first two solver boundaries to a VTK file
+    >>> export_solver_analysis_vtk(
+    ...     output_filepath='C:/path/to/data.vtk',
+    ...     surfaces=2,
+    ...     boundaries=[1, 2]
+    ... )
+
+    >>> # Export all solver boundaries to a VTK file
+    >>> export_solver_analysis_vtk(
+    ...     output_filepath='C:/path/to/all_data.vtk',
+    ...     surfaces=-1
+    ... )
     """
+    if surfaces != -1 and boundaries is None:
+        raise ValueError("`boundaries` must be provided if `surfaces` is not -1.")
+    
+    if boundaries and len(boundaries) != surfaces:
+        raise ValueError("Length of `boundaries` list must match `surfaces` value.")
 
     lines = [
         "#************************************************************************",
@@ -90,29 +151,57 @@ def export_solver_analysis_vtk(output_filepath, surfaces, boundaries=None):
     script.append_lines(lines)
     return
 
-def set_vtk_export_variables(num_variables, export_wake, variables=None):
+def set_vtk_export_variables(
+    num_variables: int,
+    export_wake: RunOptions,
+    variables: Optional[List[str]] = None
+) -> None:
     """
-    Appends lines to script state to set the variables to be exported in the VTK file.
-    
+    Set the variables to be exported in the VTK file.
 
-    :param num_variables: Number of variables to be exported. For all variable export set value to -1
-    :param export_wake: Option to export wake filaments to VTK file. Either 'ENABLE' or 'DISABLE'.
-    :param variables: List of variables to be exported, if applicable.
-    
-    Example usage:
-    # Set a custom list of export variables in VTK file
-    set_vtk_export_variables(, 5, 'DISABLE', ['X', 'Y', 'Z', 'CP', 'PSTATIC'])
-    # Set all variables for export in VTK file
-    set_vtk_export_variables(, -1, 'ENABLE')
+    This function appends a command to the script state to configure the
+    variables that will be included in the VTK export.
+
+    Parameters
+    ----------
+    num_variables : int
+        The number of variables to be exported. Use -1 to export all
+        available variables.
+    export_wake : RunOptions
+        Option to export wake filaments to the VTK file ('ENABLE' or
+        'DISABLE').
+    variables : Optional[List[str]], optional
+        A list of specific variable names to be exported. Required if
+        `num_variables` is not -1. Defaults to None.
+
+    Raises
+    ------
+    ValueError
+        If `export_wake` is not a valid option, if `num_variables` is not
+        an integer, or if `variables` is not provided when required.
+
+    Examples
+    --------
+    >>> # Set a custom list of export variables for the VTK file
+    >>> set_vtk_export_variables(
+    ...     num_variables=5,
+    ...     export_wake='DISABLE',
+    ...     variables=['X', 'Y', 'Z', 'CP', 'PSTATIC']
+    ... )
+
+    >>> # Set all variables for export in the VTK file
+    >>> set_vtk_export_variables(num_variables=-1, export_wake='ENABLE')
     """
     
     # Type and value checking
-    valid_wakes = ['ENABLE', 'DISABLE']
-    if export_wake not in valid_wakes:
-        raise ValueError(f"export_wake should be one of {valid_wakes}")
+    if export_wake not in VALID_RUN_OPTIONS:
+        raise ValueError(f"export_wake should be one of {VALID_RUN_OPTIONS}")
     
     if not isinstance(num_variables, int):
         raise ValueError("`num_variables` should be an integer value.")
+        
+    if num_variables != -1 and variables is None:
+        raise ValueError("`variables` must be provided if `num_variables` is not -1.")
     
     lines = [
         "SET_VTK_EXPORT_VARIABLES",
@@ -126,47 +215,65 @@ def set_vtk_export_variables(num_variables, export_wake, variables=None):
     return
 
 def export_solver_analysis_csv(
-    file_path: str, 
-    format_value: str = 'DIFFERENCE-PRESSURE', 
-    units: str = 'PASCALS', 
-    surfaces: int = -1, 
+    file_path: str,
+    format_value: ValidExportFormat = 'PRESSURE',
+    units: ValidPressureUnits = 'PASCALS',
+    surfaces: int = -1,
     frame: int = 1,
-    boundary_indices: list = None
-):
+    boundary_indices: Optional[List[int]] = None
+) -> None:
     """
-    Appends lines to script state to export the FEM CSV based on the solver results.
-    :param file_path: File name with path to file.
-    :param format_value: Format of the export data. 
-    :param units: Units for the exported data.
-    :param surfaces: Number of boundaries to be exported or -1 for all.
-    :param boundary_indices: List of boundary indices.
-    
-    Example usage:
-    # Export the FEM CSV file for the first three boundaries
-    export_solver_analysis_csv('C:\\Users\\Desktop\\Models\\scripting_test_output_data.txt',
-                               surfaces=3, frame=1,
-                               boundary_indices=[1,2,3])
+    Export FEM CSV data based on solver results.
+
+    This function appends a command to the script state to export FEM CSV
+    data with specified formatting and units for selected boundaries.
+
+    Parameters
+    ----------
+    file_path : str
+        The absolute path to the output CSV file.
+    format_value : ValidExportFormat, optional
+        The format of the export data. Defaults to 'PRESSURE'.
+    units : ValidPressureUnits, optional
+        The units for the exported pressure data. Defaults to 'PASCALS'.
+    surfaces : int, optional
+        The number of boundaries to export. Use -1 for all boundaries.
+        Defaults to -1.
+    frame : int, optional
+        The coordinate system frame index. Defaults to 1.
+    boundary_indices : Optional[List[int]], optional
+        A list of boundary indices to export. Required if `surfaces` is not
+        -1. Defaults to None.
+
+    Raises
+    ------
+    ValueError
+        If `format_value` or `units` are invalid, or if `surfaces` is not
+        -1 and `boundary_indices` is not provided or its length mismatches.
+
+    Examples
+    --------
+    >>> # Export the FEM CSV file for the first three boundaries
+    >>> export_solver_analysis_csv(
+    ...     file_path='C:/path/to/data.csv',
+    ...     surfaces=3,
+    ...     boundary_indices=[1, 2, 3]
+    ... )
     """
 
-    valid_formats = ['CP-FREESTREAM', 'CP-REFERENCE', 'PRESSURE']
-    valid_units = ['PASCALS', 'MEGAPASCALS', 'BAR', 'ATMOSPHERES', 'PSI']
+    if format_value not in VALID_EXPORT_FORMAT_LIST:
+        raise ValueError(f"Invalid format value. Valid formats are: {VALID_EXPORT_FORMAT_LIST}")
 
+    if units not in VALID_PRESSURE_UNITS_LIST:
+        raise ValueError(f"Invalid unit type. Valid units are: {VALID_PRESSURE_UNITS_LIST}")
 
-    if format_value not in valid_formats:
-        raise ValueError(f"Invalid format value. Valid formats are: {valid_formats}")
-
-    if units not in valid_units:
-        raise ValueError(f"Invalid unit type. Valid units are: {valid_units}")
-
-    if surfaces != -1 and boundary_indices is None:
-        raise ValueError("`boundary_indices` must be provided if `surfaces` is not -1.")
-
-    if boundary_indices is not None:
-        if not isinstance(boundary_indices, list):
-            raise TypeError("`boundary_indices` must be a list of integers.")
-        for idx in boundary_indices:
-            if not isinstance(idx, int):
-                raise TypeError("Each element in `boundary_indices` must be an integer.")
+    if surfaces != -1:
+        if boundary_indices is None:
+            raise ValueError("`boundary_indices` must be provided if `surfaces` is not -1.")
+        if len(boundary_indices) != surfaces:
+            raise ValueError("Length of `boundary_indices` must match `surfaces`.")
+        if not all(isinstance(i, int) for i in boundary_indices):
+            raise TypeError("All elements in `boundary_indices` must be integers.")
 
     lines = [
         "#************************************************************************",
@@ -181,39 +288,59 @@ def export_solver_analysis_csv(
         f"SURFACES {surfaces}"
     ]
 
-    if surfaces != -1:
-        if not boundary_indices:
-            raise ValueError("`boundary_indices` must be provided if `surfaces` is not -1.")
+    if surfaces != -1 and boundary_indices:
         for boundary in boundary_indices:
             lines.append(str(boundary))
-    else:
-        lines.append("ALL")
 
     script.append_lines(lines)
     return
 
-def export_solver_analysis_pload_bdf(file_path, surfaces=-1, boundary_indices=None):
+def export_solver_analysis_pload_bdf(
+    file_path: str,
+    surfaces: int = -1,
+    boundary_indices: Optional[List[int]] = None
+) -> None:
     """
-    Appends lines to script state to export the NASTRAN PLOAD BDF based on the solver results.
-    
+    Export NASTRAN PLOAD BDF data based on solver results.
 
-    :param file_path: File name with path to file.
-    :param surfaces: Number of boundaries to be exported or -1 for all.
-    :param boundary_indices: List of boundary indices.
-    
-    Example usage:
-    # Export the NASTRAN PLOAD BDF file for the first three boundaries
-    export_solver_analysis_pload_bdf(, 
-                                     'C:\\Users\\Desktop\\Models\\scripting_test_output_data.bdf',
-                                     surfaces=3,
-                                     boundary_indices=[1,2,3])
+    This function appends a command to the script state to export a NASTRAN
+    PLOAD BDF file for specified boundaries.
+
+    Parameters
+    ----------
+    file_path : str
+        The absolute path to the output BDF file.
+    surfaces : int, optional
+        The number of boundaries to export. Use -1 for all boundaries.
+        Defaults to -1.
+    boundary_indices : Optional[List[int]], optional
+        A list of boundary indices to export. Required if `surfaces` is not
+        -1. Defaults to None.
+
+    Raises
+    ------
+    ValueError
+        If `surfaces` is not an integer, or if `surfaces` is not -1 and
+        `boundary_indices` is not provided or its length mismatches.
+
+    Examples
+    --------
+    >>> # Export the NASTRAN PLOAD BDF file for the first three boundaries
+    >>> export_solver_analysis_pload_bdf(
+    ...     file_path='C:/path/to/data.bdf',
+    ...     surfaces=3,
+    ...     boundary_indices=[1, 2, 3]
+    ... )
     """
     
     if not isinstance(surfaces, int):
         raise ValueError("`surfaces` should be an integer.")
     
-    if surfaces != -1 and boundary_indices is None:
-        raise ValueError("`boundary_indices` must be provided if `surfaces` is not -1.")
+    if surfaces != -1:
+        if boundary_indices is None:
+            raise ValueError("`boundary_indices` must be provided if `surfaces` is not -1.")
+        if len(boundary_indices) != surfaces:
+            raise ValueError("Length of `boundary_indices` must match `surfaces`.")
     
     lines = [
         "#************************************************************************",
@@ -232,27 +359,53 @@ def export_solver_analysis_pload_bdf(file_path, surfaces=-1, boundary_indices=No
     script.append_lines(lines)
     return
 
-def export_solver_analysis_force_distributions(output_filepath, surfaces=-1, boundary_indices=None):
+def export_solver_analysis_force_distributions(
+    output_filepath: str,
+    surfaces: int = -1,
+    boundary_indices: Optional[List[int]] = None
+) -> None:
     """
-    Appends lines to script state to export the force distribution vectors based on the solver results.
-    
+    Export force distribution vectors based on solver results.
 
-    :param output_filepath: Path to the output data file.
-    :param surfaces: Number of boundaries that need to be exported, or -1 if all boundaries need to be exported.
-    :param boundary_indices: List of boundary indices to be exported. If surfaces is not -1, this parameter must be provided.
-    
-    Example usage:
-    export_solver_analysis_force_distributions(, 'C:\\Users\\Desktop\\Models\\scripting_test_output_data.txt', 3, [1, 2, 3])
+    This function appends a command to the script state to export the force
+    distribution vectors for specified boundaries.
+
+    Parameters
+    ----------
+    output_filepath : str
+        The absolute path to the output data file.
+    surfaces : int, optional
+        The number of boundaries to export. Use -1 for all boundaries.
+        Defaults to -1.
+    boundary_indices : Optional[List[int]], optional
+        A list of boundary indices to export. Required if `surfaces` is not
+        -1. Defaults to None.
+
+    Raises
+    ------
+    ValueError
+        If `surfaces` is not an integer, or if `surfaces` is not -1 and
+        `boundary_indices` is not provided or its length mismatches.
+
+    Examples
+    --------
+    >>> # Export force distributions for three specified boundaries
+    >>> export_solver_analysis_force_distributions(
+    ...     output_filepath='C:/path/to/force_data.txt',
+    ...     surfaces=3,
+    ...     boundary_indices=[1, 2, 3]
+    ... )
     """
     
     # Type and value checking
     if not isinstance(surfaces, int):
         raise ValueError("`surfaces` should be an integer value.")
     
-    if surfaces != -1 and boundary_indices is None:
-        raise ValueError("`boundary_indices` should be provided when `surfaces` is not -1.")
-    
-    if boundary_indices:
+    if surfaces != -1:
+        if boundary_indices is None:
+            raise ValueError("`boundary_indices` must be provided when `surfaces` is not -1.")
+        if len(boundary_indices) != surfaces:
+            raise ValueError("Length of `boundary_indices` must match `surfaces`.")
         if not all(isinstance(b, int) for b in boundary_indices):
             raise ValueError("`boundary_indices` should be a list of integers.")
     
