@@ -160,7 +160,7 @@ def cad_create_auto_cross_sections(
     body_index: int = 1,
     growth_scheme: ValidGrowthScheme = 3,
     growth_rate: float = 1.2,
-    symmetry: ValidSymmetryPlanes = 'NONE',
+    symmetry: ValidSymmetry = 'NONE',
     cad_mesh: ValidCadMesh = 'MESH'
 ) -> None:
     """
@@ -186,7 +186,7 @@ def cad_create_auto_cross_sections(
         Defaults to 3.
     growth_rate : float, optional
         Growth rate for the selected growth scheme. Defaults to 1.2.
-    symmetry : ValidSymmetryPlanes, optional
+    symmetry : ValidSymmetry, optional
         Symmetry plane ('XY', 'XZ', 'YZ') for half-sections, or 'NONE' for
         full sections. Defaults to 'NONE'.
     cad_mesh : ValidCadMesh, optional
@@ -227,8 +227,8 @@ def cad_create_auto_cross_sections(
     if not isinstance(growth_rate, (int, float)) or growth_rate <= 0:
         raise ValueError("`growth_rate` should be a positive numeric value.")
     
-    if symmetry not in VALID_SYMMETRY_PLANE_LIST:
-        raise ValueError(f"`symmetry` should be one of {VALID_SYMMETRY_PLANE_LIST}. Received: {symmetry}")
+    if symmetry not in VALID_SYMMETRY_LIST:
+        raise ValueError(f"`symmetry` should be one of {VALID_SYMMETRY_LIST}. Received: {symmetry}")
     
     if cad_mesh not in VALID_CAD_MESH_LIST:
         raise ValueError(f"`cad_mesh` should be one of {VALID_CAD_MESH_LIST}. Received: {cad_mesh}")

@@ -3,14 +3,17 @@ from .script import script
 from .types import *
 import numpy as np
 
-def create_new_coordinate_system():
+def create_new_coordinate_system() -> None:
     """
-    Appends lines to script state to create a new coordinate system.
-    
-    Example usage:
-    create_new_coordinate_system()
+    Create a new coordinate system.
 
+    This function appends a command to the script state to create a new
+    local coordinate system.
 
+    Examples
+    --------
+    >>> # Create a new local coordinate system
+    >>> create_new_coordinate_system()
     """
     
     lines = [
@@ -24,42 +27,64 @@ def create_new_coordinate_system():
     script.append_lines(lines)
     return
 
-def edit_coordinate_system(frame: int, name: str, origin_x: float, origin_y: float, origin_z: float, 
-                           vector_x_x: float, vector_x_y: float, vector_x_z: float, 
-                           vector_y_x: float, vector_y_y: float, vector_y_z: float,
-                           vector_z_x: float, vector_z_y: float, vector_z_z: float):
+def edit_coordinate_system(
+    frame: int,
+    name: str,
+    origin_x: float, origin_y: float, origin_z: float,
+    vector_x_x: float, vector_x_y: float, vector_x_z: float,
+    vector_y_x: float, vector_y_y: float, vector_y_z: float,
+    vector_z_x: float, vector_z_y: float, vector_z_z: float
+) -> None:
     """
-    Appends lines to script state to edit a local coordinate system.
+    Edit a local coordinate system.
 
-    Example usage:
-    edit_coordinate_system(2, "Prop-1", 0, 1, 0.5,
-                           1, 0, 0, 0, -1, 0, 0, 0, -1.2)
+    This function appends a command to the script state to modify an existing
+    local coordinate system's properties, including its name, origin, and
+    axis vectors.
 
+    Parameters
+    ----------
+    frame : int
+        Index of the local coordinate system to edit. Must be > 1.
+    name : str
+        New name for the coordinate system.
+    origin_x, origin_y, origin_z : float
+        Coordinates of the new origin.
+    vector_x_x, vector_x_y, vector_x_z : float
+        Components of the new X-axis vector.
+    vector_y_x, vector_y_y, vector_y_z : float
+        Components of the new Y-axis vector.
+    vector_z_x, vector_z_y, vector_z_z : float
+        Components of the new Z-axis vector.
 
-    :param frame: Index of the local coordinate system.
-    :param name: Name of the local coordinate system.
-    :param origin_x: X coordinate of the origin.
-    :param origin_y: Y coordinate of the origin.
-    :param origin_z: Z coordinate of the origin.
-    :param vector_x_x: X component of the X axis vector.
-    :param vector_x_y: Y component of the X axis vector.
-    :param vector_x_z: Z component of the X axis vector.
-    :param vector_y_x: X component of the Y axis vector.
-    :param vector_y_y: Y component of the Y axis vector.
-    :param vector_y_z: Z component of the Y axis vector.
-    :param vector_z_x: X component of the Z axis vector.
-    :param vector_z_y: Y component of the Z axis vector.
-    :param vector_z_z: Z component of the Z axis vector.
+    Raises
+    ------
+    ValueError
+        If `frame` is not an integer greater than 1, or if any coordinate
+        or vector component is not a numeric value.
+
+    Examples
+    --------
+    >>> # Edit coordinate system 2
+    >>> edit_coordinate_system(
+    ...     frame=2, name="Prop-1",
+    ...     origin_x=0, origin_y=1, origin_z=0.5,
+    ...     vector_x_x=1, vector_x_y=0, vector_x_z=0,
+    ...     vector_y_x=0, vector_y_y=-1, vector_y_z=0,
+    ...     vector_z_x=0, vector_z_y=0, vector_z_z=-1.2
+    ... )
     """
 
     # Type and value checking
     if not isinstance(frame, int) or frame <= 1:
         raise ValueError("`frame` should be an integer greater than 1.")
-    if not all(isinstance(val, (int, float)) for val in [origin_x, origin_y, origin_z, 
-                                                         vector_x_x, vector_x_y, vector_x_z,
-                                                         vector_y_x, vector_y_y, vector_y_z,
-                                                         vector_z_x, vector_z_y, vector_z_z]):
-        raise ValueError("Coordinates and vector components should be integer or float values.")
+    if not all(isinstance(val, (int, float)) for val in [
+        origin_x, origin_y, origin_z,
+        vector_x_x, vector_x_y, vector_x_z,
+        vector_y_x, vector_y_y, vector_y_z,
+        vector_z_x, vector_z_y, vector_z_z
+    ]):
+        raise ValueError("Coordinates and vector components should be numeric values.")
 
     lines = [
         "#************************************************************************",
@@ -86,24 +111,35 @@ def edit_coordinate_system(frame: int, name: str, origin_x: float, origin_y: flo
     script.append_lines(lines)
     return
 
-def set_coordinate_system_name(frame: int, name: str):
+def set_coordinate_system_name(frame: int, name: str) -> None:
     """
-    Appends lines to script state to set the name of an existing local coordinate system.
-    
-    Example usage:
-    set_coordinate_system_name(, 2, 'Propeller_Axis')
-    
+    Set the name of an existing local coordinate system.
 
-    :param frame: Index of the local coordinate system.
-    :param name: New name of the coordinate system.
+    This function appends a command to the script state to change the name
+    of a specified local coordinate system.
+
+    Parameters
+    ----------
+    frame : int
+        Index of the local coordinate system. Must be an integer > 1.
+    name : str
+        The new name for the coordinate system.
+
+    Raises
+    ------
+    ValueError
+        If `frame` is not an integer greater than 1, or if `name` is not a
+        string.
+
+    Examples
+    --------
+    >>> # Set the name of coordinate system 2 to "Propeller_Axis"
+    >>> set_coordinate_system_name(frame=2, name='Propeller_Axis')
     """
     
     # Type and value checking
-    if not isinstance(frame, int):
-        raise ValueError("`frame` should be an integer value.")
-    
-    if frame <= 1:
-        raise ValueError("`frame` should be greater than 1.")
+    if not isinstance(frame, int) or frame <= 1:
+        raise ValueError("`frame` should be an integer greater than 1.")
     
     if not isinstance(name, str):
         raise ValueError("`name` should be a string.")
@@ -119,30 +155,50 @@ def set_coordinate_system_name(frame: int, name: str):
     script.append_lines(lines)
     return
 
-def set_coordinate_system_origin(frame, x, y, z, units='INCH'):
+def set_coordinate_system_origin(
+    frame: int,
+    x: float,
+    y: float,
+    z: float,
+    units: ValidUnits = 'INCH'
+) -> None:
     """
-    Appends lines to script state to set the origin of an existing local 
-    coordinate system.
-    
-    Example usage:
-    set_coordinate_system_origin(, 2, 0.0, 1.0, 1.4, 'INCH')
-    
+    Set the origin of an existing local coordinate system.
 
-    :param frame: Index of the local coordinate system.
-    :param x: Origin position in X relative to the reference coordinate system.
-    :param y: Origin position in Y relative to the reference coordinate system.
-    :param z: Origin position in Z relative to the reference coordinate system.
-    :param units: Units of the position values.
+    This function appends a command to the script state to set the origin
+    of a specified local coordinate system relative to the reference
+    coordinate system.
+
+    Parameters
+    ----------
+    frame : int
+        Index of the local coordinate system. Must be an integer > 1.
+    x, y, z : float
+        The new origin coordinates.
+    units : ValidUnits, optional
+        The units for the position values. Defaults to 'INCH'.
+
+    Raises
+    ------
+    ValueError
+        If `frame` is not an integer greater than 1, if coordinates are not
+        numeric, or if `units` is invalid.
+
+    Examples
+    --------
+    >>> # Set the origin of coordinate system 2 to (0, 1, 1.4) in inches
+    >>> set_coordinate_system_origin(frame=2, x=0.0, y=1.0, z=1.4, units='INCH')
     """
     
     # Type and value checking
     if not isinstance(frame, int) or frame <= 1:
         raise ValueError("`frame` should be an integer greater than 1.")
     
-    if not isinstance(x, (int, float)) or not isinstance(y, (int, float)) or not isinstance(z, (int, float)):
-        raise ValueError("`x`, `y`, and `z` should be integer or float values.")
+    if not all(isinstance(val, (int, float)) for val in [x, y, z]):
+        raise ValueError("`x`, `y`, and `z` should be numeric values.")
     
-    check_valid_length_units(units)
+    if units not in VALID_UNITS_LIST:
+        raise ValueError(f"Invalid units: {units}. Must be one of {VALID_UNITS_LIST}.")
     
     lines = [
         "#************************************************************************",
@@ -155,32 +211,53 @@ def set_coordinate_system_origin(frame, x, y, z, units='INCH'):
     script.append_lines(lines)
     return
 
-def set_coordinate_system_axis(frame, axis, nx, ny, nz, 
-                               normalize_frame=True):
+def set_coordinate_system_axis(
+    frame: int,
+    axis: ValidAxis,
+    nx: float,
+    ny: float,
+    nz: float,
+    normalize_frame: bool = True
+) -> None:
     """
-    Example usage:
-    set_coordinate_system_axis(, 2, 'X', -1.0, 0.5, 0.0, True)
-    
-    Appends lines to script state to set an axis of an existing local coordinate system.
-    
+    Set an axis of an existing local coordinate system.
 
-    :param frame: Index of the local coordinate system.
-    :param axis: Axis of the coordinate system to be set.
-    :param nx: X-coordinate of the normal direction vector.
-    :param ny: Y-coordinate of the normal direction vector.
-    :param nz: Z-coordinate of the normal direction vector.
-    :param normalize_frame: Automatically normalize all axes of the coordinate system after updating.
+    This function appends a command to the script state to set a specified
+    axis of an existing local coordinate system with a new vector.
+
+    Parameters
+    ----------
+    frame : int
+        Index of the local coordinate system. Must be an integer > 1.
+    axis : ValidAxis
+        The axis to set ('X', 'Y', or 'Z').
+    nx, ny, nz : float
+        Components of the new axis vector.
+    normalize_frame : bool, optional
+        If True, automatically normalizes all axes of the coordinate system
+        after the update. Defaults to True.
+
+    Raises
+    ------
+    ValueError
+        If `frame` is not an integer greater than 1, if `axis` is invalid,
+        if vector components are not numeric, or if `normalize_frame` is
+        not a boolean.
+
+    Examples
+    --------
+    >>> # Set the X-axis of coordinate system 2
+    >>> set_coordinate_system_axis(frame=2, axis='X', nx=-1.0, ny=0.5, nz=0.0)
     """
     
     # Type and value checking
     if not isinstance(frame, int) or frame <= 1:
         raise ValueError("`frame` should be an integer value greater than 1.")
     
-    valid_axes = ['X', 'Y', 'Z']
-    if axis not in valid_axes:
-        raise ValueError(f"`axis` should be one of {valid_axes}")
+    if axis not in VALID_AXIS_LIST:
+        raise ValueError(f"`axis` should be one of {VALID_AXIS_LIST}")
     
-    if not isinstance(nx, (int, float)) or not isinstance(ny, (int, float)) or not isinstance(nz, (int, float)):
+    if not all(isinstance(val, (int, float)) for val in [nx, ny, nz]):
         raise ValueError("`nx`, `ny`, and `nz` should be numeric values.")
     
     if not isinstance(normalize_frame, bool):
@@ -197,15 +274,28 @@ def set_coordinate_system_axis(frame, axis, nx, ny, nz,
     script.append_lines(lines)
     return
 
-def normalize_coordinate_system(coord_system_index=1):
+def normalize_coordinate_system(coord_system_index: int = 1) -> None:
     """
-    Appends lines to script state to normalize a coordinate system.
-    
+    Normalize a coordinate system.
 
-    :param coord_system_index: Index of the local coordinate system to be rotated.
-    
-    Example usage:
-    normalize_coordinate_system(, 2)
+    This function appends a command to the script state to normalize the
+    axes of a specified local coordinate system.
+
+    Parameters
+    ----------
+    coord_system_index : int, optional
+        The index of the local coordinate system to normalize. Must be a
+        positive integer. Defaults to 1.
+
+    Raises
+    ------
+    ValueError
+        If `coord_system_index` is not a positive integer.
+
+    Examples
+    --------
+    >>> # Normalize coordinate system 2
+    >>> normalize_coordinate_system(coord_system_index=2)
     """
     
     # Type and value checking
@@ -223,19 +313,41 @@ def normalize_coordinate_system(coord_system_index=1):
     script.append_lines(lines)
     return
 
-def rotate_coordinate_system(frame=2, rotation_frame=3, 
-                             rotation_axis='Y', angle=-45.0):
+def rotate_coordinate_system(
+    frame: int = 2,
+    rotation_frame: int = 3,
+    rotation_axis: ValidRotationAxis = 'Y',
+    angle: float = -45.0
+) -> None:
     """
-    Example usage:
-    rotate_coordinate_system()
-    
-    Appends lines to script state to rotate a coordinate system.
-    
+    Rotate a coordinate system.
 
-    :param frame: Index of the local coordinate system to be rotated.
-    :param rotation_frame: Index of the local coordinate system to be used to rotate the selected system.
-    :param rotation_axis: Axis of rotation. Can be 'X', 'Y', 'Z', '1', '2', or '3'.
-    :param angle: Rotation angle in degrees.
+    This function appends a command to the script state to rotate a local
+    coordinate system around a specified axis of another coordinate system.
+
+    Parameters
+    ----------
+    frame : int, optional
+        Index of the local coordinate system to be rotated. Defaults to 2.
+    rotation_frame : int, optional
+        Index of the local coordinate system to be used for the rotation.
+        Defaults to 3.
+    rotation_axis : ValidRotationAxis, optional
+        The axis of rotation ('X', 'Y', 'Z', '1', '2', or '3').
+        Defaults to 'Y'.
+    angle : float, optional
+        The rotation angle in degrees. Defaults to -45.0.
+
+    Raises
+    ------
+    ValueError
+        If `frame` or `rotation_frame` are not integers, if `rotation_axis`
+        is invalid, or if `angle` is not a numeric value.
+
+    Examples
+    --------
+    >>> # Rotate coordinate system 2 around the Y-axis of system 3 by -45 degrees
+    >>> rotate_coordinate_system()
     """
     
     # Type and value checking
@@ -245,9 +357,8 @@ def rotate_coordinate_system(frame=2, rotation_frame=3,
     if not isinstance(rotation_frame, int):
         raise ValueError("`rotation_frame` should be an integer value.")
     
-    valid_axes = ['X', 'Y', 'Z', '1', '2', '3']
-    if rotation_axis not in valid_axes:
-        raise ValueError(f"`rotation_axis` should be one of {valid_axes}")
+    if rotation_axis not in VALID_ROTATION_AXIS_LIST:
+        raise ValueError(f"`rotation_axis` should be one of {VALID_ROTATION_AXIS_LIST}")
     
     if not isinstance(angle, (int, float, np.integer, np.floating)):
         raise ValueError("`angle` should be an integer or float value, including numpy types.")
@@ -267,30 +378,49 @@ def rotate_coordinate_system(frame=2, rotation_frame=3,
     script.append_lines(lines)
     return
 
-def translate_coordinate_system(frame, x, y, z, units='METER'):
+def translate_coordinate_system(
+    frame: int,
+    x: float,
+    y: float,
+    z: float,
+    units: ValidUnits = 'METER'
+) -> None:
     """
-    Appends lines to script state to translate a coordinate system.
-    
-    Example usage:
-    translate_coordinate_system(, 2, 0.0, 1.0, 1.4, 'INCH')
-    
+    Translate a coordinate system.
 
-    :param frame: Index of the local coordinate system to be rotated.
-    :param x: Translation vector value in X direction.
-    :param y: Translation vector value in Y direction.
-    :param z: Translation vector value in Z direction.
-    :param units: Unit type for translation.
+    This function appends a command to the script state to translate a local
+    coordinate system by a specified vector.
+
+    Parameters
+    ----------
+    frame : int
+        Index of the local coordinate system to translate. Must be > 1.
+    x, y, z : float
+        Components of the translation vector.
+    units : ValidUnits, optional
+        The units for the translation vector. Defaults to 'METER'.
+
+    Raises
+    ------
+    ValueError
+        If `frame` is not an integer greater than 1, if translation
+        components are not numeric, or if `units` is invalid.
+
+    Examples
+    --------
+    >>> # Translate coordinate system 2 by (0, 1, 1.4) in inches
+    >>> translate_coordinate_system(frame=2, x=0.0, y=1.0, z=1.4, units='INCH')
     """
     
     # Type and value checking
     if not isinstance(frame, int) or frame <= 1:
         raise ValueError("`frame` should be an integer value greater than 1.")
     
-    check_valid_length_units(units)
+    if units not in VALID_UNITS_LIST:
+        raise ValueError(f"Invalid units: {units}. Must be one of {VALID_UNITS_LIST}.")
     
-    for value in [x, y, z]:
-        if not isinstance(value, (int, float)):
-            raise ValueError("Translation vector values (x, y, z) should be integers or float values.")
+    if not all(isinstance(val, (int, float)) for val in [x, y, z]):
+        raise ValueError("Translation vector values (x, y, z) should be numeric.")
     
     lines = [
         "#************************************************************************",
@@ -303,23 +433,32 @@ def translate_coordinate_system(frame, x, y, z, units='METER'):
     script.append_lines(lines)
     return
 
-def duplicate_coordinate_system(frame):
+def duplicate_coordinate_system(frame: int) -> None:
     """
-    Appends lines to script state to duplicate a local coordinate system.
-    
+    Duplicate a local coordinate system.
 
-    :param frame: Index of the local coordinate system to be duplicated.
-    
-    Example usage:
-    duplicate_coordinate_system(, 2)
+    This function appends a command to the script state to duplicate a
+    specified local coordinate system.
+
+    Parameters
+    ----------
+    frame : int
+        Index of the local coordinate system to be duplicated. Must be > 1.
+
+    Raises
+    ------
+    ValueError
+        If `frame` is not an integer greater than 1.
+
+    Examples
+    --------
+    >>> # Duplicate coordinate system 2
+    >>> duplicate_coordinate_system(frame=2)
     """
     
     # Type and value checking
-    if not isinstance(frame, int):
-        raise ValueError("`frame` should be an integer value.")
-    
-    if frame <= 1:
-        raise ValueError("`frame` should be greater than 1.")
+    if not isinstance(frame, int) or frame <= 1:
+        raise ValueError("`frame` should be an integer greater than 1.")
     
     lines = [
         "#************************************************************************",
@@ -332,25 +471,43 @@ def duplicate_coordinate_system(frame):
     script.append_lines(lines)
     return
 
-def mirror_coordinate_system(frame, plane='XZ'):
+def mirror_coordinate_system(frame: int, plane: ValidPlanes = 'XZ') -> None:
     """
-    Example usage:
-    mirror_coordinate_system(, 2)
-    
-    Appends lines to script state to mirror a local coordinate system.
-    
+    Mirror a local coordinate system.
 
-    :param frame: Index of the local coordinate system to be duplicated and then mirrored.
-    :param plane: Plane of the reference coordinate system to be used.
+    This function appends a command to the script state to duplicate and
+    mirror a local coordinate system across a specified plane of the
+    reference coordinate system.
+
+    Parameters
+    ----------
+    frame : int
+        Index of the local coordinate system to be mirrored. Must be > 1.
+    plane : ValidPlanes, optional
+        The plane of the reference coordinate system to be used for
+        mirroring ('XY', 'XZ', 'YZ'). Defaults to 'XZ'.
+
+    Raises
+    ------
+    ValueError
+        If `frame` is not an integer greater than 1, or if `plane` is
+        invalid.
+
+    Examples
+    --------
+    >>> # Mirror coordinate system 2 across the XZ plane
+    >>> mirror_coordinate_system(frame=2)
+
+    >>> # Mirror coordinate system 3 across the YZ plane
+    >>> mirror_coordinate_system(frame=3, plane='YZ')
     """
     
     # Type and value checking
     if not isinstance(frame, int) or frame <= 1:
         raise ValueError("`frame` should be an integer value greater than 1.")
     
-    valid_planes = ['YZ', 'XZ', 'XY']
-    if plane not in valid_planes:
-        raise ValueError(f"`plane` should be one of {valid_planes}")
+    if plane not in VALID_PLANE_LIST:
+        raise ValueError(f"`plane` should be one of {VALID_PLANE_LIST}")
     
     lines = [
         "#************************************************************************",
@@ -363,22 +520,32 @@ def mirror_coordinate_system(frame, plane='XZ'):
     script.append_lines(lines)
     return
 
-def delete_coordinate_system(frame):
+def delete_coordinate_system(frame: int) -> None:
     """
-    Appends lines to script state to delete a coordinate system.
-    
-    Example usage:
-    delete_coordinate_system(, 2)
-    
+    Delete a coordinate system.
 
-    :param frame: Index of the local coordinate system to be deleted.
+    This function appends a command to the script state to delete a specified
+    local coordinate system.
+
+    Parameters
+    ----------
+    frame : int
+        Index of the local coordinate system to be deleted. Must be > 1.
+
+    Raises
+    ------
+    ValueError
+        If `frame` is not an integer greater than 1.
+
+    Examples
+    --------
+    >>> # Delete coordinate system 2
+    >>> delete_coordinate_system(frame=2)
     """
     
     # Type and value checking
-    if not isinstance(frame, int):
-        raise ValueError("`frame` should be an integer value.")
-    if frame <= 1:
-        raise ValueError("`frame` should be greater than 1.")
+    if not isinstance(frame, int) or frame <= 1:
+        raise ValueError("`frame` should be an integer greater than 1.")
 
     lines = [
         "#************************************************************************",
