@@ -1,0 +1,19 @@
+
+
+{
+  "refFrame": "1",  
+  "runU": true,     
+  "uStart": 80,     
+  "uInterval": 20,  
+  "uInts": 8,       
+
+  "runV": false,    
+  "vStart": 80,     
+  "vInterval": 30,  
+  "vInts": 9,       
+
+  "aoaStart": 2,    
+  "aoaStop": 10,     
+  "aoaDelta": 2     
+}
+
