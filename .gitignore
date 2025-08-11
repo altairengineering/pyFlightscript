@@ -9,6 +9,7 @@ pyFlightscript/__pycache__/
 *.swp
 gemini.md
 .env
+.cursor/*
 .windsurf*
 # Sphinx generated files
 .sphinx-build/
