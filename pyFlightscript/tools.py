@@ -1,5 +1,5 @@
 from typing import List, Union
-from . import script
+from .script import script
 from .types import (
     RunOptions, VALID_RUN_OPTIONS, VALID_STABILITY_UNITS_LIST,
     VALID_FORCE_UNITS_LIST, VALID_STABILITY_NUMERATOR_LIST,
