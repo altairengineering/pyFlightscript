@@ -73,8 +73,8 @@ def initialize_solver(
                     isinstance(surface[0], int) and surface[1] in VALID_RUN_OPTIONS):
                 raise ValueError("Each entry in `surfaces` must be a tuple of (index, 'ENABLE'/'DISABLE').")
 
-    if symmetry not in VALID_SYMMETRY_LIST:
-        raise ValueError(f"`symmetry` must be one of {VALID_SYMMETRY_LIST}")
+    if symmetry not in ["NONE", "MIRROR", "PERIODIC"]:
+        raise ValueError(f"`symmetry` must be one of NONE, MIRROR, or PERIODIC")
     if symmetry == 'PERIODIC' and (not isinstance(symmetry_periodicity, int) or symmetry_periodicity <= 0):
         raise ValueError("`symmetry_periodicity` must be a positive integer for 'PERIODIC' symmetry.")
 
@@ -97,9 +97,6 @@ def initialize_solver(
         f"SOLVER_MODEL {solver_model}",
     ]
 
-    if symmetry == 'PERIODIC':
-        lines.append(f"SYMMETRY_PERIODICITY {symmetry_periodicity}")
-
     if surfaces == -1:
         lines.append("SURFACES -1")
     else:
@@ -110,7 +107,12 @@ def initialize_solver(
     if solver_model in ['INCOMPRESSIBLE', 'SUBSONIC_PRANDTL_GLAUERT', 'TRANSONIC_FIELD_PANEL']:
         lines.append(f"WAKE_TERMINATION_X {wake_termination_x}")
 
-    lines.append(f"SYMMETRY {symmetry}")
+    # Emit symmetry in a single line per manual: "SYMMETRY MIRROR|NONE" or
+    # "SYMMETRY PERIODIC <COPIES>"
+    if symmetry == 'PERIODIC':
+        lines.append(f"SYMMETRY PERIODIC {symmetry_periodicity}")
+    else:
+        lines.append(f"SYMMETRY {symmetry}")
 
     if solver_model in ['INCOMPRESSIBLE', 'SUBSONIC_PRANDTL_GLAUERT', 'TRANSONIC_FIELD_PANEL']:
         lines.append(f"WALL_COLLISION_AVOIDANCE {wall_collision_avoidance}")
