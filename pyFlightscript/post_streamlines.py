@@ -1,6 +1,7 @@
 from .utils import *
 from .script import script
 from .types import *
+from typing import List, Union, Optional
 
 def new_off_body_streamline(
     position_x: float,

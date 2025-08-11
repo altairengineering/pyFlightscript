@@ -1,7 +1,7 @@
 from .utils import *    
 from .script import script
 from .types import *
-from .types import ValidForceUnits, VALID_FORCE_UNITS_LIST, RunOptions
+from .types import ValidForceUnits, VALID_FORCE_UNITS_LIST, RunOptions, VALID_ANIMATION_FILETYPE_LIST, VALID_BOUNDARY_LAYER_TYPE_LIST
 from typing import Union, Optional, Literal
 
 def steady() -> None:
@@ -63,7 +63,6 @@ def unsteady(time_iterations: int = 100, delta_time: float = 0.1) -> None:
     return
 
 from typing import List, Tuple, Optional
-from . import script
 from .types import (
     ValidForceUnits, VALID_FORCE_UNITS_LIST, RunOptions,
     VALID_UNSTEADY_FORCE_PLOT_PARAMETER_LIST,
