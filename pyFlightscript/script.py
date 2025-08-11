@@ -1,113 +1,130 @@
+from typing import List, Union, Optional
+import os
+import subprocess
+
 class State:
-    def __init__(self):
-        self.lines = []
-
-    def append_lines(self, lines):
+    """
+    Manages the state of the FlightStream script being generated.
+    """
+    def __init__(self) -> None:
         """
-        Append lines to the existing lines array in the object.
+        Initializes the State object with an empty list of lines.
+        """
+        self.lines: List[str] = []
 
-        Parameters:
-            lines (str or list): The lines to be appended. It can be either a string or a list of strings.
+    def append_lines(self, lines: Union[str, List[str]]) -> None:
+        """
+        Append lines to the existing script.
 
-        Returns:
-            None
+        Parameters
+        ----------
+        lines : Union[str, List[str]]
+            A single line or a list of lines to be appended to the script.
         """
         if isinstance(lines, str):
             self.lines.append(lines)
         elif isinstance(lines, list):
             self.lines.extend(lines)
 
-    def display_lines(self):
+    def display_lines(self) -> None:
         """
-        Print each line stored in lines array.
+        Print each line stored in the script to the console.
         """
         for line in self.lines:
             print(line)
 
-    def write_to_file(self, filename="script_out.txt"):
+    def write_to_file(self, filename: str = "script_out.txt") -> None:
         """
-        Writes the contents of the 'lines' attribute to a script file for use in FlightStream.
+        Write the script content to a file for use in FlightStream.
 
-        Args:
-            filename (str, optional): The name of the file to write to. Defaults to "script_out.txt".
-
-        Returns:
-            None
+        Parameters
+        ----------
+        filename : str, optional
+            The name of the file to write to, by default "script_out.txt".
         """
         with open(filename, 'w') as file:
             for line in self.lines:
                 file.write(line + '\n')
             file.write('\n')
 
-    def clear_lines(self):
+    def clear_lines(self) -> None:
         """
-        Clear the lines arrray of the object.
-
-        Parameters:
-            None
-
-        Returns:
-            None
+        Clear all lines from the current script state.
         """
         self.lines = []
 
-# create an instance of State to hold lines
+# Create a global instance of State to hold the script lines
 script = State()
 
-def display_lines():
+def display_lines() -> None:
     """
-        Print each line stored in lines array.
+    Print each line stored in the global script state to the console.
     """
     script.display_lines()
-    return
 
-def write_to_file(filename="script_out.txt"):
+def write_to_file(filename: str = "script_out.txt") -> None:
+    """
+    Write the global script content to a file.
+
+    Parameters
+    ----------
+    filename : str, optional
+        The name of the file to write to, by default "script_out.txt".
+    """
     script.write_to_file(filename)
-    print("pyscript lines written to: "+ filename)
-    return
+    print(f"pyscript lines written to: {filename}")
 
-def clear_lines():
+def clear_lines() -> None:
+    """
+    Clear all lines from the global script state.
+    """
     script.clear_lines()
     print("pyscript lines cleared")
-    return
 
-def hard_reset(filename="script_out.txt"):
+def hard_reset(filename: str = "script_out.txt") -> None:
     """
-    Resets the script lines and deletes the specified output file.
+    Reset the script and delete the specified output file.
 
-    Parameters:
-        filename (str): The name of the output file. Defaults to "script_out.txt".
+    This function clears all lines from the script and removes the output file
+    from the filesystem if it exists.
 
-    Returns:
-        None
+    Parameters
+    ----------
+    filename : str, optional
+        The name of the output file to delete, by default "script_out.txt".
     """
-    import os
     script.clear_lines()
-    # Check if file exists and then delete
     if os.path.exists(filename):
         try:
             os.remove(filename)
         except OSError as e:
             print(f"Error: {e.filename} - {e.strerror}")
-    return
 
-def run_script(fsexe_path, script_path=r'.\script_out.txt', hidden=False):
+def run_script(
+    fsexe_path: str,
+    script_path: str = r'.\script_out.txt',
+    hidden: bool = False
+) -> subprocess.CompletedProcess:
     """
-    Runs a script using FlightStream executable path and runs script path.
+    Run a script using the FlightStream executable.
 
-    Args:
-        fsexe_path (str): The path to the external executable.
-        script_path (str, optional): The path to the script file. Defaults to '.\script_out.txt'.
+    Parameters
+    ----------
+    fsexe_path : str
+        The path to the FlightStream executable.
+    script_path : str, optional
+        The path to the script file to run, by default r'.\script_out.txt'.
+    hidden : bool, optional
+        If True, runs FlightStream in hidden mode, by default False.
 
-    Returns:
-        None
+    Returns
+    -------
+    subprocess.CompletedProcess
+        The result of the subprocess run command.
     """
-
-    import subprocess
     command = [fsexe_path]
     if hidden:
         command.append('-hidden')
     command.extend(['-script', script_path])
     result = subprocess.run(command, capture_output=True, text=True)
-    # Now you can use result.stdout and result.stderr if needed
     return result
