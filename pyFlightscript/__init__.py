@@ -10,6 +10,7 @@ from . import freestream
 from . import mesh
 from . import fsinit
 from . import inlets
+from . import log
 from . import motion
 from . import plots
 from . import post_points
@@ -37,6 +38,7 @@ from .freestream import *
 from .mesh import *
 from .fsinit import *
 from .inlets import *
+from .log import *
 from .motion import *
 from .plots import *
 from .post_points import *

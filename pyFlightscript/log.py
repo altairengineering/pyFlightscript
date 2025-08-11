@@ -1,13 +1,14 @@
-from .utils import *    
 from .script import script
-from .types import *
 
-def clear():
+def clear_log() -> None:
     """
-    Appends lines to script state to clear the log.
-    
-    Example usage:
-    clear_log()
+    Clear the log.
+
+    This function appends a command to the script state to clear the log.
+
+    Examples
+    --------
+    >>> clear_log()
     """
     
     lines = ["CLEAR_LOG"]
@@ -15,17 +16,25 @@ def clear():
     return
 
 
-def output_settings_and_status(output_filename):
+def output_settings_and_status(output_filename: str) -> None:
     """
-    Appends lines to script state to output fluid properties and solver status.
-    
-    Args:
-        output_filename (str): Path to the output file.
-    
-    Example usage:
-    output_settings_and_status('C:/path/to/output.txt')
+    Output fluid properties and solver status.
+
+    This function appends a command to the script state to output fluid
+    properties and solver status to a specified file.
+
+    Parameters
+    ----------
+    output_filename : str
+        Path to the output file.
+
+    Examples
+    --------
+    >>> output_settings_and_status('C:/path/to/output.txt')
     """
-    
+    if not isinstance(output_filename, str):
+        raise TypeError("`output_filename` must be a string.")
+
     lines = [
         "#************************************************************************",
         "#************** Output fluid properties and solver status ***************",
@@ -37,17 +46,26 @@ def output_settings_and_status(output_filename):
     
     script.append_lines(lines)
     return
-    
-def export(log_filepath):
-    """
-    Appends lines to script state to export log window messages.
-    
 
-    :param log_filepath: Path to the output log file.
-    
-    Example usage:
-    export_log(, 'C:/.../Output_log.txt')
+
+def export_log(log_filepath: str) -> None:
     """
+    Export log window messages.
+
+    This function appends a command to the script state to export log window
+    messages to a specified file.
+
+    Parameters
+    ----------
+    log_filepath : str
+        Path to the output log file.
+
+    Examples
+    --------
+    >>> export_log('C:/.../Output_log.txt')
+    """
+    if not isinstance(log_filepath, str):
+        raise TypeError("`log_filepath` must be a string.")
 
     lines = [
         "#************************************************************************",
