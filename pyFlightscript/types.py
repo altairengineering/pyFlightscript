@@ -35,13 +35,6 @@ VALID_AXIS_LIST = ['X', 'Y', 'Z']
 VALID_BOOL_LIST = ['ON', 'OFF']
 VALID_SIDE_LIST = ['L', 'R']
 VALID_ROTATION_TYPE_LIST = ['EULER', 'QUATERNION']
-VALID_CONTOUR_VARIABLE_LIST = [
-    'Cp', 'Cp(Sonic)', 'Mach', 'Pressure', 'Temperature', 'Density',
-    'Velocity Magnitude', 'Velocity X', 'Velocity Y', 'Velocity Z',
-    'Vorticity Magnitude', 'Vorticity X', 'Vorticity Y', 'Vorticity Z',
-    'Q-Criterion', 'Lambda2', 'Wall Shear X', 'Wall Shear Y', 'Wall Shear Z',
-    'Wall Shear Mag', 'Y+'
-]
 VALID_VECTOR_VARIABLE_LIST = [
     'Velocity', 'Vorticity', 'Wall Shear Stress'
 ]
@@ -87,6 +80,8 @@ VALID_PLOT_TYPE_LIST = [
     'FORCE_Y_AXIS_Z', 'FORCE_Z_AXIS_X', 'FORCE_Z_AXIS_Y', 'FORCE_Z_AXIS_Z',
     'RESIDUALS', 'LOADS', 'SECTIONS_CP', 'SECTIONS_MACH', 'UNSTEADY'
 ]
+
+VALID_PROBE_POINT_TYPE_LIST = ['VOLUME', 'SURFACE']
 
 VALID_BASE_REGION_TYPE_LIST = ['EMPIRICAL', 'CONSTANT']
 VALID_DIMENSIONS_LIST = ['2D', '3D']
