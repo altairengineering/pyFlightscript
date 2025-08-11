@@ -1,26 +1,44 @@
-from .utils import *    
+from .utils import *
 from .script import script
 from .types import *
 
-def new_off_body_streamline(position_x, position_y, position_z, upstream='DISABLE'):
+def new_off_body_streamline(
+    position_x: float,
+    position_y: float,
+    position_z: float,
+    upstream: RunOptions = 'DISABLE'
+) -> None:
     """
-    Appends lines to script state to create an off-body streamline.
-    
-    Example usage:
-    new_off_body_streamline(, -3.0, -0.1, 0.2, 'DISABLE')
-    
+    Create an off-body streamline.
 
-    :param position_x: X coordinate of the position.
-    :param position_y: Y coordinate of the position.
-    :param position_z: Z coordinate of the position.
-    :param upstream: Enable/Disable upstream.
+    This function appends a command to the script state to create a single
+    off-body streamline starting at a specified position.
+
+    Parameters
+    ----------
+    position_x : float
+        X-coordinate of the streamline's starting position.
+    position_y : float
+        Y-coordinate of the streamline's starting position.
+    position_z : float
+        Z-coordinate of the streamline's starting position.
+    upstream : RunOptions, optional
+        Whether to generate the streamline upstream from the starting point,
+        by default 'DISABLE'. Must be one of `VALID_RUN_OPTIONS`.
+
+    Examples
+    --------
+    >>> # Create a downstream streamline at a specific point
+    >>> new_off_body_streamline(-3.0, -0.1, 0.2)
+
+    >>> # Create an upstream streamline
+    >>> new_off_body_streamline(-3.0, -0.1, 0.2, upstream='ENABLE')
     """
-    
-    # Value checking
-    valid_upstream_values = ['ENABLE', 'DISABLE']
-    if upstream not in valid_upstream_values:
-        raise ValueError(f"`upstream` should be one of {valid_upstream_values}")
-    
+    if not all(isinstance(v, (int, float)) for v in [position_x, position_y, position_z]):
+        raise ValueError("Position coordinates must be numeric.")
+    if upstream not in VALID_RUN_OPTIONS:
+        raise ValueError(f"`upstream` must be one of {VALID_RUN_OPTIONS}")
+
     lines = [
         "#************************************************************************",
         "#****************** Create a off-body streamline ************************",
@@ -36,28 +54,52 @@ def new_off_body_streamline(position_x, position_y, position_z, upstream='DISABL
     script.append_lines(lines)
     return
 
-def new_streamline_distribution(position_1_x, position_1_y, position_1_z,
-                                position_2_x, position_2_y, position_2_z, subdivisions):
+def new_streamline_distribution(
+    position_1_x: float,
+    position_1_y: float,
+    position_1_z: float,
+    position_2_x: float,
+    position_2_y: float,
+    position_2_z: float,
+    subdivisions: int
+) -> None:
     """
-    Appends lines to script state to create a new off-body streamline distribution.
-    
-    Example usage:
-    new_streamline_distribution(, -3.0, -1.2, -0.3, -3.0, 1.2, -0.3, 48)
-    
+    Create a new off-body streamline distribution.
 
-    :param position_1_x: X coordinate of the starting vertex.
-    :param position_1_y: Y coordinate of the starting vertex.
-    :param position_1_z: Z coordinate of the starting vertex.
-    :param position_2_x: X coordinate of the ending vertex.
-    :param position_2_y: Y coordinate of the ending vertex.
-    :param position_2_z: Z coordinate of the ending vertex.
-    :param subdivisions: N+1 , where N = Number of streamlines.
+    This function appends a command to the script state to create a line of
+    streamlines between two specified points.
+
+    Parameters
+    ----------
+    position_1_x : float
+        X-coordinate of the starting vertex.
+    position_1_y : float
+        Y-coordinate of the starting vertex.
+    position_1_z : float
+        Z-coordinate of the starting vertex.
+    position_2_x : float
+        X-coordinate of the ending vertex.
+    position_2_y : float
+        Y-coordinate of the ending vertex.
+    position_2_z : float
+        Z-coordinate of the ending vertex.
+    subdivisions : int
+        The number of streamlines to create is `subdivisions` - 1.
+        Value must be > 1.
+
+    Examples
+    --------
+    >>> # Create 48 streamlines between two points
+    >>> new_streamline_distribution(-3.0, -1.2, -0.3, -3.0, 1.2, -0.3, 49)
     """
-    
-    # Type and value checking
+    if not all(isinstance(v, (int, float)) for v in [
+        position_1_x, position_1_y, position_1_z,
+        position_2_x, position_2_y, position_2_z
+    ]):
+        raise ValueError("Position coordinates must be numeric.")
     if not isinstance(subdivisions, int) or subdivisions < 2:
         raise ValueError("`subdivisions` should be an integer value greater than 1.")
-    
+
     lines = [
         "#************************************************************************",
         "#****************** Create a new off-body streamline distribution *******",
@@ -76,36 +118,47 @@ def new_streamline_distribution(position_1_x, position_1_y, position_1_z,
     script.append_lines(lines)
     return
 
-def new_off_body_streamtube(radius, frame, axis, radial_subdivisions, azimuth_subdivisions):
+def new_off_body_streamtube(
+    radius: float,
+    frame: int,
+    axis: int,
+    radial_subdivisions: int,
+    azimuth_subdivisions: int
+) -> None:
     """
-    Appends lines to script state to create a new off-body streamtube.
+    Create a new off-body streamtube.
 
+    This function appends a command to the script state to create a streamtube,
+    which is a bundle of streamlines starting from a circular area.
 
-    :param radius: Value of the radius.
-    :param frame: Index of the coordinate system to be used for this actuator (> 0).
-    :param axis: Axis of the actuator disc. Value is 1, 2 or 3 for X, Y and Z axes respectively.
-    :param radial_subdivisions: Number of radial subdivisions.
-    :param azimuth_subdivisions: Number of azimuth subdivisions.
-    
-    Example usage:
-    new_off_body_streamtube(, 0.5, 2, 1, 3, 10)
+    Parameters
+    ----------
+    radius : float
+        The radius of the streamtube's circular base.
+    frame : int
+        The index of the coordinate system to be used (> 0).
+    axis : int
+        The axis of the streamtube's disc. Use 1 for X, 2 for Y, and 3 for Z.
+    radial_subdivisions : int
+        The number of subdivisions along the radius.
+    azimuth_subdivisions : int
+        The number of subdivisions around the azimuth.
+
+    Examples
+    --------
+    >>> # Create a streamtube with a radius of 0.5 in frame 2 along the X-axis
+    >>> new_off_body_streamtube(0.5, 2, 1, 3, 10)
     """
-
-    # Type and value checking
     if not isinstance(radius, (int, float)):
-        raise ValueError("`radius` should be an integer or float value.")
-    
+        raise ValueError("`radius` should be a numeric value.")
     if not isinstance(frame, int) or frame <= 0:
         raise ValueError("`frame` should be a positive integer.")
-    
     if axis not in [1, 2, 3]:
-        raise ValueError("`axis` should be 1, 2 or 3 for X, Y and Z axes respectively.")
-    
+        raise ValueError("`axis` must be 1 (X), 2 (Y), or 3 (Z).")
     if not isinstance(radial_subdivisions, int):
-        raise ValueError("`radial_subdivisions` should be an integer.")
-    
+        raise ValueError("`radial_subdivisions` must be an integer.")
     if not isinstance(azimuth_subdivisions, int):
-        raise ValueError("`azimuth_subdivisions` should be an integer.")
+        raise ValueError("`azimuth_subdivisions` must be an integer.")
 
     lines = [
         "#************************************************************************",
@@ -119,35 +172,30 @@ def new_off_body_streamtube(radius, frame, axis, radial_subdivisions, azimuth_su
         f"RADIAL_SUBDIVISIONS {radial_subdivisions}",
         f"AZIMUTH_SUBDIVISIONS {azimuth_subdivisions}"
     ]
-
     script.append_lines(lines)
     return
 
-def set_off_body_streamline_length(set_length=None, set_unrestricted_length=None):
+def set_off_body_streamline_length(length: Optional[float] = None) -> None:
     """
-    Appends lines to script state to set the length of the new off-body streamlines.
+    Set the length of new off-body streamlines.
 
+    This function appends a command to the script state to define the length
+    of subsequently created off-body streamlines.
 
-    :param set_length: Length of the streamline.
-    :param set_unrestricted_length: Unrestricted length of the streamline. 
+    Parameters
+    ----------
+    length : float, optional
+        The length of the streamline. If not provided or set to None,
+        the length is considered unrestricted.
 
-    Note: Either `set_length` or `set_unrestricted_length` should be provided, not both.
-    
-    Example usage:
-    set_off_body_streamline_length(, set_length=5)
+    Examples
+    --------
+    >>> # Set a specific streamline length
+    >>> set_off_body_streamline_length(length=10.5)
+
+    >>> # Set streamlines to have unrestricted length
+    >>> set_off_body_streamline_length()
     """
-
-    # Type and value checking
-    if set_length is not None and set_unrestricted_length is not None:
-        raise ValueError("Either `set_length` or `set_unrestricted_length` should be provided, not both.")
-    
-    if set_length:
-        if not isinstance(set_length, (int, float)):
-            raise ValueError("`set_length` should be an integer or float value.")
-    else:
-        if set_unrestricted_length is None:
-            raise ValueError("Either `set_length` or `set_unrestricted_length` should be provided.")
-
     lines = [
         "#************************************************************************",
         "#****************** Set the length of the new off-body streamlines ******",
@@ -156,8 +204,10 @@ def set_off_body_streamline_length(set_length=None, set_unrestricted_length=None
         "SET_OFF_BODY_STREAMLINE_LENGTH"
     ]
 
-    if set_length:
-        lines.append(f"SET_LENGTH {set_length}")
+    if length is not None:
+        if not isinstance(length, (int, float)):
+            raise ValueError("`length` should be a numeric value.")
+        lines.append(f"SET_LENGTH {length}")
     else:
         lines.append("SET_UNRESTRICTED_LENGTH")
 
@@ -167,11 +217,11 @@ def set_off_body_streamline_length(set_length=None, set_unrestricted_length=None
 def set_all_off_body_streamlines_upstream():
     """
     Appends lines to script state to set all off-body streamlines upstream.
-    
 
-
-    Example usage:
-    set_all_off_body_streamlines_upstream()
+    Examples
+    --------
+    >>> # Set all off-body streamlines upstream
+    >>> set_all_off_body_streamlines_upstream()
     """
     lines = [
         "#************************************************************************",
@@ -186,11 +236,11 @@ def set_all_off_body_streamlines_upstream():
 def set_all_off_body_streamlines_downstream():
     """
     Appends lines to script state to set all off-body streamlines downstream.
-    
 
-
-    Example usage:
-    set_all_off_body_streamlines_downstream()
+    Examples
+    --------
+    >>> # Set all off-body streamlines downstream
+    >>> set_all_off_body_streamlines_downstream()
     """
     lines = [
         "#************************************************************************",
@@ -205,11 +255,11 @@ def set_all_off_body_streamlines_downstream():
 def generate_all_off_body_streamlines():
     """
     Appends lines to script state to generate all off-body streamlines.
-    
 
-
-    Example usage:
-    generate_all_off_body_streamlines()
+    Examples
+    --------
+    >>> # Generate all off-body streamlines
+    >>> generate_all_off_body_streamlines()
     """
     lines = [
         "#************************************************************************",
@@ -224,11 +274,11 @@ def generate_all_off_body_streamlines():
 def delete_all_off_body_streamlines():
     """
     Appends lines to script state to delete all off-body streamlines.
-    
 
-
-    Example usage:
-    delete_all_off_body_streamlines()
+    Examples
+    --------
+    >>> # Delete all off-body streamlines
+    >>> delete_all_off_body_streamlines()
     """
     lines = [
         "#************************************************************************",
@@ -240,21 +290,23 @@ def delete_all_off_body_streamlines():
     script.append_lines(lines)
     return
 
-def export_all_off_body_streamlines(filename):
+def export_all_off_body_streamlines(filename: str) -> None:
     """
     Appends lines to script state to export all off-body streamlines.
 
 
     :param filename: Filename with path to store the streamlines.
 
-    Example usage:
-    export_all_off_body_streamlines(, 'C:/.../Test_streamlines.txt')
+    Examples
+    --------
+    >>> # Export all off-body streamlines to a file
+    >>> export_all_off_body_streamlines('C:/.../Test_streamlines.txt')
     """
-    
+
     # Check for filename's type
     if not isinstance(filename, str):
         raise ValueError("`filename` should be a string value.")
-    
+
     lines = [
         "#************************************************************************",
         "#****************** Export all off-body streamlines ********************",
@@ -271,9 +323,11 @@ def export_all_off_body_streamlines(filename):
 def generate_all_surface_streamlines():
     """
     Appends lines to script state to generate all surface streamlines.
-    
-    Example usage:
-    generate_all_surface_streamlines()
+
+    Examples
+    --------
+    >>> # Generate all surface streamlines
+    >>> generate_all_surface_streamlines()
     """
     lines = [
         "#************************************************************************",
@@ -289,9 +343,11 @@ def generate_all_surface_streamlines():
 def delete_all_surface_streamlines():
     """
     Appends lines to script state to delete all surface streamlines.
-    
-    Example usage:
-    delete_all_surface_streamlines()
+
+    Examples
+    --------
+    >>> # Delete all surface streamlines
+    >>> delete_all_surface_streamlines()
     """
     lines = [
         "#************************************************************************",
@@ -304,21 +360,23 @@ def delete_all_surface_streamlines():
     script.append_lines(lines)
     return
 
-def export_all_surface_streamlines(output_filepath):
+def export_all_surface_streamlines(output_filepath: str) -> None:
     """
     Appends lines to script state to export all on-body (surface) streamlines.
-    
+
 
     :param output_filepath: Filename with path for the streamlines output.
-    
-    Example usage:
-    export_all_surface_streamlines(, 'C:/.../Test_streamlines.txt')
+
+    Examples
+    --------
+    >>> # Export all surface streamlines to a file
+    >>> export_all_surface_streamlines('C:/.../Test_streamlines.txt')
     """
-    
+
     # Type checking for output_filepath
     if not isinstance(output_filepath, str):
         raise ValueError("`output_filepath` should be a string.")
-    
+
     lines = [
         "#************************************************************************",
         "#****************** Export all on-body (surface) streamlines ************",
