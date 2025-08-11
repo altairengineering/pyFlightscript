@@ -1,27 +1,27 @@
-from .utils import *    
-from .script import script
-from .types import *
+from . import script
+from .types import VALID_PLOT_TYPE_LIST
 
-def set_plot_type(plot_type):
+def set_plot_type(plot_type: str) -> None:
     """
-    Appends lines to script state to change the plot type.
-    
+    Set the type of plot to be displayed.
 
-    :param plot_type: Type of plot.
-    
-    Example usage:
-    set_plot_type(, 'FORCE_Z_AXIS_Y')
+    This function appends a command to the script state to change the plot type.
+
+    Parameters
+    ----------
+    plot_type : str
+        The type of plot to be generated. Must be one of `VALID_PLOT_TYPE_LIST`.
+
+    Examples
+    --------
+    >>> # Set the plot type to display lift coefficient vs. angle of attack
+    >>> set_plot_type('CL_AXIS_X')
+
+    >>> # Set the plot type to display unsteady forces
+    >>> set_plot_type('UNSTEADY')
     """
-    valid_plot_types = [
-        'CL_AXIS_X', 'CL_AXIS_Y', 'CL_AXIS_Z', 'CDI_AXIS_X', 'CDI_AXIS_Y',
-        'CDI_AXIS_Z', 'CY_AXIS_X', 'CY_AXIS_Y', 'CY_AXIS_Z', 'FORCE_X_AXIS_X',
-        'FORCE_X_AXIS_Y', 'FORCE_X_AXIS_Z', 'FORCE_Y_AXIS_X', 'FORCE_Y_AXIS_Y',
-        'FORCE_Y_AXIS_Z', 'FORCE_Z_AXIS_X', 'FORCE_Z_AXIS_Y', 'FORCE_Z_AXIS_Z',
-        'RESIDUALS', 'LOADS', 'SECTIONS_CP', 'SECTIONS_MACH', 'UNSTEADY'
-    ]
-    
-    if plot_type not in valid_plot_types:
-        raise ValueError(f"`plot_type` should be one of {valid_plot_types}")
+    if plot_type not in VALID_PLOT_TYPE_LIST:
+        raise ValueError(f"`plot_type` should be one of {VALID_PLOT_TYPE_LIST}")
     
     lines = [
         "#************************************************************************",
@@ -34,19 +34,32 @@ def set_plot_type(plot_type):
     script.append_lines(lines)
     return
 
-def save_plot_to_file(filename):
+def save_plot_to_file(filename: str) -> None:
     """
-    Appends lines to script state to save the plot to an external file.
-    
+    Save the current plot to a file.
 
-    :param filename: Full path and name of the file to save the plot.
-    
-    Example usage:
-    save_plot_to_file(, 'C:/.../Test_Plot.txt')
+    This function appends a command to the script state to save the plot to an
+    external file. The format is determined by the file extension.
+
+    Parameters
+    ----------
+    filename : str
+        The full path and name of the file to save the plot.
+
+    Examples
+    --------
+    >>> # Save the plot to a text file
+    >>> save_plot_to_file('C:/Users/user/Documents/Test_Plot.txt')
+
+    >>> # Save the plot to a different location
+    >>> save_plot_to_file('D:/Analysis/Results/force_plot.dat')
     """
+    if not isinstance(filename, str):
+        raise ValueError("`filename` should be a string.")
+
     lines = [
         "#************************************************************************",
-        "#****************** Save scene as image file ****************************",
+        "#****************** Save plot to file ***********************************",
         "#************************************************************************",
         "SAVE_PLOT_TO_FILE",
         filename
