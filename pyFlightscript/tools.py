@@ -1,51 +1,92 @@
-from .utils import *    
-from .script import script
-from .types import *
+from typing import List, Union
+from . import script
+from .types import (
+    RunOptions, VALID_RUN_OPTIONS, VALID_STABILITY_UNITS_LIST,
+    VALID_FORCE_UNITS_LIST, VALID_STABILITY_NUMERATOR_LIST,
+    VALID_STABILITY_DENOMINATOR_LIST
+)
 
-def execute_solver_sweeper(results_filename, surface_results_path='', 
-                           angle_of_attack='ENABLE', side_slip_angle='DISABLE', 
-                           velocity='DISABLE', angle_of_attack_start=0.0, 
-                           angle_of_attack_stop=0., angle_of_attack_delta=1.,
-                           side_slip_angle_start=0., side_slip_angle_stop=0., 
-                           side_slip_angle_delta=1.0, velocity_start=0., 
-                           velocity_stop=0.0, velocity_delta=1.0, 
-                           export_surface_data_per_step='ENABLE', 
-                           clear_solution_after_each_run='ENABLE',
-                           reference_velocity_equals_freestream='ENABLE',
-                           append_to_existing_sweep='DISABLE'):
+def execute_solver_sweeper(
+    results_filename: str,
+    surface_results_path: str = '',
+    angle_of_attack: RunOptions = 'ENABLE',
+    side_slip_angle: RunOptions = 'DISABLE',
+    velocity: RunOptions = 'DISABLE',
+    angle_of_attack_start: float = 0.0,
+    angle_of_attack_stop: float = 0.0,
+    angle_of_attack_delta: float = 1.0,
+    side_slip_angle_start: float = 0.0,
+    side_slip_angle_stop: float = 0.0,
+    side_slip_angle_delta: float = 1.0,
+    velocity_start: float = 0.0,
+    velocity_stop: float = 0.0,
+    velocity_delta: float = 1.0,
+    export_surface_data_per_step: RunOptions = 'ENABLE',
+    clear_solution_after_each_run: RunOptions = 'ENABLE',
+    reference_velocity_equals_freestream: RunOptions = 'ENABLE',
+    append_to_existing_sweep: RunOptions = 'DISABLE'
+) -> None:
     """
-    Appends lines to script state to execute the solver sweeper.
-    :param results_filename (str): The full file path name of the sweep results file.
-    :param surface_results_path (str): The path to export surface data per step if 'ENABLE'.
+    Execute the solver sweeper.
 
-    Example usage:
-    execute_solver_sweeper(results_filename='C:\...\sweep_results\sweep.txt', 
-                           surface_results_path='C:\...\surface_data\', angle_of_attack='ENABLE', 
-                           side_slip_angle='DISABLE', velocity='DISABLE', 
-                           angle_of_attack_start=0.0, angle_of_attack_stop=10.0,
-                           angle_of_attack_delta=1.0, export_surface_data_per_step='ENABLE',
-                           surface_results_path='C:\\...\\sweep_results\\', 
-                           clear_solution_after_each_run='ENABLE')
-    
+    This function appends a command to the script state to perform a parameter
+    sweep with the solver.
 
+    Parameters
+    ----------
+    results_filename : str
+        The full file path for the sweep results file.
+    surface_results_path : str, optional
+        The path to export surface data at each step, by default ''.
+    angle_of_attack : RunOptions, optional
+        Enable or disable angle of attack sweep, by default 'ENABLE'.
+    side_slip_angle : RunOptions, optional
+        Enable or disable side slip angle sweep, by default 'DISABLE'.
+    velocity : RunOptions, optional
+        Enable or disable velocity sweep, by default 'DISABLE'.
+    angle_of_attack_start : float, optional
+        Start value for angle of attack sweep, by default 0.0.
+    angle_of_attack_stop : float, optional
+        Stop value for angle of attack sweep, by default 0.0.
+    angle_of_attack_delta : float, optional
+        Increment for angle of attack sweep, by default 1.0.
+    side_slip_angle_start : float, optional
+        Start value for side slip angle sweep, by default 0.0.
+    side_slip_angle_stop : float, optional
+        Stop value for side slip angle sweep, by default 0.0.
+    side_slip_angle_delta : float, optional
+        Increment for side slip angle sweep, by default 1.0.
+    velocity_start : float, optional
+        Start value for velocity sweep, by default 0.0.
+    velocity_stop : float, optional
+        Stop value for velocity sweep, by default 0.0.
+    velocity_delta : float, optional
+        Increment for velocity sweep, by default 1.0.
+    export_surface_data_per_step : RunOptions, optional
+        Enable or disable exporting surface data at each step, by default 'ENABLE'.
+    clear_solution_after_each_run : RunOptions, optional
+        Enable or disable clearing the solution after each run, by default 'ENABLE'.
+    reference_velocity_equals_freestream : RunOptions, optional
+        Set reference velocity equal to freestream velocity, by default 'ENABLE'.
+    append_to_existing_sweep : RunOptions, optional
+        Enable or disable appending to an existing sweep file, by default 'DISABLE'.
     """
-    
-    # Type and value checking
-    valid_options = ['ENABLE', 'DISABLE']
-    if angle_of_attack not in valid_options or side_slip_angle not in valid_options or \
-       velocity not in valid_options or export_surface_data_per_step not in valid_options or \
-       clear_solution_after_each_run not in valid_options or \
-       reference_velocity_equals_freestream not in valid_options or \
-       append_to_existing_sweep not in valid_options:
-        raise ValueError("Only 'ENABLE' or 'DISABLE' are valid options for the respective fields.")
-    
-    # Create lines based on the given values
+    for option in [
+        angle_of_attack, side_slip_angle, velocity, export_surface_data_per_step,
+        clear_solution_after_each_run, reference_velocity_equals_freestream,
+        append_to_existing_sweep
+    ]:
+        if option not in VALID_RUN_OPTIONS:
+            raise ValueError(f"Invalid option '{option}'. Must be one of {VALID_RUN_OPTIONS}")
+
     lines = [
         "#************************************************************************",
         "#****************** Initialize and execute the solver sweeper ***********",
         "#************************************************************************",
         "#",
         "EXECUTE_SOLVER_SWEEPER",
+        f"RESULTS_FILENAME {results_filename}",
+        f"SURFACE_RESULTS_PATH {surface_results_path}",
         f"ANGLE_OF_ATTACK {angle_of_attack}",
         f"SIDE_SLIP_ANGLE {side_slip_angle}",
         f"VELOCITY {velocity}",
@@ -59,167 +100,174 @@ def execute_solver_sweeper(results_filename, surface_results_path='',
         f"VELOCITY_STOP {velocity_stop}",
         f"VELOCITY_DELTA {velocity_delta}",
         f"EXPORT_SURFACE_DATA_PER_STEP {export_surface_data_per_step}",
-        ]
-
-    # Only add surface_results_path if EXPORT_SURFACE_DATA_PER_STEP is ENABLE
-    if export_surface_data_per_step == 'ENABLE' and surface_results_path:
-        lines.append(f"{surface_results_path}")
-
-    lines.extend([
         f"CLEAR_SOLUTION_AFTER_EACH_RUN {clear_solution_after_each_run}",
         f"REFERENCE_VELOCITY_EQUALS_FREESTREAM {reference_velocity_equals_freestream}",
-        f"APPEND_TO_EXISTING_SWEEP {append_to_existing_sweep}",
-        f"{results_filename}"
-    ])
-
+        f"APPEND_TO_EXISTING_SWEEP {append_to_existing_sweep}"
+    ]
     script.append_lines(lines)
     return
 
-def stability_toolbox_settings(ROTATION_FRAME=1, UNITS='PER_RADIAN', 
-                               CLEAR_SOLVER_PER_RUN='DISABLE', ANGULAR_RATE_INCREMENT=0.1):
+def stability_toolbox_settings(
+    rotation_frame: int = 1,
+    units: str = 'PER_RADIAN',
+    clear_solver_per_run: RunOptions = 'DISABLE',
+    angular_rate_increment: float = 0.1
+) -> None:
     """
-    Appends lines to script state to set the S&C toolbox parameters.
+    Set the Stability & Control (S&C) toolbox parameters.
 
-    :param ROTATION_FRAME: Index of the coordinate system used for applying rotation rates.
-                           Default is 1 for reference coordinate system.
-    :param UNITS: PER_RADIAN or PER_DEGREE (only for dynamic stability coefficients).
-    :param CLEAR_SOLVER_PER_RUN: ENABLE or DISABLE clearing of the solution prior to each solver run.
-    :param ANGULAR_RATE_INCREMENT: Incremental angular rate (rad/sec) to be applied about the three axes 
-                                   of the specified rotation coordinate system for dynamic coefficients.
+    This function appends a command to the script state to configure the
+    stability and control toolbox.
 
-    Example usage:
-    stability_toolbox_settings(3, 'PER_RADIAN', 'DISABLE', 0.2)
+    Parameters
+    ----------
+    rotation_frame : int, optional
+        Index of the coordinate system for rotation rates, by default 1.
+    units : str, optional
+        Units for dynamic stability coefficients, by default 'PER_RADIAN'.
+        Must be one of `VALID_STABILITY_UNITS_LIST`.
+    clear_solver_per_run : RunOptions, optional
+        Enable or disable clearing the solution before each run, by default 'DISABLE'.
+        Must be one of `VALID_RUN_OPTIONS`.
+    angular_rate_increment : float, optional
+        Incremental angular rate in rad/sec for dynamic coefficients, by default 0.1.
     """
-    
-    valid_units = ['PER_RADIAN', 'PER_DEGREE']
-    valid_options = ['ENABLE', 'DISABLE']
-    
-    if not isinstance(ROTATION_FRAME, int):
-        raise ValueError("`ROTATION_FRAME` should be an integer value.")
+    if not isinstance(rotation_frame, int):
+        raise ValueError("`rotation_frame` must be an integer.")
+    if units not in VALID_STABILITY_UNITS_LIST:
+        raise ValueError(f"`units` must be one of {VALID_STABILITY_UNITS_LIST}")
+    if clear_solver_per_run not in VALID_RUN_OPTIONS:
+        raise ValueError(f"`clear_solver_per_run` must be one of {VALID_RUN_OPTIONS}")
+    if not isinstance(angular_rate_increment, (int, float)):
+        raise ValueError("`angular_rate_increment` must be a numeric value.")
 
-    if UNITS not in valid_units:
-        raise ValueError(f"`UNITS` should be one of {valid_units}")
-
-    if CLEAR_SOLVER_PER_RUN not in valid_options:
-        raise ValueError(f"`CLEAR_SOLVER_PER_RUN` should be one of {valid_options}")
-
-    if not isinstance(ANGULAR_RATE_INCREMENT, (int, float)):
-        raise ValueError("`ANGULAR_RATE_INCREMENT` should be an integer or float value.")
-        
     lines = [
         "#************************************************************************",
         "#****************** Set the S&C toolbox parameters here *****************",
         "#************************************************************************",
         "#",
         "STABILITY_TOOLBOX_SETTINGS",
-        f"{ROTATION_FRAME}",
-        f"{UNITS}",
-        f"{CLEAR_SOLVER_PER_RUN}",
-        f"{ANGULAR_RATE_INCREMENT}"
+        f"ROTATION_FRAME {rotation_frame}",
+        f"UNITS {units}",
+        f"CLEAR_SOLVER_PER_RUN {clear_solver_per_run}",
+        f"ANGULAR_RATE_INCREMENT {angular_rate_increment}"
     ]
-
     script.append_lines(lines)
     return
 
-def stability_toolbox_new_coefficient(FRAME, UNITS, NUMERATOR, DENOMINATOR, CONSTANT, NAME, BOUNDARIES):
+def stability_toolbox_new_coefficient(
+    frame: int,
+    units: str,
+    numerator: str,
+    denominator: str,
+    constant: float,
+    name: str,
+    boundaries: Union[int, List[int]]
+) -> None:
     """
-    Appends lines to script state to define a new Stability & Control (S&C) coefficient.
+    Define a new Stability & Control (S&C) coefficient.
 
-    :param FRAME: Index of the coordinate system for computing the coefficient's numerator variable.
-    :param UNITS: One of: COEFFICIENTS, NEWTONS, KILO-NEWTONS, POUND-FORCE, KILOGRAM-FORCE
-    :param NUMERATOR: One of: CL,CDI,CDO,CD,FORCE_X,FORCE_Y,FORCE_Z,MOMENT_X,MOMENT_Y,MOMENT_Z
-    :param DENOMINATOR: One of: AOA,BETA,ROTX,ROTY,ROTZ
-    :param CONSTANT: Value of the constant to multiply to the basic derivative term.
-    :param NAME: Name of the user-defined coefficient.
-    :param BOUNDARIES: Geometry boundaries linked to this coefficient's numerator variable.
-    
-    Example usage:
-    stability_toolbox_new_coefficient(NAME='CLq', NUMERATOR='CL', DENOMINATOR='ROTY', FRAME=2, CONSTANT=208.7, BOUNDARIES=-1)
+    This function appends a command to the script state to create a new
+    user-defined stability and control coefficient.
+
+    Parameters
+    ----------
+    frame : int
+        Index of the coordinate system for the numerator variable.
+    units : str
+        Units of the coefficient. Must be one of `VALID_FORCE_UNITS_LIST`.
+    numerator : str
+        The numerator of the coefficient derivative. Must be one of
+        `VALID_STABILITY_NUMERATOR_LIST`.
+    denominator : str
+        The denominator of the coefficient derivative. Must be one of
+        `VALID_STABILITY_DENOMINATOR_LIST`.
+    constant : float
+        A constant multiplier for the derivative term.
+    name : str
+        The name of the user-defined coefficient.
+    boundaries : Union[int, List[int]]
+        The geometry boundaries linked to the numerator. Use -1 for all.
     """
-
-    valid_units = ['COEFFICIENTS', 'NEWTONS', 'KILO-NEWTONS', 'POUND-FORCE', 'KILOGRAM-FORCE']
-    if UNITS not in valid_units:
-        raise ValueError(f"`UNITS` should be one of {valid_units}")
-
-    valid_numerators = ['CL', 'CDI', 'CDO', 'CD', 'FORCE_X', 'FORCE_Y', 'FORCE_Z', 'MOMENT_X', 'MOMENT_Y', 'MOMENT_Z']
-    if NUMERATOR not in valid_numerators:
-        raise ValueError(f"`NUMERATOR` should be one of {valid_numerators}")
-
-    valid_denominators = ['AOA', 'BETA', 'ROTX', 'ROTY', 'ROTZ']
-    if DENOMINATOR not in valid_denominators:
-        raise ValueError(f"`DENOMINATOR` should be one of {valid_denominators}")
-
-    if not isinstance(CONSTANT, (int, float)):
-        raise ValueError("`CONSTANT` should be an integer or float value.")
+    if units not in VALID_FORCE_UNITS_LIST:
+        raise ValueError(f"`units` must be one of {VALID_FORCE_UNITS_LIST}")
+    if numerator not in VALID_STABILITY_NUMERATOR_LIST:
+        raise ValueError(f"`numerator` must be one of {VALID_STABILITY_NUMERATOR_LIST}")
+    if denominator not in VALID_STABILITY_DENOMINATOR_LIST:
+        raise ValueError(f"`denominator` must be one of {VALID_STABILITY_DENOMINATOR_LIST}")
+    if not isinstance(constant, (int, float)):
+        raise ValueError("`constant` must be a numeric value.")
 
     lines = [
         "#************************************************************************",
         "#********* Create a new S&C Coefficient *********************************",
         "#************************************************************************",
         "STABILITY_TOOLBOX_NEW_COEFFICIENT",
-        f"NAME {NAME}",
-        f"NUMERATOR {NUMERATOR}",
-        f"DENOMINATOR {DENOMINATOR}",
-        f"FRAME {FRAME}",
-        f"CONSTANT {CONSTANT}",
-        f"BOUNDARIES {BOUNDARIES}"
+        f"NAME {name}",
+        f"NUMERATOR {numerator}",
+        f"DENOMINATOR {denominator}",
+        f"FRAME {frame}",
+        f"CONSTANT {constant}",
     ]
 
-    if BOUNDARIES != -1:
-        boundaries_list = ",".join(map(str, BOUNDARIES))
-        lines.append(boundaries_list)
+    if isinstance(boundaries, int) and boundaries == -1:
+        lines.append("BOUNDARIES -1")
+    elif isinstance(boundaries, list):
+        lines.append(f"BOUNDARIES {len(boundaries)}")
+        lines.append(",".join(map(str, boundaries)))
+    else:
+        raise ValueError("`boundaries` must be -1 or a list of integers.")
 
     script.append_lines(lines)
     return
 
-def stability_toolbox_delete_all():
+def stability_toolbox_delete_all() -> None:
     """
-    Appends lines to script state to delete all S&C toolbox coefficients.
+    Delete all S&C toolbox coefficients.
 
-    Example usage:
-    stability_toolbox_delete_all()
+    This function appends a command to the script state to remove all
+    user-defined stability and control coefficients.
     """
-    
     lines = [
         "#************************************************************************",
         "#****************** Delete all S&C Toolbox coefficients *****************",
         "#************************************************************************",
         "STABILITY_TOOLBOX_DELETE_ALL"
     ]
-
     script.append_lines(lines)
     return
 
-def compute_stability_coefficients():
+def compute_stability_coefficients() -> None:
     """
-    Appends lines to script state to compute the stability coefficients.
-    
-    Example usage:
-    compute_stability_coefficients()
+    Compute the stability coefficients.
+
+    This function appends a command to the script state to trigger the
+    computation of all defined stability and control coefficients.
     """
-    
     lines = [
         "#************************************************************************",
         "#****************** Compute the stability coefficients ******************",
         "#************************************************************************",
         "COMPUTE_STABILITY_COEFFICIENTS"
     ]
-
     script.append_lines(lines)
     return
 
-def stability_toolbox_export(filename):
+def stability_toolbox_export(filename: str) -> None:
     """
-    Appends lines to script state to export the S&C toolbox results to an external file.
+    Export the S&C toolbox results to an external file.
 
-    :param filename: Path of the file where S&C toolbox results should be exported.
+    This function appends a command to the script state to save the results
+    of the stability and control analysis to a file.
 
-    Example usage:
-    stability_toolbox_export(r'C:\...\Testing cases\test_stability.txt')
+    Parameters
+    ----------
+    filename : str
+        The absolute path of the file to export the results to.
     """
-    
     if not isinstance(filename, str):
-        raise ValueError("`filename` should be a string representing the path.")
+        raise ValueError("`filename` must be a string.")
+
     lines = [
         "#************************************************************************",
         "#*********** Export the S&C toolbox results to external file ************",
@@ -227,6 +275,5 @@ def stability_toolbox_export(filename):
         "STABILITY_TOOLBOX_EXPORT",
         filename
     ]
-
     script.append_lines(lines)
     return

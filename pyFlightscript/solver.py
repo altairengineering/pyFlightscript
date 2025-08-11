@@ -1,98 +1,93 @@
-from .utils import *    
+from .types import (
+    RunOptions, VALID_RUN_OPTIONS, VALID_SOLVER_MODEL_LIST, VALID_SYMMETRY_LIST
+)
+from typing import Union, List, Tuple
 from .script import script
-from .types import *
-from typing import Union, List, Tuple, Optional, Any, Literal
+from .utils import *
 
 def initialize_solver(
-    solver_model: Literal['INCOMPRESSIBLE', 'SUBSONIC_PRANDTL_GLAUERT', 'TRANSONIC_FIELD_PANEL', 
-                         'SUPERSONIC_LINEAR_DOUBLET', 'TANGENT_CONE', 'MODIFIED_NEWTONIAN'],
-    surfaces: Union[int, List[Union[int, Tuple[int, Literal['ENABLE', 'DISABLE']]]]],
+    solver_model: str,
+    surfaces: Union[int, List[Union[int, Tuple[int, RunOptions]]]],
     wake_termination_x: Union[str, float] = 'DEFAULT',
-    symmetry: Literal['NONE', 'MIRROR', 'PERIODIC'] = 'NONE',
+    symmetry: str = 'NONE',
     symmetry_periodicity: int = 1,
-    wall_collision_avoidance: Literal['ENABLE', 'DISABLE'] = 'ENABLE',
-    stabilization: Literal['ENABLE', 'DISABLE'] = 'ENABLE',
+    wall_collision_avoidance: RunOptions = 'ENABLE',
+    stabilization: RunOptions = 'ENABLE',
     stabilization_strength: float = 1.0
 ) -> None:
     """
-    Appends lines to script state to initialize the solver.
-    
-    Args:
-        solver_model (str): One of: 'INCOMPRESSIBLE', 'SUBSONIC_PRANDTL_GLAUERT', 'TRANSONIC_FIELD_PANEL', 
-                           'SUPERSONIC_LINEAR_DOUBLET', 'TANGENT_CONE', 'MODIFIED_NEWTONIAN'
-        surfaces (int or list): Number of surfaces being initialized in the solver (> 0 and < total surfaces).
-                               Value can be -1 to specify all boundaries. If a list is provided, each item should
-                               be a tuple of (surface_index, quad_mesher_enabled) where quad_mesher_enabled is 'ENABLE' or 'DISABLE'.
-                               Alternatively, a list of integers can be provided, in which case quad_mesher_enabled will default to 'ENABLE'.
-        wake_termination_x (str or float): Wake termination plane location downstream of the geometry. X axis value 
-                                         measured relative to the Reference coordinate system. Use value of 'DEFAULT' 
-                                         if you require this value to be auto-computed. Required for solvers 1-3.
-        symmetry (str): One of: 'NONE', 'MIRROR', 'PERIODIC'. If 'PERIODIC', symmetry_periodicity must be provided. Default is 'NONE'.
-        symmetry_periodicity (int): Integer value for number of periodic symmetry transforms about the Reference frame X axis.
-        wall_collision_avoidance (str): 'ENABLE' or 'DISABLE' wall collision avoidance for the wake strands. Required for solvers 1-3. Default is 'Enable'
-        stabilization (str): 'ENABLE' or 'DISABLE' solver stabilization. Required for models 1-3.
-        stabilization_strength (float): Stabilization strength value (0.0 < Value < 5.0). Only used when stabilization is 'ENABLE'.
-    
-    Example usage:
-    # For INCOMPRESSIBLE solver with specific surfaces
-    initialize_solver('INCOMPRESSIBLE', [(1, 'ENABLE'), (2, 'ENABLE')], '3.5', 'MIRROR', 1, 'DISABLE', 'ENABLE', 1.0)
-    
-    # For SUBSONIC_PRANDTL_GLAUERT solver with all surfaces
-    initialize_solver('SUBSONIC_PRANDTL_GLAUERT', -1, '3.5', 'PERIODIC', 4, 'DISABLE', 'ENABLE', 1.0)
-    
-    # For TANGENT_CONE solver
-    initialize_solver('TANGENT_CONE', [(1, 'ENABLE'), (2, 'ENABLE')], symmetry='NONE')
+    Initialize the solver with specified parameters.
+
+    This function appends a command to the script state to set up the solver
+    with a chosen model and configuration.
+
+    Parameters
+    ----------
+    solver_model : str
+        The solver model to use. Must be one of `VALID_SOLVER_MODEL_LIST`.
+    surfaces : Union[int, List[Union[int, Tuple[int, RunOptions]]]]
+        Specifies the surfaces to be included in the simulation.
+        - Use -1 to include all boundaries.
+        - Provide a list of integers to specify surface indices (quad mesher enabled by default).
+        - Provide a list of tuples, where each tuple contains the surface index
+          and the quad mesher status ('ENABLE' or 'DISABLE').
+    wake_termination_x : Union[str, float], optional
+        The wake termination plane location downstream. Use 'DEFAULT' for
+        auto-computation, by default 'DEFAULT'.
+    symmetry : str, optional
+        The symmetry condition, by default 'NONE'. Must be one of
+        `VALID_SYMMETRY_LIST`.
+    symmetry_periodicity : int, optional
+        The number of periodic symmetry transforms, required if symmetry is
+        'PERIODIC', by default 1.
+    wall_collision_avoidance : RunOptions, optional
+        Enable or disable wall collision avoidance for wake strands, by default
+        'ENABLE'. Must be one of `VALID_RUN_OPTIONS`.
+    stabilization : RunOptions, optional
+        Enable or disable solver stabilization, by default 'ENABLE'. Must be
+        one of `VALID_RUN_OPTIONS`.
+    stabilization_strength : float, optional
+        The stabilization strength (0.0 < value < 5.0), by default 1.0.
+
+    Examples
+    --------
+    >>> # Initialize an incompressible solver with specific surfaces
+    >>> initialize_solver(
+    ...     'INCOMPRESSIBLE', [(1, 'ENABLE'), (2, 'ENABLE')],
+    ...     wake_termination_x=3.5, symmetry='MIRROR'
+    ... )
+
+    >>> # Initialize a tangent cone solver with all surfaces
+    >>> initialize_solver('TANGENT_CONE', -1)
     """
-    
-    # Validate solver_model
-    valid_models = ['INCOMPRESSIBLE', 'SUBSONIC_PRANDTL_GLAUERT', 'TRANSONIC_FIELD_PANEL', 
-                   'SUPERSONIC_LINEAR_DOUBLET', 'TANGENT_CONE', 'MODIFIED_NEWTONIAN']
-    if solver_model not in valid_models:
-        raise ValueError(f"`solver_model` must be one of {valid_models}")
-    
-    # Validate surfaces
+    if solver_model not in VALID_SOLVER_MODEL_LIST:
+        raise ValueError(f"`solver_model` must be one of {VALID_SOLVER_MODEL_LIST}")
+
     if surfaces != -1:
         if not isinstance(surfaces, list):
-            raise ValueError("`surfaces` should be a list of integers, a list of tuples, or -1.")
-        
-        # Convert list of integers to list of tuples with 'ENABLE' as default
-        if surfaces and all(isinstance(surface, int) for surface in surfaces):
-            surfaces = [(surface, 'ENABLE') for surface in surfaces]
-        
+            raise ValueError("`surfaces` must be a list of integers, a list of tuples, or -1.")
+        if surfaces and all(isinstance(s, int) for s in surfaces):
+            surfaces = [(s, 'ENABLE') for s in surfaces]
         for surface in surfaces:
-            if not isinstance(surface, tuple) or len(surface) != 2:
-                raise ValueError("Each entry in `surfaces` should be a tuple of (surface_index, quad_mesher_enabled).")
-            
-            if not isinstance(surface[1], str) or surface[1] not in ['ENABLE', 'DISABLE']:
-                raise ValueError("Second element in each tuple should be 'ENABLE' or 'DISABLE'.")
-    
-    # Validate symmetry
-    valid_symmetry = ['NONE', 'MIRROR', 'PERIODIC']
-    if symmetry not in valid_symmetry:
-        raise ValueError(f"`symmetry` must be one of {valid_symmetry}")
-    
-    # If symmetry is PERIODIC, validate symmetry_periodicity
-    if symmetry == 'PERIODIC':
-        if not isinstance(symmetry_periodicity, int) or symmetry_periodicity <= 0:
-            raise ValueError("`symmetry_periodicity` should be a positive integer when symmetry is 'PERIODIC'.")
-    
-    # Validate wake_termination_x for solvers 1-3
+            if not (isinstance(surface, tuple) and len(surface) == 2 and
+                    isinstance(surface[0], int) and surface[1] in VALID_RUN_OPTIONS):
+                raise ValueError("Each entry in `surfaces` must be a tuple of (index, 'ENABLE'/'DISABLE').")
+
+    if symmetry not in VALID_SYMMETRY_LIST:
+        raise ValueError(f"`symmetry` must be one of {VALID_SYMMETRY_LIST}")
+    if symmetry == 'PERIODIC' and (not isinstance(symmetry_periodicity, int) or symmetry_periodicity <= 0):
+        raise ValueError("`symmetry_periodicity` must be a positive integer for 'PERIODIC' symmetry.")
+
     if solver_model in ['INCOMPRESSIBLE', 'SUBSONIC_PRANDTL_GLAUERT', 'TRANSONIC_FIELD_PANEL']:
         if wake_termination_x != 'DEFAULT' and not isinstance(wake_termination_x, (int, float)):
-            raise ValueError("`wake_termination_x` should be either 'DEFAULT' or a number.")
-    
-    # Validate wall_collision_avoidance and stabilization for solvers 1-3
-    if solver_model in ['INCOMPRESSIBLE', 'SUBSONIC_PRANDTL_GLAUERT', 'TRANSONIC_FIELD_PANEL']:
-        for param, value in {'wall_collision_avoidance': wall_collision_avoidance, 'stabilization': stabilization}.items():
-            if value not in ['ENABLE', 'DISABLE']:
-                raise ValueError(f"`{param}` should be either 'ENABLE' or 'DISABLE'.")
-        
-        # Validate stabilization_strength if stabilization is ENABLE
-        if stabilization == 'ENABLE':
-            if not isinstance(stabilization_strength, (int, float)) or not (0.0 < stabilization_strength < 5.0):
-                raise ValueError("`stabilization_strength` should be a number between 0.0 and 5.0.")
-    
-    # Create the command lines
+            raise ValueError("`wake_termination_x` must be 'DEFAULT' or a number.")
+        if wall_collision_avoidance not in VALID_RUN_OPTIONS:
+            raise ValueError(f"`wall_collision_avoidance` must be one of {VALID_RUN_OPTIONS}")
+        if stabilization not in VALID_RUN_OPTIONS:
+            raise ValueError(f"`stabilization` must be one of {VALID_RUN_OPTIONS}")
+        if stabilization == 'ENABLE' and not (0.0 < stabilization_strength < 5.0):
+            raise ValueError("`stabilization_strength` must be between 0.0 and 5.0.")
+
     lines = [
         "#************************************************************************",
         "#****************** Initialize the solver *******************************",
@@ -101,34 +96,24 @@ def initialize_solver(
         "INITIALIZE_SOLVER",
         f"SOLVER_MODEL {solver_model}",
     ]
-    
-    # Add symmetry periodicity if needed
+
     if symmetry == 'PERIODIC':
         lines.append(f"SYMMETRY_PERIODICITY {symmetry_periodicity}")
-    
-    # Add surfaces
+
     if surfaces == -1:
         lines.append("SURFACES -1")
     else:
         lines.append(f"SURFACES {len(surfaces)}")
-        
         for surface in surfaces:
             lines.append(f"{surface[0]},{surface[1]}")
-    
-    # Add wake termination for solvers 1-3
+
     if solver_model in ['INCOMPRESSIBLE', 'SUBSONIC_PRANDTL_GLAUERT', 'TRANSONIC_FIELD_PANEL']:
         lines.append(f"WAKE_TERMINATION_X {wake_termination_x}")
-    
-    # Add symmetry
-    if symmetry == 'PERIODIC':
-        lines.append(f"SYMMETRY {symmetry} {symmetry_periodicity}")
-    else:
-        lines.append(f"SYMMETRY {symmetry}")
-    
-    # Add wall collision avoidance and stabilization for solvers 1-3
+
+    lines.append(f"SYMMETRY {symmetry}")
+
     if solver_model in ['INCOMPRESSIBLE', 'SUBSONIC_PRANDTL_GLAUERT', 'TRANSONIC_FIELD_PANEL']:
         lines.append(f"WALL_COLLISION_AVOIDANCE {wall_collision_avoidance}")
-        
         if stabilization == 'ENABLE':
             lines.append(f"STABILIZATION {stabilization} {stabilization_strength}")
         else:
@@ -139,20 +124,31 @@ def initialize_solver(
 
 def solver_proximal_boundaries(*boundaries: int) -> None:
     """
-    Appends lines to script state to enable solver proximity checking for specified boundaries.
-    
+    Enable solver proximity checking for specified boundaries.
 
-    :param boundaries: Indices of the geometry boundaries for which solver proximity checking is being enabled.
-    
-    Example usage:
-    solver_proximal_boundaries(, 1, 4, 5)
+    This function appends a command to the script state to enable proximity
+    checking for the given boundary indices. This is used to prevent wake
+    strands from penetrating certain boundaries.
+
+    Parameters
+    ----------
+    *boundaries : int
+        Variable length argument list of geometry boundary indices for which 
+        proximity checking is to be enabled.
+
+    Examples
+    --------
+    >>> # Enable proximity checking for boundaries 1, 4, and 5
+    >>> solver_proximal_boundaries(1, 4, 5)
+
+    >>> # Enable proximity checking for a single boundary
+    >>> solver_proximal_boundaries(2)
     """
-    
-    # Type and value checking
-    for boundary in boundaries:
-        if not isinstance(boundary, int):
-            raise ValueError("`boundaries` should be a list/tuple of integer values.")
-    
+    if not boundaries:
+        raise ValueError("At least one boundary index must be provided.")
+    if not all(isinstance(b, int) for b in boundaries):
+        raise ValueError("All `boundaries` must be integers.")
+
     lines = [
         "#************************************************************************",
         "#********* Enable solver proximity checking for specified boundaries ****",
@@ -160,23 +156,22 @@ def solver_proximal_boundaries(*boundaries: int) -> None:
         "#",
         f"SOLVER_PROXIMAL_BOUNDARIES {len(boundaries)}"
     ]
-
-    for boundary in boundaries:
-        lines.append(str(boundary))
-        
+    lines.extend(map(str, boundaries))
     script.append_lines(lines)
     return
 
 def solver_remove_initialization() -> None:
     """
-    Appends lines to script state to remove the solver initialization.
-    
+    Remove the solver initialization.
 
-    
-    Example usage:
+    This function appends a command to the script state to clear the current
+    solver initialization.
+
+    Examples
+    --------
+    >>> # Remove the solver initialization
     >>> solver_remove_initialization()
     """
-    
     lines = [
         "#************************************************************************",
         "#********* Remove the solver initialization *****************************",
@@ -184,6 +179,5 @@ def solver_remove_initialization() -> None:
         "#",
         "REMOVE_INITIALIZATION"
     ]
-    
     script.append_lines(lines)
     return
