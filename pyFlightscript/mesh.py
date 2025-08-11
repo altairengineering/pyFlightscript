@@ -1,28 +1,42 @@
-from .utils import *    
+from .utils import check_file_existence, check_valid_length_units
 from .script import script
 from .types import *
-import numpy as np
+from typing import List
 
-def import_mesh( geometry_filepath, units='METER', file_type='STL', clear=True):
+def import_mesh(
+    geometry_filepath: str, 
+    units: ValidUnits = 'METER', 
+    file_type: ValidImportMeshFileTypes = 'STL', 
+    clear: bool = True
+) -> None:
     """
-    Appends lines to script state to import a geometry into the simulation.
-    
+    Import a geometry into the simulation.
 
-    :param units: The unit type for the geometry.
-    :param file_type: Type of the geometry file.
-    :param geometry_filepath: Path to the geometry file.
-    :param clear: Boolean, if True, will add CLEAR to the script to delete existing geometry boundaries.
+    This function appends a command to the script state to import a geometry
+    file, specifying units, file type, and whether to clear existing
+    geometry boundaries.
+
+    Parameters
+    ----------
+    geometry_filepath : str
+        Path to the geometry file.
+    units : ValidUnits, optional
+        The unit type for the geometry, by default 'METER'.
+    file_type : ValidImportMeshFileTypes, optional
+        Type of the geometry file, by default 'STL'.
+    clear : bool, optional
+        If True, deletes existing geometry boundaries before import, by default True.
+
+    Raises
+    ------
+    ValueError
+        If an invalid file type or unit is provided.
     """
-    
     check_file_existence(geometry_filepath)
-    
-    # Valid units and file types
-    valid_file_types = ["STL", "TRI", "P3D", "CSV", "INP", "STRUCTURED_QUAD", "UNSTRUCTURED_QUAD", "LAWGS", "VTK", "AC", "FAC", "OBJ"]
-    
     check_valid_length_units(units)
     
-    if file_type not in valid_file_types:
-        raise ValueError(f"'{file_type}' is not a valid file type. Valid file types are: {', '.join(valid_file_types)}")
+    if file_type not in VALID_IMPORT_MESH_FILE_TYPES:
+        raise ValueError(f"'{file_type}' is not a valid file type. Valid file types are: {', '.join(VALID_IMPORT_MESH_FILE_TYPES)}")
     
     lines = [
         "#************************************************************************",
@@ -41,28 +55,44 @@ def import_mesh( geometry_filepath, units='METER', file_type='STL', clear=True):
     script.append_lines(lines)
     return
 
-def ccs_import(ccs_filepath, close_component_ends="ENABLE", update_properties="DISABLE", clear_existing="ENABLE"):
+def ccs_import(
+    ccs_filepath: str, 
+    close_component_ends: RunOptions = "ENABLE", 
+    update_properties: RunOptions = "DISABLE", 
+    clear_existing: RunOptions = "ENABLE"
+) -> None:
     """
-    Appends lines to script state to import a Component Cross-Section (CCS) geometry.
-    
+    Import a Component Cross-Section (CCS) geometry.
 
-    :param ccs_filepath: Path to the CCS geometry file.
-    :param close_component_ends: "ENABLE" or "DISABLE" hole-filling at the ends of each valid component. Default is "ENABLE".
-    :param update_properties: "ENABLE" or "DISABLE" to update the simulation using the user-defined simulation properties in the file. Default is "DISABLE".
-    :param clear_existing: "ENABLE" or "DISABLE" to delete all existing geometry boundaries prior to importing new geometry. Default is "ENABLE".
+    This function appends a command to the script state to import a CCS
+    geometry file with options for handling component ends, properties, and
+    existing geometry.
+
+    Parameters
+    ----------
+    ccs_filepath : str
+        Path to the CCS geometry file.
+    close_component_ends : RunOptions, optional
+        Enable/disable hole-filling at component ends, by default "ENABLE".
+    update_properties : RunOptions, optional
+        Enable/disable updating simulation properties from the file, by default "DISABLE".
+    clear_existing : RunOptions, optional
+        Enable/disable deleting existing geometry before import, by default "ENABLE".
+
+    Raises
+    ------
+    ValueError
+        If any option is not 'ENABLE' or 'DISABLE'.
     """
-    
     check_file_existence(ccs_filepath)
 
-    
-    # Validate values for ENABLE or DISABLE options
-    valid_values = ["ENABLE", "DISABLE"]
-    if close_component_ends not in valid_values:
-        raise ValueError(f"'close_component_ends' value should be one of {valid_values}. Received: {close_component_ends}")
-    if update_properties not in valid_values:
-        raise ValueError(f"'update_properties' value should be one of {valid_values}. Received: {update_properties}")
-    if clear_existing not in valid_values:
-        raise ValueError(f"'clear_existing' value should be one of {valid_values}. Received: {clear_existing}")
+    for option, name in [
+        (close_component_ends, 'close_component_ends'),
+        (update_properties, 'update_properties'),
+        (clear_existing, 'clear_existing')
+    ]:
+        if option not in VALID_RUN_OPTIONS:
+            raise ValueError(f"'{name}' value should be one of {VALID_RUN_OPTIONS}. Received: {option}")
     
     lines = [
         "#************************************************************************",
@@ -79,20 +109,33 @@ def ccs_import(ccs_filepath, close_component_ends="ENABLE", update_properties="D
     script.append_lines(lines)
     return
 
-def export_surface_mesh(file_path, file_type, surface=-1):
+def export_surface_mesh(
+    file_path: str, 
+    file_type: ValidExportMeshFileTypes, 
+    surface: int = -1
+) -> None:
     """
-    Appends lines to script state to export a geometry surface to an external file.
-    
+    Export a geometry surface to an external file.
 
-    :param file_path: Path to save the exported file.
-    :param file_type: File type for the exported geometry. One of the following: STL, TRI, OBJ.
-    :param surface: Index of the surface that should be exported. Default is -1 (exports all geometry surfaces).
+    This function appends a command to the script state to export one or all
+    geometry surfaces to a specified file format.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to save the exported file.
+    file_type : ValidExportMeshFileTypes
+        File type for the exported geometry (STL, TRI, OBJ).
+    surface : int, optional
+        Index of the surface to export (-1 for all surfaces), by default -1.
+
+    Raises
+    ------
+    ValueError
+        If an invalid file type is provided.
     """
-    
-    # Validate file type
-    valid_file_types = ["STL", "TRI", "OBJ"]
-    if file_type not in valid_file_types:
-        raise ValueError(f"'file_type' should be one of {valid_file_types}. Received: {file_type}")
+    if file_type not in VALID_EXPORT_MESH_FILE_TYPES:
+        raise ValueError(f"'file_type' should be one of {VALID_EXPORT_MESH_FILE_TYPES}. Received: {file_type}")
     
     lines = [
         "#************************************************************************",
@@ -106,35 +149,53 @@ def export_surface_mesh(file_path, file_type, surface=-1):
     script.append_lines(lines)
     return
 
-def surface_rotate(frame=1, axis='X', angle=0, surfaces=[-1], 
-                   split_vertices='DISABLE', adaptive_mesh='DISABLE', 
-                   detach_normal_to_axis='DISABLE'):
-                   
+def surface_rotate(
+    frame: int = 1, 
+    axis: ValidRotationAxis = 'X', 
+    angle: float = 0, 
+    surfaces: List[int] = [-1], 
+    split_vertices: RunOptions = 'DISABLE', 
+    adaptive_mesh: RunOptions = 'DISABLE', 
+    detach_normal_to_axis: RunOptions = 'DISABLE'
+) -> None:
     """
-    Appends lines to script state to rotate an existing surface.
-    
+    Rotate an existing surface.
 
-    :param frame: Index of the coordinate system to be used. Default is 1.
-    :param axis: Coordinate axis about which to rotate the surface. Default is 'X'.
-    :param angle: Angle value in degrees. Default is 0.
-    :param surfaces: List of surface indices to be rotated. Default is [-1] which selects all surfaces.
-    :param split_vertices: ENABLE or DISABLE. Default is 'DISABLE'.
-    :param adaptive_mesh: ENABLE or DISABLE. Default is 'ENABLE'.
-    :param detach_normal_to_axis: ENABLE or DISABLE. Default is 'ENABLE'.
+    This function appends a command to the script state to rotate specified
+    surfaces around a given axis and frame.
 
-    Example usage:
-    surface_rotate(1, 'X', 90, [-1], split_vertices='ENABLE', adaptive_mesh='DISABLE', detach_normal_to_axis='DISABLE')
+    Parameters
+    ----------
+    frame : int, optional
+        Index of the coordinate system to be used, by default 1.
+    axis : ValidRotationAxis, optional
+        Coordinate axis about which to rotate the surface, by default 'X'.
+    angle : float, optional
+        Angle value in degrees, by default 0.
+    surfaces : List[int], optional
+        List of surface indices to be rotated (-1 for all), by default [-1].
+    split_vertices : RunOptions, optional
+        Enable/disable splitting vertices, by default 'DISABLE'.
+    adaptive_mesh : RunOptions, optional
+        Enable/disable adaptive meshing, by default 'DISABLE'.
+    detach_normal_to_axis : RunOptions, optional
+        Enable/disable detaching normals, by default 'DISABLE'.
+
+    Raises
+    ------
+    ValueError
+        If an invalid axis or option is provided.
     """
+    if axis not in VALID_ROTATION_AXIS_LIST:
+        raise ValueError(f"'axis' should be one of {VALID_ROTATION_AXIS_LIST}. Received: {axis}")
     
-    # Validate axis
-    valid_axes = ['X', 'Y', 'Z', '1', '2', '3']
-    if axis not in valid_axes:
-        raise ValueError(f"'axis' should be one of {valid_axes}. Received: {axis}")
-    
-    # Validate ENABLE/DISABLE options
-    valid_options = ['ENABLE', 'DISABLE']
-    if any(option not in valid_options for option in [split_vertices, adaptive_mesh, detach_normal_to_axis]):
-        raise ValueError(f"Options 'split_vertices', 'adaptive_mesh', and 'detach_normal_to_axis' should be one of {valid_options}.")
+    for option, name in [
+        (split_vertices, 'split_vertices'),
+        (adaptive_mesh, 'adaptive_mesh'),
+        (detach_normal_to_axis, 'detach_normal_to_axis')
+    ]:
+        if option not in VALID_RUN_OPTIONS:
+            raise ValueError(f"'{name}' should be one of {VALID_RUN_OPTIONS}. Received: {option}")
     
     lines = [
         "#************************************************************************",
@@ -146,7 +207,7 @@ def surface_rotate(frame=1, axis='X', angle=0, surfaces=[-1],
         f"AXIS {axis}",
         f"ANGLE {angle}",
         f"SURFACES {len(surfaces)}",
-        ", ".join(str(s) for s in surfaces),
+        ", ".join(map(str, surfaces)),
         f"SPLIT_VERTICES {split_vertices}",
         f"ADAPTIVE_MESH {adaptive_mesh}",
         f"DETACH_NORMAL_TO_AXIS {detach_normal_to_axis}"
@@ -155,26 +216,43 @@ def surface_rotate(frame=1, axis='X', angle=0, surfaces=[-1],
     script.append_lines(lines)
     return
 
-def translate_surface_in_frame(frame=1, x=0.0, y=0.0, z=0.0, units='INCH', 
-                               surface=0, split_vertices='DISABLE'):
+def translate_surface_in_frame(
+    frame: int = 1, 
+    x: float = 0.0, 
+    y: float = 0.0, 
+    z: float = 0.0, 
+    units: ValidUnits = 'INCH', 
+    surface: int = 0, 
+    split_vertices: RunOptions = 'DISABLE'
+) -> None:
     """
-    Appends lines to script state to translate a surface with a vector.
-    
+    Translate a surface with a vector.
 
-    :param frame: Index of the coordinate system to be used. Default is 1.
-    :param x, y, z: Translation vector values in the specified coordinate system. Default is (0.0, 0.0, 0.0).
-    :param units: Unit type for translation. Default is 'INCH'.
-    :param surface: Index of the surface to be translated. Default is 0 which selects all surfaces.
-    :param split_vertices: ENABLE or DISABLE. Default is 'DISABLE'.
+    This function appends a command to the script state to translate a surface
+    using a vector in a specified coordinate system.
+
+    Parameters
+    ----------
+    frame : int, optional
+        Index of the coordinate system, by default 1.
+    x, y, z : float, optional
+        Translation vector components, by default 0.0.
+    units : ValidUnits, optional
+        Unit type for translation, by default 'INCH'.
+    surface : int, optional
+        Index of the surface to translate (0 for all), by default 0.
+    split_vertices : RunOptions, optional
+        Enable/disable splitting vertices, by default 'DISABLE'.
+
+    Raises
+    ------
+    ValueError
+        If an invalid option is provided.
     """
-    
-    # Validate units
     check_valid_length_units(units)
     
-    # Validate ENABLE/DISABLE option
-    valid_options = ['ENABLE', 'DISABLE']
-    if split_vertices not in valid_options:
-        raise ValueError(f"'split_vertices' should be one of {valid_options}. Received: {split_vertices}")
+    if split_vertices not in VALID_RUN_OPTIONS:
+        raise ValueError(f"'split_vertices' should be one of {VALID_RUN_OPTIONS}. Received: {split_vertices}")
     
     lines = [
         "#************************************************************************",
@@ -187,16 +265,25 @@ def translate_surface_in_frame(frame=1, x=0.0, y=0.0, z=0.0, units='INCH',
     script.append_lines(lines)
     return
 
-def translate_surface_by_frame(frame1=1, frame2=1, surface=0):
+def translate_surface_by_frame(frame1: int = 1, frame2: int = 1, surface: int = 0) -> None:
     """
-    Appends lines to script state to translate a surface from one frame to another.
-    
+    Translate a surface from one frame to another.
 
-    :param frame1: Index of initial frame. Default is 1.
-    :param frame2: Index of destination frame. Default is 1.
-    :param surface: Index of the surface to be translated. Default is 0 which selects all surfaces.
+    This function appends a command to the script state to translate a surface
+    by aligning its coordinate system from an initial frame to a destination frame.
+
+    Parameters
+    ----------
+    frame1 : int, optional
+        Index of the initial frame, by default 1.
+    frame2 : int, optional
+        Index of the destination frame, by default 1.
+    surface : int, optional
+        Index of the surface to translate (0 for all), by default 0.
     """
-    
+    if not all(isinstance(arg, int) for arg in [frame1, frame2, surface]):
+        raise TypeError("All arguments must be integers.")
+
     lines = [
         "#************************************************************************",
         "#****************** Translate a surface from one frame to another *******",
@@ -208,18 +295,31 @@ def translate_surface_by_frame(frame1=1, frame2=1, surface=0):
     script.append_lines(lines)
     return
 
-def surface_scale(frame=1, scale_x=1.0, scale_y=1.0, scale_z=1.0, surface=-1):
+def surface_scale(
+    frame: int = 1, 
+    scale_x: float = 1.0, 
+    scale_y: float = 1.0, 
+    scale_z: float = 1.0, 
+    surface: int = -1
+) -> None:
     """
-    Appends lines to script state to scale existing surface(s).
-    
+    Scale existing surface(s).
 
-    :param frame: Index of the coordinate system for scaling. Default is 1.
-    :param scale_x: Scaling value in X direction. Default is 1.0.
-    :param scale_y: Scaling value in Y direction. Default is 1.0.
-    :param scale_z: Scaling value in Z direction. Default is 1.0.
-    :param surface: Index of the surface to be scaled. Default is -1 which selects all surfaces.
+    This function appends a command to the script state to scale one or all
+    surfaces in a specified coordinate system.
+
+    Parameters
+    ----------
+    frame : int, optional
+        Index of the coordinate system for scaling, by default 1.
+    scale_x, scale_y, scale_z : float, optional
+        Scaling factors in X, Y, and Z directions, by default 1.0.
+    surface : int, optional
+        Index of the surface to scale (-1 for all), by default -1.
     """
-    
+    if not isinstance(frame, int) or not all(isinstance(s, (int, float)) for s in [scale_x, scale_y, scale_z, surface]):
+        raise TypeError("Frame and surface must be integers, and scaling factors must be numeric.")
+
     lines = [
         "#************************************************************************",
         "#****************** Scale existing surface(s) ***************************",
@@ -231,15 +331,21 @@ def surface_scale(frame=1, scale_x=1.0, scale_y=1.0, scale_z=1.0, surface=-1):
     script.append_lines(lines)
     return
 
-def surface_invert(index=1):
+def surface_invert(index: int = 1) -> None:
     """
-    Appends lines to script state to invert the surface normals of a given surface.
-    
+    Invert the surface normals of a given surface.
 
-    :param index: Index of the surface to be inverted. Default is 1. 
-                  To invert all surfaces, specify -1.
+    This function appends a command to the script state to invert the normals
+    of a specified surface.
+
+    Parameters
+    ----------
+    index : int, optional
+        Index of the surface to invert (-1 for all), by default 1.
     """
-    
+    if not isinstance(index, int):
+        raise TypeError("`index` must be an integer.")
+
     lines = [
         "#************************************************************************",
         "#****************** Invert the surface normals of a surface *************",
@@ -251,20 +357,24 @@ def surface_invert(index=1):
     script.append_lines(lines)
     return
 
-def surface_rename(name, index=1):
+def surface_rename(name: str, index: int = 1) -> None:
     """
-    Appends lines to script state to rename the surface geometry.
-    
+    Rename the surface geometry.
 
-    :param index: Index of the surface to be renamed.
-    :param name: New name to be used for the geometry surface.
+    This function appends a command to the script state to assign a new name
+    to a specified geometry surface.
+
+    Parameters
+    ----------
+    name : str
+        New name for the geometry surface.
+    index : int, optional
+        Index of the surface to be renamed, by default 1.
     """
-    
-    # Type checking
     if not isinstance(index, int):
-        raise ValueError("`index` should be an integer value.")
+        raise TypeError("`index` must be an integer.")
     if not isinstance(name, str):
-        raise ValueError("`name` should be a string value.")
+        raise TypeError("`name` must be a string.")
     
     lines = [
         "#************************************************************************",
@@ -277,21 +387,27 @@ def surface_rename(name, index=1):
     script.append_lines(lines)
     return
 
-def select_geometry_by_id(surface=1):
+def select_geometry_by_id(surface: int = 1) -> None:
     """
-    Appends lines to script state to select a geometry surface by its index.
-    
+    Select a geometry surface by its index.
 
-    :param surface: Index of the surface to be selected.
+    This function appends a command to the script state to select a geometry
+    surface.
+
+    Parameters
+    ----------
+    surface : int, optional
+        Index of the surface to select (-1 for all), by default 1.
+
+    Raises
+    ------
+    ValueError
+        If the surface index is invalid.
     """
-    
-    # Type checking
     if not isinstance(surface, int):
-        raise TypeError("`surface` should be an integer value.")
-    
-    # Value checking
+        raise TypeError("`surface` must be an integer.")
     if surface <= 0 and surface != -1:
-        raise ValueError("`surface` should be greater than 0 or -1 to select all surfaces.")
+        raise ValueError("`surface` must be a positive integer or -1 to select all surfaces.")
     
     lines = [
         "#************************************************************************",
@@ -304,43 +420,52 @@ def select_geometry_by_id(surface=1):
     script.append_lines(lines)
     return
 
-def surface_select_by_threshold(frame=1, threshold='Y', min_value=0.5, 
-                                max_value=2.5, range_value='ABOVE_MIN_BELOW_MAX', 
-                                subset='ALL_FACES'):
+def surface_select_by_threshold(
+    frame: int = 1, 
+    threshold: ValidThresholds = 'Y', 
+    min_value: float = 0.5, 
+    max_value: float = 2.5, 
+    range_value: ValidRanges = 'ABOVE_MIN_BELOW_MAX', 
+    subset: ValidSubsets = 'ALL_FACES'
+) -> None:
     """
-    Appends lines to script state to select surface faces by threshold.
-    
+    Select surface faces by threshold.
 
-    :param frame: Index of the coordinate system used for defining the threshold parameters.
-    :param threshold: Type of the threshold.
-    :param min_value: Minimum value of the threshold range.
-    :param max_value: Maximum value of the threshold range.
-    :param range_value: Range type.
-    :param subset: Subset type.
+    This function appends a command to the script state to select surface
+    faces based on a specified threshold criterion.
+
+    Parameters
+    ----------
+    frame : int, optional
+        Index of the coordinate system for thresholding, by default 1.
+    threshold : ValidThresholds, optional
+        Type of threshold, by default 'Y'.
+    min_value : float, optional
+        Minimum value of the threshold range, by default 0.5.
+    max_value : float, optional
+        Maximum value of the threshold range, by default 2.5.
+    range_value : ValidRanges, optional
+        Type of range selection, by default 'ABOVE_MIN_BELOW_MAX'.
+    subset : ValidSubsets, optional
+        Subset of faces to consider, by default 'ALL_FACES'.
+
+    Raises
+    ------
+    ValueError
+        If any parameter is invalid.
     """
-    
-    # Type and value checking
     if not isinstance(frame, int):
-        raise ValueError("`frame` should be an integer value.")
-    
-    valid_thresholds = ['AREA', 'QUALITY', 'X', 'Y', 'Z', 'VELOCITY', 'VX', 
-                        'VY', 'VZ', 'CP', 'MACH', 'SOLVER_QUALITY']
-    if threshold not in valid_thresholds:
-        raise ValueError(f"`threshold` should be one of {valid_thresholds}")
-    
+        raise TypeError("`frame` must be an integer.")
+    if threshold not in VALID_THRESHOLD_LIST:
+        raise ValueError(f"`threshold` must be one of {VALID_THRESHOLD_LIST}")
     if not isinstance(min_value, (int, float)):
-        raise ValueError("`min_value` should be an integer or float value.")
-    
+        raise TypeError("`min_value` must be a numeric value.")
     if not isinstance(max_value, (int, float)):
-        raise ValueError("`max_value` should be an integer or float value.")
-    
-    valid_ranges = ['ABOVE_MIN', 'BELOW_MAX', 'ABOVE_MIN_BELOW_MAX']
-    if range_value not in valid_ranges:
-        raise ValueError(f"`range_value` should be one of {valid_ranges}")
-    
-    valid_subsets = ['ALL_FACES', 'VISIBLE_FACES', 'SELECTED_FACES']
-    if subset not in valid_subsets:
-        raise ValueError(f"`subset` should be one of {valid_subsets}")
+        raise TypeError("`max_value` must be a numeric value.")
+    if range_value not in VALID_RANGE_LIST:
+        raise ValueError(f"`range_value` must be one of {VALID_RANGE_LIST}")
+    if subset not in VALID_SUBSET_LIST:
+        raise ValueError(f"`subset` must be one of {VALID_SUBSET_LIST}")
     
     lines = [
         "#************************************************************************",
@@ -359,12 +484,13 @@ def surface_select_by_threshold(frame=1, threshold='Y', min_value=0.5,
     script.append_lines(lines)
     return
 
-def create_new_surface_from_selection():
+def create_new_surface_from_selection() -> None:
     """
-    Appends lines to script state to create a new geometry surface 
-    from the currently selected faces.
+    Create a new geometry surface from the currently selected faces.
+
+    This function appends a command to the script state to generate a new
+    surface from the set of currently selected faces.
     """
-    
     lines = [
         "#************************************************************************",
         "#************** Create new geometry surface from selected faces *********",
@@ -376,31 +502,37 @@ def create_new_surface_from_selection():
     script.append_lines(lines)
     return
 
-def surface_cut_by_plane(frame=1, plane='XZ', offset=0.0, 
-                         surface=-1):
+def surface_cut_by_plane(
+    frame: int = 1, 
+    plane: ValidPlanes = 'XZ', 
+    offset: float = 0.0, 
+    surface: int = -1
+) -> None:
     """
-    Appends lines to script state to cut surfaces using a cutting plane.
-    
+    Cut surfaces using a cutting plane.
 
-    :param frame: Index of the coordinate system used for defining the cutting plane.
-    :param plane: Plane of the specified coordinate system used as a cutting plane.
-    :param offset: Offset distance of the plane along the plane normal vector.
-    :param surface: Index of the surface that must be cut.
+    This function appends a command to the script state to cut one or all
+    surfaces with a specified plane.
+
+    Parameters
+    ----------
+    frame : int, optional
+        Index of the coordinate system for the cutting plane, by default 1.
+    plane : ValidPlanes, optional
+        Plane of the coordinate system to use as the cutting plane, by default 'XZ'.
+    offset : float, optional
+        Offset distance of the plane along its normal vector, by default 0.0.
+    surface : int, optional
+        Index of the surface to cut (-1 for all), by default -1.
     """
-    
-    # Type and value checking
     if not isinstance(frame, int):
-        raise ValueError("`frame` should be an integer value.")
-    
-    valid_planes = ['ZX', 'YZ', 'XY']
-    if plane not in valid_planes:
-        raise ValueError(f"`plane` should be one of {valid_planes}")
-    
+        raise TypeError("`frame` must be an integer.")
+    if plane not in VALID_PLANE_LIST:
+        raise ValueError(f"`plane` must be one of {VALID_PLANE_LIST}")
     if not isinstance(offset, (int, float)):
-        raise ValueError("`offset` should be an integer or float value.")
-    
+        raise TypeError("`offset` must be a numeric value.")
     if not isinstance(surface, int):
-        raise ValueError("`surface` should be an integer value.")
+        raise TypeError("`surface` must be an integer.")
     
     lines = [
         "#************************************************************************",
@@ -417,35 +549,38 @@ def surface_cut_by_plane(frame=1, plane='XZ', offset=0.0,
     script.append_lines(lines)
     return
 
-def surface_mirror(surface=1, coordinate_system=1, mirror_plane=1, 
-                   combine_flag=True, delete_source_flag=False):
+def surface_mirror(
+    surface: int = 1, 
+    coordinate_system: int = 1, 
+    mirror_plane: int = 1, 
+    combine_flag: bool = True, 
+    delete_source_flag: bool = False
+) -> None:
     """
-    Appends lines to script state to mirror an existing surface.
-    
+    Mirror an existing surface.
 
-    :param surface: Index of the surface that must be mirrored.
-    :param coordinate_system: Index of the coordinate system to be used.
-    :param mirror_plane: Index of the mirror plane within the selected coordinate system.
-    :param combine_flag: Indicate whether the mirrored geometry should be combined with the source.
-    :param delete_source_flag: Indicate if the source geometry should be deleted after mirroring.
+    This function appends a command to the script state to mirror a surface
+    across a specified plane.
+
+    Parameters
+    ----------
+    surface : int, optional
+        Index of the surface to mirror, by default 1.
+    coordinate_system : int, optional
+        Index of the coordinate system to use, by default 1.
+    mirror_plane : int, optional
+        Index of the mirror plane (1=XY, 2=YZ, 3=XZ), by default 1.
+    combine_flag : bool, optional
+        Combine the mirrored geometry with the source, by default True.
+    delete_source_flag : bool, optional
+        Delete the source geometry after mirroring, by default False.
     """
-    
-    # Type and value checking
-    if not isinstance(surface, int):
-        raise ValueError("`surface` should be an integer value.")
-    
-    if not isinstance(coordinate_system, int):
-        raise ValueError("`coordinate_system` should be an integer value.")
-    
-    valid_mirror_planes = [1, 2, 3]
-    if mirror_plane not in valid_mirror_planes:
-        raise ValueError(f"`mirror_plane` should be one of {valid_mirror_planes}")
-    
-    if not isinstance(combine_flag, bool):
-        raise ValueError("`combine_flag` should be a boolean value.")
-    
-    if not isinstance(delete_source_flag, bool):
-        raise ValueError("`delete_source_flag` should be a boolean value.")
+    if not all(isinstance(arg, int) for arg in [surface, coordinate_system, mirror_plane]):
+        raise TypeError("`surface`, `coordinate_system`, and `mirror_plane` must be integers.")
+    if mirror_plane not in [1, 2, 3]:
+        raise ValueError("`mirror_plane` must be 1, 2, or 3.")
+    if not all(isinstance(arg, bool) for arg in [combine_flag, delete_source_flag]):
+        raise TypeError("`combine_flag` and `delete_source_flag` must be booleans.")
     
     lines = [
         "#************************************************************************",
@@ -458,20 +593,25 @@ def surface_mirror(surface=1, coordinate_system=1, mirror_plane=1,
     script.append_lines(lines)
     return
 
-def surface_auto_hole_fill(surface=1):
+def surface_auto_hole_fill(surface: int = 1) -> None:
     """
-    Appends lines to script state to automatically fill holes on a surface.
-    
+    Automatically fill holes on a surface.
 
-    :param surface: Index of the surface on which the geometry holes must be filled.
+    This function appends a command to the script state to automatically fill
+    all holes on a specified surface.
+
+    Parameters
+    ----------
+    surface : int, optional
+        Index of the surface to fill, by default 1.
+
+    Raises
+    ------
+    ValueError
+        If the surface index is not a positive integer.
     """
-    
-    # Type and value checking
-    if not isinstance(surface, int):
-        raise ValueError("`surface` should be an integer value.")
-    
-    if surface <= 0:
-        raise ValueError("`surface` index should be greater than 0.")
+    if not isinstance(surface, int) or surface <= 0:
+        raise ValueError("`surface` must be a positive integer.")
     
     lines = [
         "#************************************************************************",
@@ -485,41 +625,40 @@ def surface_auto_hole_fill(surface=1):
     script.append_lines(lines)
     return
 
-def surface_combine(surface_indices):
+def surface_combine(surface_indices: List[int]) -> None:
     """
-    Appends lines to script state to combine selected surfaces.
+    Combine selected surfaces.
 
-    :param surface_indices: List of surface indices to be combined.
+    This function appends a command to the script state to combine multiple
+    surfaces into a single surface.
+
+    Parameters
+    ----------
+    surface_indices : List[int]
+        List of surface indices to be combined.
     """
-    
-    # Type and value checking
-    if not isinstance(surface_indices, list):
-        raise ValueError("`surface_indices` should be a list of integer values.")
-    
-    if not all(isinstance(idx, int) for idx in surface_indices):
-        raise ValueError("All elements in `surface_indices` should be integers.")
-    
-    surface_count = len(surface_indices)
+    if not isinstance(surface_indices, list) or not all(isinstance(idx, int) for idx in surface_indices):
+        raise TypeError("`surface_indices` must be a list of integers.")
     
     lines = [
         "#************************************************************************",
         "#****************** Combine selected surfaces ***************************",
         "#************************************************************************",
         "#",
-        f"SURFACE_COMBINE {surface_count}",
+        f"SURFACE_COMBINE {len(surface_indices)}",
         ",".join(map(str, surface_indices))
     ]
 
     script.append_lines(lines)
     return
 
-def delete_selected_faces():
+def delete_selected_faces() -> None:
     """
-    Appends lines to script state to delete selected mesh faces.
-    
 
+    Delete selected mesh faces.
+    This function appends a command to the script state to delete all
+    currently selected mesh faces.
     """
-    
     lines = [
         "#************************************************************************",
         "#****************** Delete selected mesh faces **************************",
@@ -531,17 +670,25 @@ def delete_selected_faces():
     script.append_lines(lines)
     return
 
-def surface_delete(surface_index):
+def surface_delete(surface_index: int) -> None:
     """
-    Appends lines to script state to delete an existing surface.
-    
+    Delete an existing surface.
 
-    :param surface_index: Index of the surface to be deleted.
+    This function appends a command to the script state to delete a specified
+    surface.
+
+    Parameters
+    ----------
+    surface_index : int
+        Index of the surface to be deleted.
+
+    Raises
+    ------
+    ValueError
+        If the surface index is not a positive integer.
     """
-    
-    # Type and value checking
     if not isinstance(surface_index, int) or surface_index < 1:
-        raise ValueError("`surface_index` should be an integer value greater than 0.")
+        raise ValueError("`surface_index` must be an integer greater than 0.")
     
     lines = [
         "#************************************************************************",
@@ -555,13 +702,13 @@ def surface_delete(surface_index):
     script.append_lines(lines)
     return
 
-def surface_clearall():
+def surface_clearall() -> None:
     """
-    Appends lines to script state to delete all surfaces in the simulation.
-    
+    Delete all surfaces in the simulation.
 
+    This function appends a command to the script state to delete all
+    geometry surfaces currently in the simulation.
     """
-    
     lines = [
         "#************************************************************************",
         "#****************** Delete all surfaces in simulation *******************",
@@ -573,39 +720,39 @@ def surface_clearall():
     script.append_lines(lines)
     return
 
-def transform_selected_nodes(coordinate_system, translation_type, x, y, z):
+def transform_selected_nodes(
+    coordinate_system: int, 
+    translation_type: ValidTranslationTypes, 
+    x: float, 
+    y: float, 
+    z: float
+) -> None:
     """
-    Appends lines to script state to transform selected nodes by translation.
-    
+    Transform selected nodes by translation.
 
-    :param coordinate_system: Index of the coordinate system to be used.
-    :param translation_type: Type of translation - 'ABSOLUTE' or 'TRANSLATION'.
-                             ABSOLUTE specifies the absolute values of the new XYZ coordinates.
-                             TRANSLATION specifies delta increments to the current node XYZ values.
-    :param x: X value of translation.
-    :param y: Y value of translation.
-    :param z: Z value of translation.
-    
-    Example usage:
-        pyfs.transform_selected_nodes(1, 'TRANSLATION', -1, 0, 0)
+    This function appends a command to the script state to transform selected
+    nodes by either absolute coordinates or a translation vector.
+
+    Parameters
+    ----------
+    coordinate_system : int
+        Index of the coordinate system to be used.
+    translation_type : ValidTranslationTypes
+        Type of translation ('ABSOLUTE' or 'TRANSLATION').
+    x, y, z : float
+        Translation values.
+
+    Raises
+    ------
+    ValueError
+        If any parameter is invalid.
     """
-    
-    # Type and value checking
-    if not isinstance(coordinate_system, int):
-        raise ValueError("`coordinate_system` should be an integer value.")
-    
-    if coordinate_system <= 0:
-        raise ValueError("`coordinate_system` index should be greater than 0.")
-    
-    # Validate translation type
-    valid_translation_types = ["ABSOLUTE", "TRANSLATION"]
-    if translation_type not in valid_translation_types:
-        raise ValueError(f"`translation_type` should be one of {valid_translation_types}. Received: {translation_type}")
-    
-    # Validate x, y, z are numeric
-    for val, name in [(x, 'x'), (y, 'y'), (z, 'z')]:
-        if not isinstance(val, (int, float)):
-            raise ValueError(f"`{name}` should be a numeric value.")
+    if not isinstance(coordinate_system, int) or coordinate_system <= 0:
+        raise ValueError("`coordinate_system` must be a positive integer.")
+    if translation_type not in VALID_TRANSLATION_TYPES:
+        raise ValueError(f"`translation_type` must be one of {VALID_TRANSLATION_TYPES}.")
+    if not all(isinstance(val, (int, float)) for val in [x, y, z]):
+        raise TypeError("`x`, `y`, and `z` must be numeric values.")
     
     lines = [
         "#************************************************************************",
