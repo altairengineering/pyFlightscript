@@ -3,19 +3,41 @@ from .utils import *
 from .script import script
 from .types import *
 
-def physics(auto_trail_edges=False, auto_wake_nodes=False, end=True):
-    """
-    Appends lines to script state to set the physics conditions.
+from typing import List
+from .script import script
 
-    :param auto_trail_edges: If True, launches trailing-edge auto-detection tool.
-    :param auto_wake_nodes: If True, launches wake termination node auto-detection tool.
-    :param end: If True, adds an "END" line.
-
-    Example usage:
-    physics(auto_trail_edges=True, auto_wake_nodes=True)
+def physics(
+    auto_trail_edges: bool = False, 
+    auto_wake_nodes: bool = False, 
+    end: bool = True
+) -> None:
     """
-    
-    # List to store the lines
+    Set the physics conditions for the simulation.
+
+    This function appends a command to the script state to define the physics
+    conditions, with options to enable auto-detection for trailing edges and
+    wake termination nodes.
+
+    Parameters
+    ----------
+    auto_trail_edges : bool, optional
+        If True, launches the trailing-edge auto-detection tool, by default False.
+    auto_wake_nodes : bool, optional
+        If True, launches the wake termination node auto-detection tool, by default False.
+    end : bool, optional
+        If True, adds an "END" line to conclude the physics definition, by default True.
+
+    Examples
+    --------
+    >>> # Enable auto-detection for trailing edges and wake nodes
+    >>> physics(auto_trail_edges=True, auto_wake_nodes=True)
+
+    >>> # Set physics conditions without auto-detection
+    >>> physics()
+    """
+    if not all(isinstance(arg, bool) for arg in [auto_trail_edges, auto_wake_nodes, end]):
+        raise ValueError("All arguments must be boolean values.")
+
     lines = [
         "#************************************************************************",
         "#****************** Set the physics conditions if needed ****************",
@@ -34,21 +56,29 @@ def physics(auto_trail_edges=False, auto_wake_nodes=False, end=True):
         lines.append("END")
 
     script.append_lines(lines)
-    return
 
-def detect_trailing_edges_by_surface(surfaces=[1]):
+def detect_trailing_edges_by_surface(surfaces: List[int]) -> None:
     """
-    Example usage:
-    detect_trailing_edges_by_surface(, [2, 4])
+    Detect trailing edges for a given list of surfaces.
 
-    Appends lines to script state to detect trailing edges by surface.
+    This function appends a command to the script state to initiate trailing
+    edge detection on the specified surfaces.
 
-    :param surfaces: List of surface indices to be checked for trailing edge detection.
+    Parameters
+    ----------
+    surfaces : List[int]
+        A list of surface indices for which trailing edges are to be detected.
+
+    Examples
+    --------
+    >>> # Detect trailing edges on surfaces 1, 2, and 5
+    >>> detect_trailing_edges_by_surface([1, 2, 5])
+
+    >>> # Detect trailing edges on a single surface
+    >>> detect_trailing_edges_by_surface([3])
     """
-
-    # Type and value checking
     if not isinstance(surfaces, list) or not all(isinstance(s, int) for s in surfaces):
-        raise ValueError("`surfaces` should be a list of integer values.")
+        raise ValueError("`surfaces` must be a list of integers.")
 
     lines = [
         "#************************************************************************",
@@ -61,37 +91,42 @@ def detect_trailing_edges_by_surface(surfaces=[1]):
     ]
 
     script.append_lines(lines)
-    return
 
-def trailing_edges_import(file_path: str):
+def trailing_edges_import(file_path: str) -> None:
     """
-    Appends lines to script state to import trailing edges from a given file.
+    Import trailing edges from a specified file.
 
-    :Example usage:
-    trailing_edges_import('C:/.../Custom_TE.txt')
-        
-    :param file_path: Path to the CSV text file containing the vertices on which the trailing edges are to be marked.
+    This function appends a command to the script state to import trailing
+    edges from a text file. The file should contain the vertices where
+    trailing edges are to be marked.
 
-    Sample File Format: 
-    10
-    MILLIMETER
+    Parameters
+    ----------
+    file_path : str
+        The path to the .txt file containing the trailing edge vertices.
+
+    Examples
+    --------
+    >>> # Import trailing edges from a custom file
+    >>> trailing_edges_import('C:/data/custom_trailing_edges.txt')
+
+    Notes
+    -----
+    The file format should be as follows:
+    <number_of_vertices>
+    <UNIT_TYPE>
     1,X1,Y1,Z1
     2,X2,Y2,Z2
-    3,X3,Y3,Z3
     ...
-    10,X10,Y10,Z10
-    
-    UNIT_TYPE is one of the following:
-    INCH, MILLIMETER, FEET, MILE, METER, KILOMETER, MILS, MICRON, CENTIMETER, MICROINCH
+
+    UNIT_TYPE can be one of: INCH, MILLIMETER, FEET, MILE, METER, KILOMETER,
+    MILS, MICRON, CENTIMETER, MICROINCH.
     """
-    
-    # Type and value checking
     if not isinstance(file_path, str):
-        raise ValueError("`file_path` should be a string value.")
+        raise ValueError("`file_path` must be a string.")
     
-    # Check if the file path has the correct extension
     if not file_path.lower().endswith('.txt'):
-        raise ValueError("`file_path` should end with '.txt'")
+        raise ValueError("`file_path` must be a .txt file.")
     
     lines = [
         "#************************************************************************",
@@ -99,25 +134,30 @@ def trailing_edges_import(file_path: str):
         "#************************************************************************",
         "#",
         "TRAILING_EDGES_IMPORT",
-        file_path
+        f'"{file_path}"'
     ]
 
     script.append_lines(lines)
-    return
 
-def detect_wake_termination_nodes_by_surface(surface_id=1):
+def detect_wake_termination_nodes_by_surface(surface_id: int) -> None:
     """
-    Appends lines to script state to detect wake termination nodes by surface.
+    Detect wake termination nodes on a specified surface.
 
-    Example usage:
-    detect_wake_termination_nodes_by_surface()
-    
-    :param surface_id: Index of the surface on which the wake termination nodes should be detected.
+    This function appends a command to the script state to detect wake
+    termination nodes on a given surface index.
+
+    Parameters
+    ----------
+    surface_id : int
+        The index of the surface for wake termination node detection.
+
+    Examples
+    --------
+    >>> # Detect wake termination nodes on surface 3
+    >>> detect_wake_termination_nodes_by_surface(3)
     """
-    
-    # Type and value checking
     if not isinstance(surface_id, int):
-        raise ValueError("`surface_id` should be an integer value.")
+        raise ValueError("`surface_id` must be an integer.")
     
     lines = [
         "#************************************************************************",
@@ -128,4 +168,3 @@ def detect_wake_termination_nodes_by_surface(surface_id=1):
     ]
 
     script.append_lines(lines)
-    return
