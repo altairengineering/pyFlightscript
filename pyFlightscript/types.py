@@ -1,36 +1,80 @@
 from typing import Literal
 
 # Type Aliases for static type checking
-# RunOptions
+
+#: Enable/disable options used across most API functions.
 RunOptions = Literal['ENABLE', 'DISABLE']
+
+#: Valid units for length measurements.
 ValidUnits = Literal["INCH", "MILLIMETER", "OTHER", "FEET", "MILE", "METER", "KILOMETER", "MILS", "MICRON", "CENTIMETER", "MICROINCH"]
+
+#: Valid units for force and moment measurements.
 ValidForceUnits = Literal['COEFFICIENTS', 'NEWTONS', 'KILO-NEWTONS', 'POUND-FORCE', 'KILOGRAM-FORCE']
+#: Valid coordinate planes.
 ValidPlanes = Literal['XY', 'XZ', 'YZ', 'ZX']
+
+#: Base region types.
 BaseRegionType = Literal['EMPIRICAL', 'USER', 'CUSTOM']
+
+#: Valid dimensions for geometry operations.
 ValidDimensions = Literal['2D', '3D']
+
+#: Valid coordinate axes.
 ValidAxis = Literal['X', 'Y', 'Z']
+
+#: Valid growth schemes for meshing.
 ValidGrowthScheme = Literal[1, 2, 3, 4]
+
+#: Valid symmetry planes.
 ValidSymmetry = Literal['XY', 'XZ', 'YZ', 'NONE']
+
+#: Valid CAD/mesh selection options.
 ValidCadMesh = Literal['CAD', 'MESH']
+
+#: Valid quadrant numbers.
 ValidQuadrant = Literal[1, 2, 3, 4]
+
+#: Valid rotation axes (numeric or named).
 ValidRotationAxis = Literal['X', 'Y', 'Z', '1', '2', '3']
+
+#: Valid export formats for surface data.
 ValidExportFormat = Literal['CP-FREESTREAM', 'CP-REFERENCE', 'PRESSURE']
+
+#: Valid pressure units.
 ValidPressureUnits = Literal['PASCALS', 'MEGAPASCALS', 'BAR', 'ATMOSPHERES', 'PSI']
+
+#: Valid freestream types.
 ValidFreestreamType = Literal['CONSTANT', 'CUSTOM', 'ROTATION']
+
+#: Valid file types for mesh import.
 ValidImportMeshFileTypes = Literal["STL", "TRI", "P3D", "CSV", "INP", "STRUCTURED_QUAD", "UNSTRUCTURED_QUAD", "LAWGS", "VTK", "AC", "FAC", "OBJ"]
+
+#: Valid file types for mesh export.
 ValidExportMeshFileTypes = Literal["STL", "TRI", "OBJ"]
+
+#: Valid threshold types for mesh operations.
 ValidThresholds = Literal['AREA', 'QUALITY', 'X', 'Y', 'Z', 'VELOCITY', 'VX', 'VY', 'VZ', 'CP', 'MACH', 'SOLVER_QUALITY']
+
+#: Valid range specifications.
 ValidRanges = Literal['ABOVE_MIN', 'BELOW_MAX', 'ABOVE_MIN_BELOW_MAX']
+
+#: Valid subset selections.
 ValidSubsets = Literal['ALL_FACES', 'VISIBLE_FACES', 'SELECTED_FACES']
+
+#: Valid translation types.
 ValidTranslationTypes = Literal["ABSOLUTE", "TRANSLATION"]
 
 
 # Lists for runtime validation
-# ValidRunOptions
+
+#: Runtime validation list matching RunOptions.
 VALID_RUN_OPTIONS = ['ENABLE', 'DISABLE']
+
+#: Runtime validation list matching ValidUnits.
 VALID_UNITS_LIST = ["INCH", "MILLIMETER", "OTHER", "FEET", "MILE", "METER", "KILOMETER", "MILS", "MICRON", "CENTIMETER", "MICROINCH"]
+
+#: Runtime validation list matching ValidForceUnits.
 VALID_FORCE_UNITS_LIST = ['COEFFICIENTS', 'NEWTONS', 'KILO-NEWTONS', 'POUND-FORCE', 'KILOGRAM-FORCE']
-from typing import Literal
 
 VALID_PLANE_LIST = ['XY', 'XZ', 'YZ']
 VALID_AXIS_LIST = ['X', 'Y', 'Z']
@@ -113,22 +157,29 @@ VALID_ANIMATION_FILETYPE_LIST = [
 ]
 VALID_BOUNDARY_LAYER_TYPE_LIST = ['LAMINAR', 'TRANSITIONAL', 'TURBULENT']
 
+#: Valid solver models for FlightStream analysis.
 VALID_SOLVER_MODEL_LIST = [
     'INCOMPRESSIBLE', 'SUBSONIC_PRANDTL_GLAUERT', 'TRANSONIC_FIELD_PANEL',
     'SUPERSONIC_LINEAR_DOUBLET', 'TANGENT_CONE', 'MODIFIED_NEWTONIAN'
 ]
 
+#: Valid units for stability coefficient calculations.
 VALID_STABILITY_UNITS_LIST = ['PER_RADIAN', 'PER_DEGREE']
+
+#: Valid numerator variables for stability coefficients.
 VALID_STABILITY_NUMERATOR_LIST = [
     'CL', 'CDI', 'CDO', 'CD', 'FORCE_X', 'FORCE_Y', 'FORCE_Z',
     'MOMENT_X', 'MOMENT_Y', 'MOMENT_Z'
 ]
+
+#: Valid denominator variables for stability coefficients.
 VALID_STABILITY_DENOMINATOR_LIST = ['AOA', 'BETA', 'ROTX', 'ROTY', 'ROTZ']
 
 VALID_BASE_REGION_TYPE_LIST = ['EMPIRICAL', 'CONSTANT']
 VALID_DIMENSIONS_LIST = ['2D', '3D']
 VALID_AXIS_LIST = ['X', 'Y', 'Z']
 VALID_GROWTH_SCHEME_LIST = [1, 2, 3, 4]
+#: Runtime validation list matching ValidSymmetry.
 VALID_SYMMETRY_LIST = ['XY', 'XZ', 'YZ', 'NONE']
 VALID_CAD_MESH_LIST = ['CAD', 'MESH']
 VALID_QUADRANT_LIST = [1, 2, 3, 4]

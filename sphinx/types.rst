@@ -8,7 +8,7 @@ Types Reference
 
 .. currentmodule:: pyFlightscript.types
 
-# Explicit entries for aliases and their runtime lists (best rendering)
+.. Explicit entries for aliases and their runtime lists (best rendering)
 
 .. autodata:: RunOptions
    :annotation:
