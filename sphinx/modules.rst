@@ -5,3 +5,4 @@ pyFlightscript
    :maxdepth: 4
 
    pyFlightscript
+   types

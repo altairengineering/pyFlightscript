@@ -23,7 +23,7 @@ def create_new_base_region(
         Must be an integer greater than 0.
     base_type : str, optional
         The type of base region calculation. Can be either 'EMPIRICAL' or
-        'CONSTANT'. Defaults to 'EMPIRICAL'.
+        'USER'. Defaults to 'EMPIRICAL'.
     base_pressure_coefficient : float, optional
         The pressure coefficient to be applied in the base regions.
         Defaults to -0.2.
