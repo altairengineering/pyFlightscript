@@ -204,14 +204,6 @@ pyFlightscript.tools module
    :show-inheritance:
    :undoc-members:
 
-pyFlightscript.types module
----------------------------
-
-.. automodule:: pyFlightscript.types
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
 pyFlightscript.unite module
 ---------------------------
 
