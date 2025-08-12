@@ -1,4 +1,3 @@
 setuptools
 pytest
 numpy
-sphinx-rtd-theme
