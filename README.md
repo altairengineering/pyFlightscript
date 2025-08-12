@@ -79,6 +79,8 @@ Contributions are welcome!
 1. Fork the repository.
 2. Create a new branch.
 3. Make your changes.
+    - Ensure any function changes are properly documented in the code. 
+    - Create a new test if applicable.
 4. Submit a pull request.
 
 Please post bugs to the 'issues' section. Feel free to create a branch and submit a pull request. An admin will be notified.

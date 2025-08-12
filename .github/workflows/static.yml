@@ -45,7 +45,7 @@ jobs:
           # Build the HTML documentation
           cd sphinx
           set PYTHONPATH=%GITHUB_WORKSPACE%;%PYTHONPATH%
-          sphinx-apidoc -F -f -o . ../pyFlightscript/
+          sphinx-apidoc -f -o . ../pyFlightscript/
           call make.bat html
           cd ..
         shell: cmd
