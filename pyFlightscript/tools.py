@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Literal, Optional
 from .script import script
 from .types import (
     RunOptions, VALID_RUN_OPTIONS, VALID_STABILITY_UNITS_LIST,
@@ -6,12 +6,16 @@ from .types import (
     VALID_STABILITY_DENOMINATOR_LIST
 )
 
+# Valid export surface data options
+ExportSurfaceDataOptions = Literal['DISABLE', 'TXT', 'CSV', 'DAT', 'VTK']
+VALID_EXPORT_SURFACE_DATA_OPTIONS = ['DISABLE', 'TXT', 'CSV', 'DAT', 'VTK']
+
 def execute_solver_sweeper(
     results_filename: str,
-    surface_results_path: str = '',
     angle_of_attack: RunOptions = 'ENABLE',
     side_slip_angle: RunOptions = 'DISABLE',
     velocity: RunOptions = 'DISABLE',
+    velocity_mode: Literal['VELOCITY', 'MACH'] = 'VELOCITY',
     angle_of_attack_start: float = 0.0,
     angle_of_attack_stop: float = 0.0,
     angle_of_attack_delta: float = 1.0,
@@ -21,7 +25,8 @@ def execute_solver_sweeper(
     velocity_start: float = 0.0,
     velocity_stop: float = 0.0,
     velocity_delta: float = 1.0,
-    export_surface_data_per_step: RunOptions = 'ENABLE',
+    export_surface_data_per_step: ExportSurfaceDataOptions = 'DISABLE',
+    surface_results_path: Optional[str] = None,
     clear_solution_after_each_run: RunOptions = 'ENABLE',
     reference_velocity_equals_freestream: RunOptions = 'ENABLE',
     append_to_existing_sweep: RunOptions = 'DISABLE'
@@ -36,14 +41,14 @@ def execute_solver_sweeper(
     ----------
     results_filename : str
         The full file path for the sweep results file.
-    surface_results_path : str, optional
-        The path to export surface data at each step, by default ''.
     angle_of_attack : RunOptions, optional
         Enable or disable angle of attack sweep, by default 'ENABLE'.
     side_slip_angle : RunOptions, optional
         Enable or disable side slip angle sweep, by default 'DISABLE'.
     velocity : RunOptions, optional
-        Enable or disable velocity sweep, by default 'DISABLE'.
+        Enable or disable velocity/Mach sweep, by default 'DISABLE'.
+    velocity_mode : Literal['VELOCITY', 'MACH'], optional
+        Specify whether to use VELOCITY or MACH parameter names, by default 'VELOCITY'.
     angle_of_attack_start : float, optional
         Start value for angle of attack sweep, by default 0.0.
     angle_of_attack_stop : float, optional
@@ -57,13 +62,16 @@ def execute_solver_sweeper(
     side_slip_angle_delta : float, optional
         Increment for side slip angle sweep, by default 1.0.
     velocity_start : float, optional
-        Start value for velocity sweep, by default 0.0.
+        Start value for velocity/Mach sweep, by default 0.0.
     velocity_stop : float, optional
-        Stop value for velocity sweep, by default 0.0.
+        Stop value for velocity/Mach sweep, by default 0.0.
     velocity_delta : float, optional
-        Increment for velocity sweep, by default 1.0.
-    export_surface_data_per_step : RunOptions, optional
-        Enable or disable exporting surface data at each step, by default 'ENABLE'.
+        Increment for velocity/Mach sweep, by default 1.0.
+    export_surface_data_per_step : ExportSurfaceDataOptions, optional
+        Type of boundary data to export per sweep run, by default 'DISABLE'.
+        Options: 'DISABLE', 'TXT', 'CSV', 'DAT', 'VTK'.
+    surface_results_path : Optional[str], optional
+        Path for exporting surface data. Required if export_surface_data_per_step is not 'DISABLE'.
     clear_solution_after_each_run : RunOptions, optional
         Enable or disable clearing the solution after each run, by default 'ENABLE'.
     reference_velocity_equals_freestream : RunOptions, optional
@@ -71,22 +79,24 @@ def execute_solver_sweeper(
     append_to_existing_sweep : RunOptions, optional
         Enable or disable appending to an existing sweep file, by default 'DISABLE'.
     """
-    for option in [
-        angle_of_attack, side_slip_angle, velocity, export_surface_data_per_step,
-        clear_solution_after_each_run, reference_velocity_equals_freestream,
-        append_to_existing_sweep
-    ]:
+    # Validate options
+    for option in [angle_of_attack, side_slip_angle, velocity, clear_solution_after_each_run, 
+                   reference_velocity_equals_freestream, append_to_existing_sweep]:
         if option not in VALID_RUN_OPTIONS:
             raise ValueError(f"Invalid option '{option}'. Must be one of {VALID_RUN_OPTIONS}")
+    
+    if export_surface_data_per_step not in VALID_EXPORT_SURFACE_DATA_OPTIONS:
+        raise ValueError(f"Invalid export_surface_data_per_step '{export_surface_data_per_step}'. Must be one of {VALID_EXPORT_SURFACE_DATA_OPTIONS}")
+    
+    if export_surface_data_per_step != 'DISABLE' and surface_results_path is None:
+        raise ValueError("surface_results_path is required when export_surface_data_per_step is not 'DISABLE'")
 
+    # Build the script lines according to FlightStream documentation format
     lines = [
         "#************************************************************************",
         "#****************** Initialize and execute the solver sweeper ***********",
         "#************************************************************************",
-        "#",
         "EXECUTE_SOLVER_SWEEPER",
-        f"RESULTS_FILENAME {results_filename}",
-        f"SURFACE_RESULTS_PATH {surface_results_path}",
         f"ANGLE_OF_ATTACK {angle_of_attack}",
         f"SIDE_SLIP_ANGLE {side_slip_angle}",
         f"VELOCITY {velocity}",
@@ -96,14 +106,35 @@ def execute_solver_sweeper(
         f"SIDE_SLIP_ANGLE_START {side_slip_angle_start}",
         f"SIDE_SLIP_ANGLE_STOP {side_slip_angle_stop}",
         f"SIDE_SLIP_ANGLE_DELTA {side_slip_angle_delta}",
-        f"VELOCITY_START {velocity_start}",
-        f"VELOCITY_STOP {velocity_stop}",
-        f"VELOCITY_DELTA {velocity_delta}",
-        f"EXPORT_SURFACE_DATA_PER_STEP {export_surface_data_per_step}",
+    ]
+    
+    # Add velocity parameters with correct naming based on velocity_mode
+    if velocity_mode == 'MACH':
+        lines.extend([
+            f"MACH_START {velocity_start}",
+            f"MACH_STOP {velocity_stop}",
+            f"MACH_DELTA {velocity_delta}",
+        ])
+    else:
+        lines.extend([
+            f"VELOCITY_START {velocity_start}",
+            f"VELOCITY_STOP {velocity_stop}",
+            f"VELOCITY_DELTA {velocity_delta}",
+        ])
+    
+    lines.append(f"EXPORT_SURFACE_DATA_PER_STEP {export_surface_data_per_step}")
+    
+    # Add surface results path only if export is not disabled
+    if export_surface_data_per_step != 'DISABLE':
+        lines.append(surface_results_path)
+    
+    lines.extend([
         f"CLEAR_SOLUTION_AFTER_EACH_RUN {clear_solution_after_each_run}",
         f"REFERENCE_VELOCITY_EQUALS_FREESTREAM {reference_velocity_equals_freestream}",
-        f"APPEND_TO_EXISTING_SWEEP {append_to_existing_sweep}"
-    ]
+        f"APPEND_TO_EXISTING_SWEEP {append_to_existing_sweep}",
+        results_filename
+    ])
+    
     script.append_lines(lines)
     return
 

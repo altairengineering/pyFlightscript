@@ -1,10 +1,9 @@
 import pyFlightscript as pyfs
 
 
-def test_execute_solver_sweeper_appends_expected_lines(script_state):
+def test_execute_solver_sweeper_basic_appends_expected_lines(script_state):
     pyfs.execute_solver_sweeper(
         results_filename="fs_output/results.csv",
-        surface_results_path="fs_output/surface",
         angle_of_attack='ENABLE',
         side_slip_angle='DISABLE',
         velocity='DISABLE',
@@ -17,7 +16,7 @@ def test_execute_solver_sweeper_appends_expected_lines(script_state):
         velocity_start=0.0,
         velocity_stop=0.0,
         velocity_delta=1.0,
-        export_surface_data_per_step='ENABLE',
+        export_surface_data_per_step='DISABLE',
         clear_solution_after_each_run='DISABLE',
         reference_velocity_equals_freestream='ENABLE',
         append_to_existing_sweep='DISABLE',
@@ -26,10 +25,7 @@ def test_execute_solver_sweeper_appends_expected_lines(script_state):
         "#************************************************************************",
         "#****************** Initialize and execute the solver sweeper ***********",
         "#************************************************************************",
-        "#",
         "EXECUTE_SOLVER_SWEEPER",
-        "RESULTS_FILENAME fs_output/results.csv",
-        "SURFACE_RESULTS_PATH fs_output/surface",
         "ANGLE_OF_ATTACK ENABLE",
         "SIDE_SLIP_ANGLE DISABLE",
         "VELOCITY DISABLE",
@@ -42,10 +38,106 @@ def test_execute_solver_sweeper_appends_expected_lines(script_state):
         "VELOCITY_START 0.0",
         "VELOCITY_STOP 0.0",
         "VELOCITY_DELTA 1.0",
-        "EXPORT_SURFACE_DATA_PER_STEP ENABLE",
+        "EXPORT_SURFACE_DATA_PER_STEP DISABLE",
         "CLEAR_SOLUTION_AFTER_EACH_RUN DISABLE",
         "REFERENCE_VELOCITY_EQUALS_FREESTREAM ENABLE",
         "APPEND_TO_EXISTING_SWEEP DISABLE",
+        "fs_output/results.csv",
+    ]
+    assert script_state.lines[-len(expected_tail):] == expected_tail
+
+
+def test_execute_solver_sweeper_with_surface_export(script_state):
+    pyfs.execute_solver_sweeper(
+        results_filename="fs_output/results.csv",
+        angle_of_attack='ENABLE',
+        side_slip_angle='DISABLE',
+        velocity='DISABLE',
+        angle_of_attack_start=0.0,
+        angle_of_attack_stop=10.0,
+        angle_of_attack_delta=1.0,
+        side_slip_angle_start=0.0,
+        side_slip_angle_stop=0.0,
+        side_slip_angle_delta=1.0,
+        velocity_start=0.0,
+        velocity_stop=0.0,
+        velocity_delta=1.0,
+        export_surface_data_per_step='VTK',
+        surface_results_path="fs_output/surface",
+        clear_solution_after_each_run='ENABLE',
+        reference_velocity_equals_freestream='ENABLE',
+        append_to_existing_sweep='DISABLE',
+    )
+    expected_tail = [
+        "#************************************************************************",
+        "#****************** Initialize and execute the solver sweeper ***********",
+        "#************************************************************************",
+        "EXECUTE_SOLVER_SWEEPER",
+        "ANGLE_OF_ATTACK ENABLE",
+        "SIDE_SLIP_ANGLE DISABLE",
+        "VELOCITY DISABLE",
+        "ANGLE_OF_ATTACK_START 0.0",
+        "ANGLE_OF_ATTACK_STOP 10.0",
+        "ANGLE_OF_ATTACK_DELTA 1.0",
+        "SIDE_SLIP_ANGLE_START 0.0",
+        "SIDE_SLIP_ANGLE_STOP 0.0",
+        "SIDE_SLIP_ANGLE_DELTA 1.0",
+        "VELOCITY_START 0.0",
+        "VELOCITY_STOP 0.0",
+        "VELOCITY_DELTA 1.0",
+        "EXPORT_SURFACE_DATA_PER_STEP VTK",
+        "fs_output/surface",
+        "CLEAR_SOLUTION_AFTER_EACH_RUN ENABLE",
+        "REFERENCE_VELOCITY_EQUALS_FREESTREAM ENABLE",
+        "APPEND_TO_EXISTING_SWEEP DISABLE",
+        "fs_output/results.csv",
+    ]
+    assert script_state.lines[-len(expected_tail):] == expected_tail
+
+
+def test_execute_solver_sweeper_mach_sweep(script_state):
+    pyfs.execute_solver_sweeper(
+        results_filename="fs_output/mach_results.csv",
+        angle_of_attack='DISABLE',
+        side_slip_angle='DISABLE',
+        velocity='ENABLE',
+        velocity_mode='MACH',
+        angle_of_attack_start=0.0,
+        angle_of_attack_stop=0.0,
+        angle_of_attack_delta=1.0,
+        side_slip_angle_start=0.0,
+        side_slip_angle_stop=0.0,
+        side_slip_angle_delta=1.0,
+        velocity_start=0.0,
+        velocity_stop=1.0,
+        velocity_delta=0.1,
+        export_surface_data_per_step='DISABLE',
+        clear_solution_after_each_run='ENABLE',
+        reference_velocity_equals_freestream='ENABLE',
+        append_to_existing_sweep='DISABLE',
+    )
+    expected_tail = [
+        "#************************************************************************",
+        "#****************** Initialize and execute the solver sweeper ***********",
+        "#************************************************************************",
+        "EXECUTE_SOLVER_SWEEPER",
+        "ANGLE_OF_ATTACK DISABLE",
+        "SIDE_SLIP_ANGLE DISABLE",
+        "VELOCITY ENABLE",
+        "ANGLE_OF_ATTACK_START 0.0",
+        "ANGLE_OF_ATTACK_STOP 0.0",
+        "ANGLE_OF_ATTACK_DELTA 1.0",
+        "SIDE_SLIP_ANGLE_START 0.0",
+        "SIDE_SLIP_ANGLE_STOP 0.0",
+        "SIDE_SLIP_ANGLE_DELTA 1.0",
+        "MACH_START 0.0",
+        "MACH_STOP 1.0",
+        "MACH_DELTA 0.1",
+        "EXPORT_SURFACE_DATA_PER_STEP DISABLE",
+        "CLEAR_SOLUTION_AFTER_EACH_RUN ENABLE",
+        "REFERENCE_VELOCITY_EQUALS_FREESTREAM ENABLE",
+        "APPEND_TO_EXISTING_SWEEP DISABLE",
+        "fs_output/mach_results.csv",
     ]
     assert script_state.lines[-len(expected_tail):] == expected_tail
 
