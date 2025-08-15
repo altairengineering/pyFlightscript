@@ -216,56 +216,85 @@ def set_vtk_export_variables(
 
 def export_solver_analysis_csv(
     file_path: str,
-    format_value: ValidExportFormat = 'PRESSURE',
+    format_value: ValidExportFormat = 'DIFFERENCE-PRESSURE',
     units: ValidPressureUnits = 'PASCALS',
-    surfaces: int = -1,
     frame: int = 1,
+    surfaces: int = -1,
     boundary_indices: Optional[List[int]] = None
 ) -> None:
     """
-    Export FEM CSV data based on solver results.
+    Export FEM CSV (*.txt) file based on solver results.
 
     This function appends a command to the script state to export FEM CSV
-    data with specified formatting and units for selected boundaries.
+    data based on solver results for all initialized boundaries with the
+    specified format and unit specifications.
 
     Parameters
     ----------
     file_path : str
-        The absolute path to the output CSV file.
+        The file name with path to file for output.
     format_value : ValidExportFormat, optional
-        The format of the export data. Defaults to 'PRESSURE'.
+        The format of the export data. Valid options are 'CP-FREESTREAM',
+        'CP-REFERENCE', 'PRESSURE', 'DIFFERENCE-PRESSURE'. 
+        Defaults to 'DIFFERENCE-PRESSURE'.
     units : ValidPressureUnits, optional
-        The units for the exported pressure data. Defaults to 'PASCALS'.
-    surfaces : int, optional
-        The number of boundaries to export. Use -1 for all boundaries.
-        Defaults to -1.
+        The units for the exported pressure data. Valid options are 'PASCALS',
+        'MEGAPASCALS', 'BAR', 'ATMOSPHERES', 'PSI'. Defaults to 'PASCALS'.
     frame : int, optional
-        The coordinate system frame index. Defaults to 1.
+        Index of coordinate system for output. Defaults to 1.
+    surfaces : int, optional
+        Number of boundaries that need to be exported, or -1 if all boundaries
+        need to be exported. Defaults to -1.
     boundary_indices : Optional[List[int]], optional
         A list of boundary indices to export. Required if `surfaces` is not
-        -1. Defaults to None.
+        -1. Following text lines must include indices of all boundaries for
+        which data must be exported. Defaults to None.
 
     Raises
     ------
     ValueError
         If `format_value` or `units` are invalid, or if `surfaces` is not
         -1 and `boundary_indices` is not provided or its length mismatches.
+    TypeError
+        If all elements in `boundary_indices` are not integers.
 
     Examples
     --------
     >>> # Export the FEM CSV file for the first three boundaries
     >>> export_solver_analysis_csv(
-    ...     file_path='C:/path/to/data.csv',
+    ...     file_path='C:/Users/Desktop/Models/scripting_test_output_data.txt',
+    ...     format_value='DIFFERENCE-PRESSURE',
+    ...     units='PASCALS',
+    ...     frame=1,
     ...     surfaces=3,
     ...     boundary_indices=[1, 2, 3]
     ... )
+    
+    >>> # Export the FEM CSV file for ALL boundaries
+    >>> export_solver_analysis_csv(
+    ...     file_path='C:/Users/Desktop/Models/scripting_test_output_data.txt',
+    ...     format_value='DIFFERENCE-PRESSURE',
+    ...     units='PASCALS',
+    ...     frame=2,
+    ...     surfaces=-1
+    ... )
     """
 
+    # Type and value checking
+    if not isinstance(file_path, str):
+        raise ValueError("`file_path` should be a string value.")
+    
     if format_value not in VALID_EXPORT_FORMAT_LIST:
         raise ValueError(f"Invalid format value. Valid formats are: {VALID_EXPORT_FORMAT_LIST}")
 
     if units not in VALID_PRESSURE_UNITS_LIST:
         raise ValueError(f"Invalid unit type. Valid units are: {VALID_PRESSURE_UNITS_LIST}")
+    
+    if not isinstance(frame, int):
+        raise ValueError("`frame` should be an integer value.")
+    
+    if not isinstance(surfaces, int):
+        raise ValueError("`surfaces` should be an integer value.")
 
     if surfaces != -1:
         if boundary_indices is None:
