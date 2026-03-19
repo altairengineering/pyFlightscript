@@ -819,7 +819,7 @@ def cad_create_auto_annular_cross_sections(
     return
 
 
-def body_rotate(
+def cad_body_rotate(
     body_index: int = 1,
     axis: ValidAxis = 'X',
     angle: float = 0.0
@@ -847,7 +847,7 @@ def body_rotate(
 
     Examples
     --------
-    >>> body_rotate(body_index=1, axis='Z', angle=90.0)
+    >>> cad_body_rotate(body_index=1, axis='Z', angle=90.0)
     """
     if not isinstance(body_index, int) or body_index <= 0:
         raise ValueError("`body_index` should be an integer value greater than zero.")
@@ -870,7 +870,7 @@ def body_rotate(
     return
 
 
-def body_translate(
+def cad_body_translate(
     body_index: int = 1,
     x: float = 0.0,
     y: float = 0.0,
@@ -904,7 +904,7 @@ def body_translate(
 
     Examples
     --------
-    >>> body_translate(body_index=1, x=1.0)
+    >>> cad_body_translate(body_index=1, x=1.0)
     """
     if not isinstance(body_index, int) or body_index <= 0:
         raise ValueError("`body_index` should be an integer value greater than zero.")
@@ -926,7 +926,7 @@ def body_translate(
     return
 
 
-def body_scale(
+def cad_body_scale(
     body_index: int = 1,
     scale: float = 1.0
 ) -> None:
@@ -951,7 +951,7 @@ def body_scale(
 
     Examples
     --------
-    >>> body_scale(body_index=1, scale=2.0)
+    >>> cad_body_scale(body_index=1, scale=2.0)
     """
     if not isinstance(body_index, int) or body_index <= 0:
         raise ValueError("`body_index` should be an integer value greater than zero.")
@@ -970,7 +970,7 @@ def body_scale(
     return
 
 
-def body_mirror(
+def cad_body_mirror(
     body_index: int = 1,
     plane: ValidPlanes = 'XZ'
 ) -> None:
@@ -994,7 +994,7 @@ def body_mirror(
 
     Examples
     --------
-    >>> body_mirror(body_index=1, plane='XZ')
+    >>> cad_body_mirror(body_index=1, plane='XZ')
     """
     if not isinstance(body_index, int) or body_index <= 0:
         raise ValueError("`body_index` should be an integer value greater than zero.")
@@ -1014,7 +1014,7 @@ def body_mirror(
     return
 
 
-def body_delete(
+def cad_body_delete(
     body_index: int = -1
 ) -> None:
     """
@@ -1037,10 +1037,10 @@ def body_delete(
     Examples
     --------
     >>> # Delete all CAD bodies
-    >>> body_delete()
+    >>> cad_body_delete()
 
     >>> # Delete CAD body 2
-    >>> body_delete(body_index=2)
+    >>> cad_body_delete(body_index=2)
     """
     if not isinstance(body_index, int):
         raise ValueError("`body_index` should be an integer value.")
@@ -1058,7 +1058,7 @@ def body_delete(
     return
 
 
-def body_select_by_threshold(
+def cad_body_select_by_threshold(
     frame: int = 1,
     parameter: ValidAxis = 'Y',
     value: float = 0.0,
@@ -1092,7 +1092,7 @@ def body_select_by_threshold(
 
     Examples
     --------
-    >>> body_select_by_threshold(parameter='Y', value=0.0, logic='BELOW', action='DELETE')
+    >>> cad_body_select_by_threshold(parameter='Y', value=0.0, logic='BELOW', action='DELETE')
     """
     if not isinstance(frame, int) or frame <= 0:
         raise ValueError("`frame` should be an integer value greater than zero.")
@@ -1278,7 +1278,7 @@ def set_cad_curvature_refinement(
     return
 
 
-def create_box(
+def cad_create_box(
     frame: int = 1,
     x: float = 0.0,
     y: float = 0.0,
@@ -1319,10 +1319,10 @@ def create_box(
     Examples
     --------
     >>> # Create a unit box at the origin
-    >>> create_box()
+    >>> cad_create_box()
 
     >>> # Create a 2×1×0.5 box offset in Y
-    >>> create_box(x=0.0, y=1.0, z=0.0, len_x=2.0, len_y=1.0, len_z=0.5)
+    >>> cad_create_box(x=0.0, y=1.0, z=0.0, len_x=2.0, len_y=1.0, len_z=0.5)
     """
     if not isinstance(frame, int) or frame <= 0:
         raise ValueError("`frame` should be an integer value greater than zero.")
@@ -1342,7 +1342,7 @@ def create_box(
     return
 
 
-def create_sphere(
+def cad_create_sphere(
     frame: int = 1,
     x: float = 0.0,
     y: float = 0.0,
@@ -1377,10 +1377,10 @@ def create_sphere(
     Examples
     --------
     >>> # Create a unit sphere at the origin
-    >>> create_sphere()
+    >>> cad_create_sphere()
 
     >>> # Create a sphere of radius 2 centered at (1, 2, 3)
-    >>> create_sphere(x=1.0, y=2.0, z=3.0, radius=2.0)
+    >>> cad_create_sphere(x=1.0, y=2.0, z=3.0, radius=2.0)
     """
     if not isinstance(frame, int) or frame <= 0:
         raise ValueError("`frame` should be an integer value greater than zero.")
@@ -1403,7 +1403,7 @@ def create_sphere(
     return
 
 
-def create_cylinder(
+def cad_create_cylinder(
     frame: int = 1,
     x: float = 0.0,
     y: float = 0.0,
@@ -1444,10 +1444,10 @@ def create_cylinder(
     Examples
     --------
     >>> # Create a unit cylinder at the origin
-    >>> create_cylinder()
+    >>> cad_create_cylinder()
 
     >>> # Create a tapered cone of length 5
-    >>> create_cylinder(r1=1.0, r2=0.5, length=5.0)
+    >>> cad_create_cylinder(r1=1.0, r2=0.5, length=5.0)
     """
     if not isinstance(frame, int) or frame <= 0:
         raise ValueError("`frame` should be an integer value greater than zero.")
@@ -1470,7 +1470,7 @@ def create_cylinder(
     return
 
 
-def create_sheet(
+def cad_create_sheet(
     frame: int = 1,
     plane: ValidPlanes = 'XZ',
     offset: float = 0.0,
@@ -1505,10 +1505,10 @@ def create_sheet(
     Examples
     --------
     >>> # Create a unit sheet in the XZ plane
-    >>> create_sheet()
+    >>> cad_create_sheet()
 
     >>> # Create a 4×2 sheet in the XY plane at offset 1.0
-    >>> create_sheet(plane='XY', offset=1.0, len1=4.0, len2=2.0)
+    >>> cad_create_sheet(plane='XY', offset=1.0, len1=4.0, len2=2.0)
     """
     if not isinstance(frame, int) or frame <= 0:
         raise ValueError("`frame` should be an integer value greater than zero.")
@@ -1532,7 +1532,7 @@ def create_sheet(
     return
 
 
-def create_import_curve_p3d(
+def cad_create_import_curve_p3d(
     p3d_filepath: str,
     units: ValidUnits = 'METER',
     swap_direction: str = 'FALSE',
@@ -1569,9 +1569,9 @@ def create_import_curve_p3d(
 
     Examples
     --------
-    >>> create_import_curve_p3d('path/to/curves.p3d')
+    >>> cad_create_import_curve_p3d('path/to/curves.p3d')
 
-    >>> create_import_curve_p3d('curves.p3d', units='INCH', swap_direction='TRUE', component_index=2)
+    >>> cad_create_import_curve_p3d('curves.p3d', units='INCH', swap_direction='TRUE', component_index=2)
     """
     check_file_existence(p3d_filepath)
 
@@ -1600,7 +1600,7 @@ def create_import_curve_p3d(
     return
 
 
-def create_self_median_from_curves() -> None:
+def cad_create_self_median_from_curves() -> None:
     """
     Create a self-median surface from selected curves.
 
@@ -1609,7 +1609,7 @@ def create_self_median_from_curves() -> None:
 
     Examples
     --------
-    >>> create_self_median_from_curves()
+    >>> cad_create_self_median_from_curves()
     """
 
     lines = [
@@ -1623,7 +1623,7 @@ def create_self_median_from_curves() -> None:
     return
 
 
-def create_connect_curves() -> None:
+def cad_create_connect_curves() -> None:
     """
     Connect selected drawing curves into a single curve.
 
@@ -1632,7 +1632,7 @@ def create_connect_curves() -> None:
 
     Examples
     --------
-    >>> create_connect_curves()
+    >>> cad_create_connect_curves()
     """
 
     lines = [
@@ -1646,7 +1646,7 @@ def create_connect_curves() -> None:
     return
 
 
-def create_rotate_curves(
+def cad_create_rotate_curves(
     frame: int = 1,
     axis: ValidRotationAxis = 'X',
     angle: float = 0.0,
@@ -1679,7 +1679,7 @@ def create_rotate_curves(
 
     Examples
     --------
-    >>> create_rotate_curves(axis='Z', angle=45.0)
+    >>> cad_create_rotate_curves(axis='Z', angle=45.0)
     """
     if not isinstance(frame, int) or frame <= 0:
         raise ValueError("`frame` should be an integer value greater than zero.")
@@ -1707,7 +1707,7 @@ def create_rotate_curves(
     return
 
 
-def create_translate_curves(
+def cad_create_translate_curves(
     x: float = 0.0,
     y: float = 0.0,
     z: float = 0.0,
@@ -1739,7 +1739,7 @@ def create_translate_curves(
 
     Examples
     --------
-    >>> create_translate_curves(y=1.0)
+    >>> cad_create_translate_curves(y=1.0)
     """
     for value, label in [(x, 'x'), (y, 'y'), (z, 'z')]:
         if not isinstance(value, (int, float)):
@@ -1761,7 +1761,7 @@ def create_translate_curves(
     return
 
 
-def create_scale_curves(
+def cad_create_scale_curves(
     scale: float = 1.0,
     retain_curve: str = 'DELETE'
 ) -> None:
@@ -1787,7 +1787,7 @@ def create_scale_curves(
 
     Examples
     --------
-    >>> create_scale_curves(scale=2.0)
+    >>> cad_create_scale_curves(scale=2.0)
     """
     if not isinstance(scale, (int, float)) or scale <= 0:
         raise ValueError("`scale` should be a numeric value greater than zero.")
@@ -1808,7 +1808,7 @@ def create_scale_curves(
     return
 
 
-def create_mirror_curves(
+def cad_create_mirror_curves(
     frame: int = 1,
     plane: ValidPlanes = 'XZ',
     retain_curves: str = 'DELETE'
@@ -1839,10 +1839,10 @@ def create_mirror_curves(
     Examples
     --------
     >>> # Mirror and delete originals (default)
-    >>> create_mirror_curves()
+    >>> cad_create_mirror_curves()
 
     >>> # Mirror XY plane and retain originals
-    >>> create_mirror_curves(plane='XY', retain_curves='RETAIN')
+    >>> cad_create_mirror_curves(plane='XY', retain_curves='RETAIN')
     """
     if not isinstance(frame, int) or frame <= 0:
         raise ValueError("`frame` should be an integer value greater than zero.")
@@ -1867,7 +1867,7 @@ def create_mirror_curves(
     return
 
 
-def create_project_curve(
+def cad_create_project_curve(
     curve_index: int,
     frame: int = 1,
     plane: ValidPlanes = 'XZ',
@@ -1910,7 +1910,7 @@ def create_project_curve(
 
     Examples
     --------
-    >>> create_project_curve(curve_index=1)
+    >>> cad_create_project_curve(curve_index=1)
     """
     if not isinstance(curve_index, int) or curve_index == 0 or curve_index < -1:
         raise ValueError("`curve_index` should be -1 or a positive integer value.")
@@ -1942,7 +1942,7 @@ def create_project_curve(
     return
 
 
-def create_project_multi_curve(
+def cad_create_project_multi_curve(
     curve_index_1: int,
     curve_index_2: int,
     frame: int = 1,
@@ -1978,7 +1978,7 @@ def create_project_multi_curve(
 
     Examples
     --------
-    >>> create_project_multi_curve(curve_index_1=1, curve_index_2=2)
+    >>> cad_create_project_multi_curve(curve_index_1=1, curve_index_2=2)
     """
     for value, label in [(curve_index_1, 'curve_index_1'), (curve_index_2, 'curve_index_2')]:
         if not isinstance(value, int) or value <= 0:
@@ -2007,7 +2007,7 @@ def create_project_multi_curve(
     return
 
 
-def create_reorder_curves(
+def cad_create_reorder_curves(
     frame: int = 1,
     sorting_direction: str = '+Y'
 ) -> None:
@@ -2034,10 +2034,10 @@ def create_reorder_curves(
     Examples
     --------
     >>> # Reorder curves along +Y (default)
-    >>> create_reorder_curves()
+    >>> cad_create_reorder_curves()
 
     >>> # Reorder curves along -X
-    >>> create_reorder_curves(sorting_direction='-X')
+    >>> cad_create_reorder_curves(sorting_direction='-X')
     """
     if not isinstance(frame, int) or frame <= 0:
         raise ValueError("`frame` should be an integer value greater than zero.")
