@@ -1650,7 +1650,7 @@ def cad_create_rotate_curves(
     frame: int = 1,
     axis: ValidRotationAxis = 'X',
     angle: float = 0.0,
-    retain_curve: str = 'DELETE'
+    retain_curves: str = 'DELETE'
 ) -> None:
     """
     Rotate selected drawing curves about a coordinate axis.
@@ -1691,16 +1691,16 @@ def cad_create_rotate_curves(
     if not isinstance(angle, (int, float)):
         raise ValueError("`angle` should be a numeric value.")
 
-    valid_retain_curve = ['RETAIN', 'DELETE']
-    retain_curve = normalize_option(retain_curve, "retain_curve")
-    if retain_curve not in valid_retain_curve:
-        raise ValueError(f"`retain_curve` should be one of {valid_retain_curve}. Received: {retain_curve}")
+    valid_retain_curves = ['RETAIN', 'DELETE']
+    retain_curves = normalize_option(retain_curves, "retain_curves")
+    if retain_curves not in valid_retain_curves:
+        raise ValueError(f"`retain_curves` should be one of {valid_retain_curves}. Received: {retain_curves}")
 
     lines = [
         "#************************************************************************",
         "#*********************** Rotate selected curves **************************",
         "#************************************************************************",
-        f"CAD_CREATE_ROTATE_CURVES {frame} {axis} {angle} {retain_curve}"
+        f"CAD_CREATE_ROTATE_CURVES {frame} {axis} {angle} {retain_curves}"
     ]
 
     script.append_lines(lines)
@@ -1711,7 +1711,7 @@ def cad_create_translate_curves(
     x: float = 0.0,
     y: float = 0.0,
     z: float = 0.0,
-    retain_curve: str = 'DELETE'
+    retain_curves: str = 'DELETE'
 ) -> None:
     """
     Translate selected drawing curves by a vector.
@@ -1728,14 +1728,14 @@ def cad_create_translate_curves(
         Translation vector Y component. Defaults to 0.0.
     z : float, optional
         Translation vector Z component. Defaults to 0.0.
-    retain_curve : str, optional
+    retain_curves : str, optional
         Whether to retain or delete the source curves after the operation
         ('RETAIN' or 'DELETE'). Defaults to 'DELETE'.
 
     Raises
     ------
     ValueError
-        If any coordinate is not numeric or `retain_curve` is invalid.
+        If any coordinate is not numeric or `retain_curves` is invalid.
 
     Examples
     --------
@@ -1745,16 +1745,16 @@ def cad_create_translate_curves(
         if not isinstance(value, (int, float)):
             raise ValueError(f"`{label}` should be a numeric value.")
 
-    valid_retain_curve = ['RETAIN', 'DELETE']
-    retain_curve = normalize_option(retain_curve, "retain_curve")
-    if retain_curve not in valid_retain_curve:
-        raise ValueError(f"`retain_curve` should be one of {valid_retain_curve}. Received: {retain_curve}")
+    valid_retain_curves = ['RETAIN', 'DELETE']
+    retain_curves = normalize_option(retain_curves, "retain_curves")
+    if retain_curves not in valid_retain_curves:
+        raise ValueError(f"`retain_curves` should be one of {valid_retain_curves}. Received: {retain_curves}")
 
     lines = [
         "#************************************************************************",
         "#********************* Translate selected curves *************************",
         "#************************************************************************",
-        f"CAD_CREATE_TRANSLATE_CURVES {x} {y} {z} {retain_curve}"
+        f"CAD_CREATE_TRANSLATE_CURVES {x} {y} {z} {retain_curves}"
     ]
 
     script.append_lines(lines)
@@ -1763,7 +1763,7 @@ def cad_create_translate_curves(
 
 def cad_create_scale_curves(
     scale: float = 1.0,
-    retain_curve: str = 'DELETE'
+    retain_curves: str = 'DELETE'
 ) -> None:
     """
     Scale selected drawing curves by a uniform factor.
@@ -1776,14 +1776,14 @@ def cad_create_scale_curves(
     ----------
     scale : float, optional
         Uniform scaling factor (> 0). Defaults to 1.0.
-    retain_curve : str, optional
+    retain_curves : str, optional
         Whether to retain or delete the source curves after the operation
         ('RETAIN' or 'DELETE'). Defaults to 'DELETE'.
 
     Raises
     ------
     ValueError
-        If `scale` is not a positive numeric value or `retain_curve` is invalid.
+        If `scale` is not a positive numeric value or `retain_curves` is invalid.
 
     Examples
     --------
@@ -1792,16 +1792,16 @@ def cad_create_scale_curves(
     if not isinstance(scale, (int, float)) or scale <= 0:
         raise ValueError("`scale` should be a numeric value greater than zero.")
 
-    valid_retain_curve = ['RETAIN', 'DELETE']
-    retain_curve = normalize_option(retain_curve, "retain_curve")
-    if retain_curve not in valid_retain_curve:
-        raise ValueError(f"`retain_curve` should be one of {valid_retain_curve}. Received: {retain_curve}")
+    valid_retain_curves = ['RETAIN', 'DELETE']
+    retain_curves = normalize_option(retain_curves, "retain_curves")
+    if retain_curves not in valid_retain_curves:
+        raise ValueError(f"`retain_curves` should be one of {valid_retain_curves}. Received: {retain_curves}")
 
     lines = [
         "#************************************************************************",
         "#*********************** Scale selected curves ***************************",
         "#************************************************************************",
-        f"CAD_CREATE_SCALE_CURVES {scale} {retain_curve}"
+        f"CAD_CREATE_SCALE_CURVES {scale} {retain_curves}"
     ]
 
     script.append_lines(lines)

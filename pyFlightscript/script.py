@@ -25,6 +25,8 @@ class State:
             self.lines.append(lines)
         elif isinstance(lines, list):
             self.lines.extend(lines)
+            if len(lines) > 0 and lines[-1] != "":
+                self.lines.append("")
 
     def display_lines(self) -> None:
         """

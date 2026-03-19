@@ -10,6 +10,20 @@ if REPO_ROOT not in sys.path:
 import pyFlightscript as pyfs
 
 
+class ScriptStateView:
+    """Test-facing view of script state that omits blank separator lines."""
+
+    def __init__(self, state):
+        self._state = state
+
+    @property
+    def lines(self):
+        return [line for line in self._state.lines if line != ""]
+
+    def __getattr__(self, name):
+        return getattr(self._state, name)
+
+
 @pytest.fixture(autouse=True)
 def reset_script_state():
     """Automatically reset global script state before each test."""
@@ -21,4 +35,4 @@ def reset_script_state():
 @pytest.fixture()
 def script_state():
     """Return the underlying script state for assertions."""
-    return pyfs.script
+    return ScriptStateView(pyfs.script)
