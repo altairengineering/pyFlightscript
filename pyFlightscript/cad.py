@@ -648,7 +648,7 @@ def cad_create_curve_export_ccs(file_path: str) -> None:
     script.append_lines(lines)
     return
 
-def cad_import_cad(
+def import_cad(
     cad_filepath: str,
     tessellation_density: str = 'MEDIUM',
     unreferenced_patches: bool = True,
@@ -685,10 +685,10 @@ def cad_import_cad(
     Examples
     --------
     >>> # Import a CAD file using default import settings
-    >>> cad_import_cad(cad_filepath='C:/path/to/geometry.igs')
+    >>> import_cad(cad_filepath='C:/path/to/geometry.igs')
 
     >>> # Import a CAD file with custom tessellation and curvature settings
-    >>> cad_import_cad(
+    >>> import_cad(
     ...     cad_filepath='C:/path/to/geometry.step',
     ...     tessellation_density='HIGH',
     ...     unreferenced_patches=False,
