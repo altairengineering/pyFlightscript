@@ -1,7 +1,7 @@
-from .utils import *    
-from .script import script
-from .types import *    
 from typing import Union, Optional, Literal, List
+from .utils import *
+from .script import script
+from .types import *
 
 def scene_contour(variable: int = 4) -> None:
     """
@@ -66,7 +66,6 @@ def scene_contour(variable: int = 4) -> None:
         "#************************************************************************",
         "#****************** Change scene contour parameter **********************",
         "#************************************************************************",
-        "#",
         "SET_SCENE_CONTOUR",
         f"VARIABLE {variable}"
     ]
@@ -117,8 +116,7 @@ def set_vorticity_drag_boundaries(
     lines = [
         "#************************************************************************",
         "#****** Set a custom vorticity induced-drag boundary list ***************",
-        "#************************************************************************",
-        "#"
+        "#************************************************************************"
     ]
     
     if num_boundaries == -1:
@@ -149,7 +147,6 @@ def delete_vorticity_drag_boundaries():
         "#************************************************************************",
         "#************** Clear the vorticity induced-drag boundaries *************",
         "#************************************************************************",
-        "#",
         "DELETE_VORTICITY_DRAG_BOUNDARIES"
     ]
 
@@ -184,6 +181,7 @@ def set_analysis_moments_model(model: str = "PRESSURE") -> None:
     """
     
     # Type and value checking
+    model = normalize_option(model, "model")
     if model not in ['PRESSURE', 'VORTICITY']:
         raise ValueError("`model` must be either 'PRESSURE' or 'VORTICITY'.")
     
@@ -191,7 +189,6 @@ def set_analysis_moments_model(model: str = "PRESSURE") -> None:
         "#************************************************************************",
         "#****************** Set the moments model used in the analysis **********",
         "#************************************************************************",
-        "#",
         f"SET_ANALYSIS_MOMENTS_MODEL {model}"
     ]
 
@@ -234,7 +231,6 @@ def set_analysis_symmetry_loads(enable: bool) -> None:
         "#************************************************************************",
         "#**** Enable the analysis to include loads from symmetry boundaries *****" if enable else "#**** Disable the analysis to include loads from symmetry boundaries ****",
         "#************************************************************************",
-        "#",
         f"SET_ANALYSIS_SYMMETRY_LOADS {action}"
     ]
 
@@ -276,7 +272,6 @@ def analysis_loads_frame(load_frame: int = 1) -> None:
         "#************************************************************************",
         "#****************** Set the loads frame in the analysis tab *************",
         "#************************************************************************",
-        "#",
         f"SET_SOLVER_ANALYSIS_LOADS_FRAME {load_frame}"
     ]
 
@@ -320,7 +315,6 @@ def vorticity_lift_model(enable: bool = True) -> None:
         "#************************************************************************",
         "#****************** Set the lift model to vorticity mode ****************",
         "#************************************************************************",
-        "#",
         f"SET_VORTICITY_LIFT_MODEL {status}"
     ]
 
@@ -355,6 +349,7 @@ def loads_and_moments_units(unit_type: ValidForceUnits = 'NEWTONS') -> None:
     >>> loads_and_moments_units()
     """
     
+    unit_type = normalize_option(unit_type, "unit_type")
     if unit_type not in VALID_FORCE_UNITS_LIST:
         raise ValueError(f"`unit_type` must be one of {VALID_FORCE_UNITS_LIST}")
 
@@ -362,7 +357,6 @@ def loads_and_moments_units(unit_type: ValidForceUnits = 'NEWTONS') -> None:
         "#************************************************************************",
         "#****************** Set the solver analysis units selection *************",
         "#************************************************************************",
-        "#",
         f"SET_LOADS_AND_MOMENTS_UNITS {unit_type}"
     ]
     script.append_lines(lines)
@@ -410,7 +404,6 @@ def analysis_boundaries(num_boundaries: int, boundaries_list: List[int]) -> None
         "#************************************************************************",
         "#****************** Set the solver analysis boundaries ******************",
         "#************************************************************************",
-        "#",
         f"SET_SOLVER_ANALYSIS_BOUNDARIES {num_boundaries}",
         boundaries_str
     ]
@@ -455,7 +448,6 @@ def set_inviscid_loads(enable: bool) -> None:
         "#************************************************************************",
         "#********* Set the Analysis to be inviscid loads & moments only *********",
         "#************************************************************************",
-        "#",
         f"SET_INVISCID_LOADS {status}"
     ]
 

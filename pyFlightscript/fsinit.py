@@ -1,7 +1,6 @@
 from .utils import *    
 from .script import script
 from .types import *
-from .types import RunOptions, ValidUnits, VALID_RUN_OPTIONS, VALID_UNITS_LIST, VALID_FORCE_UNITS_LIST
 
 def open_fsm(
     fsm_filepath: str,
@@ -46,9 +45,11 @@ def open_fsm(
     """
     check_file_existence(fsm_filepath)
     
+    reset_parallel_cores = normalize_option(reset_parallel_cores, "reset_parallel_cores")
     if reset_parallel_cores not in VALID_RUN_OPTIONS:
         raise ValueError(f"`reset_parallel_cores` should be one of {VALID_RUN_OPTIONS}")
 
+    load_solver_initialization = normalize_option(load_solver_initialization, "load_solver_initialization")
     if load_solver_initialization not in VALID_RUN_OPTIONS:
         raise ValueError(f"`load_solver_initialization` should be one of {VALID_RUN_OPTIONS}")
         
@@ -56,7 +57,6 @@ def open_fsm(
         "#************************************************************************",
         "#****************** Open an existing simulation file ********************",
         "#************************************************************************",
-        "#",
         "OPEN",
         fsm_filepath,
         f"LOAD_SOLVER_INITIALIZATION {load_solver_initialization}"
@@ -81,7 +81,6 @@ def stop_script() -> None:
         "#************************************************************************",
         "#*********** Stop a script at this location in the script file **********",
         "#************************************************************************",
-        "#",
         "STOP"
     ]
 
@@ -110,7 +109,6 @@ def print_message(message: str = "Hello from FlightStream!") -> None:
         "#************************************************************************",
         "#**************** Print a user-defined message to the log ***************",
         "#************************************************************************",
-        "#",
         f"PRINT {message}"
     ]
 
@@ -138,7 +136,6 @@ def save_as_fsm(fsm_filepath: str) -> None:
         "#************************************************************************",
         "#****************** Save an existing simulation file ********************",
         "#************************************************************************",
-        "#",
         "SAVEAS",
         fsm_filepath
     ]
@@ -162,7 +159,6 @@ def new_simulation() -> None:
         "#************************************************************************",
         "#****************** Create a new simulation *****************************",
         "#************************************************************************",
-        "#",
         "NEW_SIMULATION"
     ]
 
@@ -198,7 +194,6 @@ def set_significant_digits(digits: int = 5) -> None:
         "#************************************************************************",
         "#****************** Set significant digits ******************************",
         "#************************************************************************",
-        "#",
         f"SET_SIGNIFICANT_DIGITS {digits}"
     ]
 
@@ -234,7 +229,6 @@ def set_vertex_merge_tolerance(tolerance: float = 1e-5) -> None:
         "#************************************************************************",
         "#****************** Set vertex merge tolerance **************************",
         "#************************************************************************",
-        "#",
         f"SET_VERTEX_MERGE_TOLERANCE {tolerance}"
     ]
 
@@ -263,6 +257,7 @@ def set_simulation_length_units(units: ValidUnits = 'METER') -> None:
     >>> # Set simulation length units to inches
     >>> set_simulation_length_units(units='INCH')
     """
+    units = normalize_option(units, "units")
     if units not in VALID_UNITS_LIST:
         raise ValueError(f"`units` should be one of {VALID_UNITS_LIST}")
 
@@ -270,7 +265,6 @@ def set_simulation_length_units(units: ValidUnits = 'METER') -> None:
         "#************************************************************************",
         "#****************** Set simulation length scale units *******************",
         "#************************************************************************",
-        "#",
         f"SET_SIMULATION_LENGTH_UNITS {units}"
     ]
 
@@ -310,7 +304,6 @@ def set_trailing_edge_sweep_angle(angle: float = 45.0) -> None:
         "#************************************************************************",
         "#****************** Set trailing edge sweep angle ***********************",
         "#************************************************************************",
-        "#",
         f"SET_TRAILING_EDGE_SWEEP_ANGLE {angle}"
     ]
 
@@ -350,7 +343,6 @@ def set_trailing_edge_bluntness_angle(angle: float = 85.0) -> None:
         "#************************************************************************",
         "#****************** Set trailing edge bluntness angle *******************",
         "#************************************************************************",
-        "#",
         f"SET_TRAILING_EDGE_BLUNTNESS_ANGLE {angle}"
     ]
 
@@ -390,7 +382,6 @@ def set_base_region_bending_angle(angle: float = 25.0) -> None:
         "#************************************************************************",
         "#****************** Set base region bending angle ***********************",
         "#************************************************************************",
-        "#",
         f"SET_BASE_REGION_BENDING_ANGLE {angle}"
     ]
 
@@ -425,7 +416,6 @@ def run_script(script_filepath: str) -> None:
         "#************************************************************************",
         "#**************** Call a script from within another script **************",
         "#************************************************************************",
-        "#",
         "RUN_SCRIPT",
         script_filepath
     ]

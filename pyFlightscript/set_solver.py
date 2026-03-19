@@ -1,8 +1,7 @@
-from .utils import *    
+from typing import Union, Optional, Literal, List, Tuple
+from .utils import *
 from .script import script
 from .types import *
-from .types import ValidForceUnits, VALID_FORCE_UNITS_LIST, RunOptions, VALID_ANIMATION_FILETYPE_LIST, VALID_BOUNDARY_LAYER_TYPE_LIST
-from typing import Union, Optional, Literal
 
 def steady() -> None:
     """
@@ -20,7 +19,6 @@ def steady() -> None:
         "#************************************************************************",
         "#********* Set the steady solver ****************************************",
         "#************************************************************************",
-        "#",
         "SET_SOLVER_STEADY"
     ]
     script.append_lines(lines)
@@ -54,20 +52,12 @@ def unsteady(time_iterations: int = 100, delta_time: float = 0.1) -> None:
         "#************************************************************************",
         "#********* Set the unsteady solver **************************************",
         "#************************************************************************",
-        "#",
         "SET_SOLVER_UNSTEADY",
         f"TIME_ITERATIONS {time_iterations}",
         f"DELTA_TIME {delta_time}"
     ]
     script.append_lines(lines)
     return
-
-from typing import List, Tuple, Optional
-from .types import (
-    ValidForceUnits, VALID_FORCE_UNITS_LIST, RunOptions,
-    VALID_UNSTEADY_FORCE_PLOT_PARAMETER_LIST,
-    VALID_UNSTEADY_FLUID_PLOT_PARAMETER_LIST
-)
 
 def unsteady_solver_new_force_plot(
     frame: int = 1,
@@ -111,8 +101,10 @@ def unsteady_solver_new_force_plot(
     """
     if not isinstance(frame, int):
         raise ValueError("`frame` must be an integer.")
+    units = normalize_option(units, "units")
     if units not in VALID_FORCE_UNITS_LIST:
         raise ValueError(f"`units` must be one of {VALID_FORCE_UNITS_LIST}")
+    parameter = normalize_option(parameter, "parameter")
     if parameter not in VALID_UNSTEADY_FORCE_PLOT_PARAMETER_LIST:
         raise ValueError(f"`parameter` must be one of {VALID_UNSTEADY_FORCE_PLOT_PARAMETER_LIST}")
 
@@ -120,7 +112,6 @@ def unsteady_solver_new_force_plot(
         "#************************************************************************",
         "#********* Create a new unsteady solver force & moments plot ************",
         "#************************************************************************",
-        "#",
         "UNSTEADY_SOLVER_NEW_FORCE_PLOT",
         f"FRAME {frame}",
         f"UNITS {units}",
@@ -170,6 +161,7 @@ def unsteady_solver_new_fluid_plot(
     """
     if not isinstance(frame, int):
         raise ValueError("`frame` must be an integer.")
+    parameter = normalize_option(parameter, "parameter")
     if parameter not in VALID_UNSTEADY_FLUID_PLOT_PARAMETER_LIST:
         raise ValueError(f"`parameter` must be one of {VALID_UNSTEADY_FLUID_PLOT_PARAMETER_LIST}")
 
@@ -177,7 +169,6 @@ def unsteady_solver_new_fluid_plot(
         "#************************************************************************",
         "#********* Create a new unsteady solver fluid properties plot ***********",
         "#************************************************************************",
-        "#",
         "UNSTEADY_SOLVER_NEW_FLUID_PLOT",
         f"FRAME {frame}",
         f"PARAMETER {parameter}",
@@ -211,7 +202,6 @@ def unsteady_solver_export_plots(export_filepath: str) -> None:
         "#************************************************************************",
         "#****************** Export all unsteady solver plots ********************",
         "#************************************************************************",
-        "#",
         "UNSTEADY_SOLVER_EXPORT_PLOTS",
         export_filepath
     ]
@@ -234,7 +224,6 @@ def unsteady_solver_delete_all_plots() -> None:
         "#************************************************************************",
         "#****************** Delete all unsteady solver plots ********************",
         "#************************************************************************",
-        "#",
         "UNSTEADY_SOLVER_DELETE_ALL_PLOTS"
     ]
     script.append_lines(lines)
@@ -275,14 +264,17 @@ def unsteady_solver_animation(
     ...     'ENABLE', 'C:/animation', 'PARAVIEW_VTK', 10, 'ENABLE'
     ... )
     """
+    enable_disable = normalize_option(enable_disable, "enable_disable")
     if enable_disable not in VALID_RUN_OPTIONS:
         raise ValueError(f"`enable_disable` must be one of {VALID_RUN_OPTIONS}")
     if not isinstance(folder, str):
         raise ValueError("`folder` must be a string indicating the path.")
+    filetype = normalize_option(filetype, "filetype")
     if filetype not in VALID_ANIMATION_FILETYPE_LIST:
         raise ValueError(f"`filetype` must be one of {VALID_ANIMATION_FILETYPE_LIST}")
     if not isinstance(frequency, int) or frequency < 1:
         raise ValueError("`frequency` must be an integer greater than 0.")
+    volume_sections = normalize_option(volume_sections, "volume_sections")
     if volume_sections not in VALID_RUN_OPTIONS:
         raise ValueError(f"`volume_sections` must be one of {VALID_RUN_OPTIONS}")
 
@@ -320,6 +312,7 @@ def boundary_layer_type(type_value: str = 'TRANSITIONAL') -> None:
     >>> # Set the boundary layer to turbulent
     >>> boundary_layer_type('TURBULENT')
     """
+    type_value = normalize_option(type_value, "type_value")
     if type_value not in VALID_BOUNDARY_LAYER_TYPE_LIST:
         raise ValueError(f"`type_value` must be one of {VALID_BOUNDARY_LAYER_TYPE_LIST}")
 
@@ -327,7 +320,6 @@ def boundary_layer_type(type_value: str = 'TRANSITIONAL') -> None:
         "#************************************************************************",
         "#****************** Set the surface boundary layer type *****************",
         "#************************************************************************",
-        "#",
         f"SET_BOUNDARY_LAYER_TYPE {type_value}"
     ]
     script.append_lines(lines)
@@ -357,7 +349,6 @@ def surface_roughness(roughness_height: float = 23.5) -> None:
         "#************************************************************************",
         "#****************** Set the surface roughness height ********************",
         "#************************************************************************",
-        "#",
         f"SET_SURFACE_ROUGHNESS {roughness_height}"
     ]
     script.append_lines(lines)
@@ -381,6 +372,7 @@ def viscous_coupling(mode: RunOptions = 'ENABLE') -> None:
     >>> # Disable viscous coupling
     >>> viscous_coupling('DISABLE')
     """
+    mode = normalize_option(mode, "mode")
     if mode not in VALID_RUN_OPTIONS:
         raise ValueError(f"`mode` must be one of {VALID_RUN_OPTIONS}")
 
@@ -388,7 +380,6 @@ def viscous_coupling(mode: RunOptions = 'ENABLE') -> None:
         "#************************************************************************",
         "#****************** Set the solver viscous coupling ********************",
         "#************************************************************************",
-        "#",
         f"SET_SOLVER_VISCOUS_COUPLING {mode}"
     ]
     script.append_lines(lines)
@@ -424,7 +415,6 @@ def viscous_excluded_boundaries(num_boundaries: int, boundaries: List[int]) -> N
         "#************************************************************************",
         "#************** Set the viscous exclusion boundary list ****************",
         "#************************************************************************",
-        "#",
         f"SET_VISCOUS_EXCLUDED_BOUNDARIES {num_boundaries}",
         ",".join(map(str, boundaries))
     ]
@@ -447,38 +437,7 @@ def delete_viscous_excluded_boundaries() -> None:
         "#************************************************************************",
         "#************** Delete the viscous exclusion boundary list **************",
         "#************************************************************************",
-        "#",
         "DELETE_VISCOUS_EXCLUDED_BOUNDARIES"
-    ]
-    script.append_lines(lines)
-    return
-
-def unsteady_viscous_coupling_iteration(num_iteration: int) -> None:
-    """
-    Set the unsteady solver viscous-coupling iteration.
-
-    This function appends a command to the script state to specify the
-    time-stepping iteration at which viscous coupling is enabled.
-
-    Parameters
-    ----------
-    num_iteration : int
-        The iteration number to enable viscous coupling.
-
-    Examples
-    --------
-    >>> # Enable viscous coupling at iteration 100
-    >>> unsteady_viscous_coupling_iteration(100)
-    """
-    if not isinstance(num_iteration, int):
-        raise ValueError("`num_iteration` must be an integer.")
-
-    lines = [
-        "#************************************************************************",
-        "#************** Set the unsteady-solver viscous-coupling iteration ******",
-        "#************************************************************************",
-        "#",
-        f"SET_UNSTEADY_VISCOUS_COUPLING_ITERATION {num_iteration}"
     ]
     script.append_lines(lines)
     return
@@ -516,7 +475,6 @@ def set_axial_separation_boundaries(boundary_indices: Union[int, List[int]]) -> 
         "#************************************************************************",
         "#************** Set the axial flow separation boundary list *************",
         "#************************************************************************",
-        "#",
         f"SET_AXIAL_SEPARATION_BOUNDARIES {num_boundaries}",
         indices_str
     ]
@@ -539,7 +497,6 @@ def delete_axial_separation_boundaries() -> None:
         "#************************************************************************",
         "#************** Delete the axial flow separation boundary list **********",
         "#************************************************************************",
-        "#",
         "DELETE_AXIAL_SEPARATION_BOUNDARIES"
     ]
     script.append_lines(lines)
@@ -571,7 +528,6 @@ def set_crossflow_separation_boundaries(boundary_indices: List[int]) -> None:
         "#************************************************************************",
         "#************** Set the cross-flow separation boundary list *************",
         "#************************************************************************",
-        "#",
         f"SET_CROSSFLOW_SEPARATION_BOUNDARIES {boundary_count}",
         ",".join(map(str, boundary_indices))
     ]
@@ -594,39 +550,7 @@ def delete_crossflow_separation_boundaries() -> None:
         "#************************************************************************",
         "#************** Delete the cross-flow separation boundary list **********",
         "#************************************************************************",
-        "#",
         "DELETE_CROSSFLOW_SEPARATION_BOUNDARIES"
-    ]
-    script.append_lines(lines)
-    return
-
-def set_crossflow_separation_cp(mean_diameter: float) -> None:
-    """
-    Set the cross-flow separation pressure coefficient.
-
-    This function appends a command to the script state to set the pressure
-    coefficient for cross-flow separation based on a mean diameter.
-
-    Parameters
-    ----------
-    mean_diameter : float
-        The mean diameter of the geometric body for calculating the
-        cross-flow separation pressure coefficient (> 0).
-
-    Examples
-    --------
-    >>> # Set the cross-flow separation Cp for a body with a mean diameter of 2.5
-    >>> set_crossflow_separation_cp(2.5)
-    """
-    if not isinstance(mean_diameter, (int, float)) or mean_diameter <= 0:
-        raise ValueError("`mean_diameter` must be a positive numeric value.")
-
-    lines = [
-        "#************************************************************************",
-        "#********** Set the cross-flow separation pressure coefficient **********",
-        "#************************************************************************",
-        "#",
-        f"SET_CROSSFLOW_SEPARATION_CP {mean_diameter}"
     ]
     script.append_lines(lines)
     return
@@ -658,7 +582,6 @@ def aoa(angle: float) -> None:
         "#************************************************************************",
         "#********* Set the solver AOA *******************************************",
         "#************************************************************************",
-        "#",
         f"SOLVER_SET_AOA {angle}"
     ]
     script.append_lines(lines)
@@ -691,7 +614,6 @@ def sideslip(angle: float) -> None:
         "#************************************************************************",
         "#********* Set the solver Side-slip angle *******************************",
         "#************************************************************************",
-        "#",
         f"SOLVER_SET_SIDESLIP {angle}"
     ]
     script.append_lines(lines)
@@ -721,7 +643,6 @@ def solver_velocity(velocity: float = 30.0) -> None:
         "#************************************************************************",
         "#********* Set the solver free-stream velocity **************************",
         "#************************************************************************",
-        "#",
         f"SOLVER_SET_VELOCITY {velocity}"
     ]
     script.append_lines(lines)
@@ -751,7 +672,6 @@ def solver_mach_number(mach: float = 3.0) -> None:
         "#************************************************************************",
         "#************** Set the solver Mach number ******************************",
         "#************************************************************************",
-        "#",
         f"SOLVER_SET_MACH_NUMBER {mach}"
     ]
     script.append_lines(lines)
@@ -781,7 +701,6 @@ def solver_iterations(num_iterations: int = 500) -> None:
         "#************************************************************************",
         "#****************** Set the solver iterations ***************************",
         "#************************************************************************",
-        "#",
         f"SOLVER_SET_ITERATIONS {num_iterations}"
     ]
     script.append_lines(lines)
@@ -811,7 +730,6 @@ def convergence_threshold(threshold: float = 1e-5) -> None:
         "#************************************************************************",
         "#****************** Set the solver convergence threshold ****************",
         "#************************************************************************",
-        "#",
         f"SOLVER_SET_CONVERGENCE {threshold}"
     ]
     script.append_lines(lines)
@@ -836,6 +754,7 @@ def forced_iterations(mode: RunOptions = 'ENABLE') -> None:
     >>> # Disable forced iterations
     >>> forced_iterations('DISABLE')
     """
+    mode = normalize_option(mode, "mode")
     if mode not in VALID_RUN_OPTIONS:
         raise ValueError(f"`mode` must be one of {VALID_RUN_OPTIONS}")
 
@@ -843,7 +762,6 @@ def forced_iterations(mode: RunOptions = 'ENABLE') -> None:
         "#************************************************************************",
         "#****************** Enable solver forced iterations mode ****************",
         "#************************************************************************",
-        "#",
         f"SOLVER_SET_FORCED_ITERATIONS {mode}"
     ]
     script.append_lines(lines)
@@ -873,7 +791,6 @@ def ref_velocity(value: float = 100.0) -> None:
         "#************************************************************************",
         "#********* Set the solver reference velocity ****************************",
         "#************************************************************************",
-        "#",
         f"SOLVER_SET_REF_VELOCITY {value}"
     ]
     script.append_lines(lines)
@@ -903,7 +820,6 @@ def ref_mach_number(mach: float = 3.0) -> None:
         "#************************************************************************",
         "#*************** Set the solver reference Mach number *******************",
         "#************************************************************************",
-        "#",
         f"SOLVER_SET_REF_MACH_NUMBER {mach}"
     ]
     script.append_lines(lines)
@@ -933,7 +849,6 @@ def ref_area(value: float = 1.0) -> None:
         "#************************************************************************",
         "#********* Set the solver reference area ********************************",
         "#************************************************************************",
-        "#",
         f"SOLVER_SET_REF_AREA {value}"
     ]
     script.append_lines(lines)
@@ -963,7 +878,6 @@ def ref_length(length: float = 1.0) -> None:
         "#************************************************************************",
         "#********* Set the solver reference length ******************************",
         "#************************************************************************",
-        "#",
         f"SOLVER_SET_REF_LENGTH {length}"
     ]
     script.append_lines(lines)
@@ -993,7 +907,6 @@ def solver_minimum_cp(cp_min: float = -100.0) -> None:
         "#************************************************************************",
         "#********* Set the solver minimum coefficient of pressure ***************",
         "#************************************************************************",
-        "#",
         f"SOLVER_MINIMUM_CP {cp_min}"
     ]
     script.append_lines(lines)
@@ -1023,7 +936,6 @@ def set_max_parallel_threads(num_cores: int = 16) -> None:
         "#************************************************************************",
         "#*********** Set maximum solver parallel cores ***************************",
         "#************************************************************************",
-        "#",
         f"SET_MAX_PARALLEL_THREADS {num_cores}"
     ]
     script.append_lines(lines)
@@ -1051,39 +963,7 @@ def mesh_induced_wake_velocity(enable: bool = True) -> None:
         "#************************************************************************",
         "#********* Set the solver mesh induced wake velocity ********************",
         "#************************************************************************",
-        "#",
         f"SOLVER_SET_MESH_INDUCED_WAKE_VELOCITY {status}"
-    ]
-    script.append_lines(lines)
-    return
-
-def adverse_gradient_boundary_layer(mode: RunOptions = 'ENABLE') -> None:
-    """
-    Set the adverse pressure gradient boundary layer mode.
-
-    This function appends a command to the script state to configure the
-    adverse pressure gradient boundary layer mode.
-
-    Parameters
-    ----------
-    mode : RunOptions, optional
-        The mode for the adverse pressure gradient boundary layer, by default
-        'ENABLE'. Must be one of `VALID_RUN_OPTIONS`.
-
-    Examples
-    --------
-    >>> # Disable the adverse gradient boundary layer model
-    >>> adverse_gradient_boundary_layer('DISABLE')
-    """
-    if mode not in VALID_RUN_OPTIONS:
-        raise ValueError(f"`mode` must be one of {VALID_RUN_OPTIONS}")
-
-    lines = [
-        "#************************************************************************",
-        "#********* Set the adverse pressure gradient boundary layer mode ********",
-        "#************************************************************************",
-        "#",
-        f"SOLVER_SET_ADVERSE_GRADIENT_BOUNDARY_LAYER {mode}"
     ]
     script.append_lines(lines)
     return
@@ -1112,7 +992,6 @@ def farfield_layers(value: int = 3) -> None:
         "#************************************************************************",
         "#********* Set the solver far-field agglomeration layers ****************",
         "#************************************************************************",
-        "#",
         f"SOLVER_SET_FARFIELD_LAYERS {value}"
     ]
     script.append_lines(lines)
@@ -1136,6 +1015,7 @@ def solver_unsteady_pressure_and_kutta(status: RunOptions = 'ENABLE') -> None:
     >>> # Disable unsteady Bernoulli and Kutta terms
     >>> solver_unsteady_pressure_and_kutta('DISABLE')
     """
+    status = normalize_option(status, "status")
     if status not in VALID_RUN_OPTIONS:
         raise ValueError(f"`status` must be one of {VALID_RUN_OPTIONS}")
 
@@ -1143,39 +1023,7 @@ def solver_unsteady_pressure_and_kutta(status: RunOptions = 'ENABLE') -> None:
         "#************************************************************************",
         "#********* Enable solver unsteady Bernoulli and Kutta terms *************",
         "#************************************************************************",
-        "#",
         f"SOLVER_UNSTEADY_PRESSURE_AND_KUTTA {status}"
-    ]
-    script.append_lines(lines)
-    return
-
-def solver_vortex_ring_normalization(status: RunOptions = 'ENABLE') -> None:
-    """
-    Enable or disable solver vortex ring normalization.
-
-    This function appends a command to the script state to control the vortex
-    ring normalization feature in the solver.
-
-    Parameters
-    ----------
-    status : RunOptions, optional
-        The status of the vortex ring normalization, by default 'ENABLE'.
-        Must be one of `VALID_RUN_OPTIONS`.
-
-    Examples
-    --------
-    >>> # Disable vortex ring normalization
-    >>> solver_vortex_ring_normalization('DISABLE')
-    """
-    if status not in VALID_RUN_OPTIONS:
-        raise ValueError(f"`status` must be one of {VALID_RUN_OPTIONS}")
-
-    lines = [
-        "#************************************************************************",
-        "#********* Enable solver vortex ring normalization **********************",
-        "#************************************************************************",
-        "#",
-        f"SOLVER_VORTEX_RING_NORMALIZATION {status}"
     ]
     script.append_lines(lines)
     return
@@ -1204,36 +1052,7 @@ def convergence_iterations(value: int = 500) -> None:
         "#************************************************************************************",
         "#************** Set the solver convergence iterations *********************************",
         "#************************************************************************************",
-        "#",
         f"SET_SOLVER_CONVERGENCE_ITERATIONS {value}"
-    ]
-    script.append_lines(lines)
-    return
-
-def wake_streamwise_agglomeration(enable: bool = True) -> None:
-    """
-    Enable or disable the wake streamwise agglomeration feature.
-
-    This function appends a command to the script state to control the
-    wake streamwise agglomeration feature.
-
-    Parameters
-    ----------
-    enable : bool, optional
-        Enable or disable the feature, by default True.
-
-    Examples
-    --------
-    >>> # Disable wake streamwise agglomeration
-    >>> wake_streamwise_agglomeration(False)
-    """
-    status = "ENABLE" if enable else "DISABLE"
-    lines = [
-        "#************************************************************************",
-        "#********* Enable the wake-->streamwise agglomeration feature ************",
-        "#************************************************************************",
-        "#",
-        f"SET_WAKE_STREAMWISE_AGGLOMERATION {status}"
     ]
     script.append_lines(lines)
     return
@@ -1262,36 +1081,190 @@ def wake_termination_time_steps(value: int) -> None:
         "#************************************************************************************",
         "#************** Set the wake termination time-steps value ***************************",
         "#************************************************************************************",
-        "#",
         f"SET_WAKE_TERMINATION_TIME_STEPS {value}"
     ]
     script.append_lines(lines)
     return
 
-def wake_relaxation(enable: bool) -> None:
+
+def set_valarezo_separation_boundaries(boundary_indices: Union[int, list]) -> None:
     """
-    Enable or disable the wake-relaxation feature.
+    Appends lines to script state to set Valarezo separation boundaries.
 
-    This function appends a command to the script state to control the
-    wake-relaxation feature.
-
-    Parameters
-    ----------
-    enable : bool
-        Enable or disable the wake-relaxation feature.
-
-    Examples
-    --------
-    >>> # Disable wake relaxation
-    >>> wake_relaxation(False)
+    :param boundary_indices: List of boundary indices, or -1 to apply to all boundaries.
     """
-    setting = "ENABLE" if enable else "DISABLE"
-    lines = [
-        "#************************************************************************",
-        "#********* Set the wake-relaxation feature ******************************",
-        "#************************************************************************",
-        "#",
-        f"SET_WAKE_RELAXATION {setting}"
-    ]
+
+    if isinstance(boundary_indices, int) and boundary_indices == -1:
+        lines = [
+            "#**************************************************************************************",
+            "#***************** Set the Valarezo separation boundary list ***************************",
+            "#**************************************************************************************",
+            "SET_VALAREZO_SEPARATION_BOUNDARIES -1"
+        ]
+    elif isinstance(boundary_indices, list):
+        if not all(isinstance(idx, int) for idx in boundary_indices):
+            raise ValueError("All elements in `boundary_indices` should be integers.")
+
+        lines = [
+            "#**************************************************************************************",
+            "#***************** Set the Valarezo separation boundary list ***************************",
+            "#**************************************************************************************",
+            f"SET_VALAREZO_SEPARATION_BOUNDARIES {len(boundary_indices)}",
+            ",".join(map(str, boundary_indices))
+        ]
+    else:
+        raise ValueError("`boundary_indices` should be a list of integers, or -1.")
+
     script.append_lines(lines)
     return
+
+
+def delete_valarezo_separation_boundaries() -> None:
+    """
+    Appends lines to script state to delete all Valarezo separation boundaries.
+    """
+
+    lines = [
+        "#**************************************************************************************",
+        "#************** Delete the Valarezo separation boundary list ***************************",
+        "#**************************************************************************************",
+        "DELETE_VALAREZO_SEPARATION_BOUNDARIES"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def set_crossflow_separation_diameter(value: Union[int, float]) -> None:
+    """
+    Appends lines to script state to set the maximum diameter for cross-flow separation model.
+
+    :param value: Maximum diameter of the geometric body on which cross-flow separation is set (> 0).
+    """
+
+    if not isinstance(value, (int, float)):
+        raise ValueError("`value` should be a numeric value (integer or float).")
+
+    if value <= 0:
+        raise ValueError("`value` should be greater than zero.")
+
+    lines = [
+        "#**************************************************************************************",
+        "#************** Set maximum diameter for crossflow separation model *******************",
+        "#**************************************************************************************",
+        f"SET_CROSSFLOW_SEPARATION_DIAMETER {value}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def set_crossflow_separation_axisymmetric(status: str = 'ENABLE') -> None:
+    """
+    Appends lines to script state to enable cross-flow separation axisymmetric vortex shedding.
+
+    :param status: Can be 'ENABLE' or 'DISABLE'.
+    """
+
+    status = normalize_option(status, "status")
+    if status not in ['ENABLE', 'DISABLE']:
+        raise ValueError("`status` should be either 'ENABLE' or 'DISABLE'")
+
+    lines = [
+        "#**************************************************************************************",
+        "#************** Enable cross-flow separation axisymmetric vortex shedding *************",
+        "#**************************************************************************************",
+        f"SET_CROSSFLOW_SEPARATION_AXISYMMETRIC {status}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def kutta_joukowski_lift_forces(status: str = 'ENABLE') -> None:
+    """
+    Appends lines to script state to set Kutta-Joukowski inviscid lift forces.
+
+    :param status: Can be 'ENABLE' or 'DISABLE'.
+    """
+
+    status = normalize_option(status, "status")
+    if status not in ['ENABLE', 'DISABLE']:
+        raise ValueError("`status` should be either 'ENABLE' or 'DISABLE'")
+
+    lines = [
+        "#************************************************************************",
+        "#************* Set the Kutta-Joukowski inviscid lift forces *************",
+        "#************************************************************************",
+        f"KUTTA_JOUKOWSKI_LIFT_FORCES {status}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def laminar_separation(status: str = 'ENABLE') -> None:
+    """
+    Appends lines to script state to set laminar boundary layer separation.
+
+    :param status: Can be 'ENABLE' or 'DISABLE'.
+    """
+
+    status = normalize_option(status, "status")
+    if status not in ['ENABLE', 'DISABLE']:
+        raise ValueError("`status` should be either 'ENABLE' or 'DISABLE'")
+
+    lines = [
+        "#************************************************************************",
+        "#*************** Set Laminar boundary layer separation ******************",
+        "#************************************************************************",
+        f"LAMINAR_SEPARATION {status}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def print_rotor_induced_velocities(status: str = 'ENABLE') -> None:
+    """
+    Appends lines to script state to print rotor-induced velocities per time step.
+
+    :param status: Can be 'ENABLE' or 'DISABLE'.
+    """
+
+    status = normalize_option(status, "status")
+    if status not in ['ENABLE', 'DISABLE']:
+        raise ValueError("`status` should be either 'ENABLE' or 'DISABLE'")
+
+    lines = [
+        "#************************************************************************",
+        "#*********** Print rotor-induced velocities per time step ***************",
+        "#************************************************************************",
+        f"PRINT_ROTOR_INDUCED_VELOCITIES {status}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def additional_wake_relaxation_iteration(status: str = 'ENABLE') -> None:
+    """
+    Appends lines to script state to perform an additional wake relaxation iteration.
+
+    :param status: Can be 'ENABLE' or 'DISABLE'.
+    """
+
+    status = normalize_option(status, "status")
+    if status not in ['ENABLE', 'DISABLE']:
+        raise ValueError("`status` should be either 'ENABLE' or 'DISABLE'")
+
+    lines = [
+        "#************************************************************************",
+        "#*********** Perform additional wake relaxation iteration ***************",
+        "#************************************************************************",
+        f"ADDITIONAL_WAKE_RELAXATION_ITERATION {status}"
+    ]
+
+    script.append_lines(lines)
+    return
+

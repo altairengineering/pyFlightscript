@@ -1,10 +1,8 @@
 import os
-from .utils import *    
+from typing import List
+from .utils import *
 from .script import script
 from .types import *
-
-from typing import List
-from .script import script
 
 def physics(
     auto_trail_edges: bool = False, 
@@ -42,7 +40,6 @@ def physics(
         "#************************************************************************",
         "#****************** Set the physics conditions if needed ****************",
         "#************************************************************************",
-        "#",
         "PHYSICS"
     ]
 
@@ -84,7 +81,6 @@ def detect_trailing_edges_by_surface(surfaces: List[int]) -> None:
         "#************************************************************************",
         "#****************** Detect Trailing Edges by Surface ********************",
         "#************************************************************************",
-        "#",
         "DETECT_TRAILING_EDGES_BY_SURFACE",
         f"SURFACES {len(surfaces)}",
         ",".join(map(str, surfaces))
@@ -132,7 +128,6 @@ def trailing_edges_import(file_path: str) -> None:
         "#************************************************************************",
         "#************** Import custom trailing edge marking from file ***********",
         "#************************************************************************",
-        "#",
         "TRAILING_EDGES_IMPORT",
         f'"{file_path}"'
     ]
@@ -163,7 +158,6 @@ def detect_wake_termination_nodes_by_surface(surface_id: int) -> None:
         "#************************************************************************",
         "#****************** Detect wake termination nodes by surface ************",
         "#************************************************************************",
-        "#",
         f"DETECT_WAKE_TERMINATION_NODES_BY_SURFACE {surface_id}"
     ]
 

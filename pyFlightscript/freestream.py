@@ -1,8 +1,8 @@
 import os
-from .utils import *    
+from typing import Optional, List
+from .utils import *
 from .script import script
 from .types import *
-from typing import Optional, List
 
 def set_freestream(
     freestream_type: ValidFreestreamType,
@@ -62,6 +62,7 @@ def set_freestream(
     """
 
     # Type and value checking
+    freestream_type = normalize_option(freestream_type, "freestream_type")
     if freestream_type not in VALID_FREESTREAM_TYPE_LIST:
         raise ValueError(f"`freestream_type` should be one of {VALID_FREESTREAM_TYPE_LIST}")
 
@@ -71,7 +72,6 @@ def set_freestream(
             "#************************************************************************",
             "#**************** Set a constant free-stream velocity *******************",
             "#************************************************************************",
-            "#",
             "SET_FREESTREAM CONSTANT"
         ])
 
@@ -85,7 +85,6 @@ def set_freestream(
             "#************************************************************************",
             "#*************** Set a custom free-stream velocity ********************",
             "#************************************************************************",
-            "#",
             "SET_FREESTREAM CUSTOM",
             profile_path
         ])
@@ -95,6 +94,7 @@ def set_freestream(
             raise ValueError("For `ROTATION` freestream_type, `frame`, `axis`, and `angular_velocity` must be provided.")
         if not isinstance(frame, int):
             raise TypeError("`frame` must be an integer when `freestream_type` is 'ROTATION'.")
+        axis = normalize_option(axis, "axis")
         if axis not in VALID_AXIS_LIST:
             raise ValueError(f"`axis` should be one of {VALID_AXIS_LIST}")
         if not isinstance(angular_velocity, (int, float)):
@@ -104,7 +104,6 @@ def set_freestream(
             "#************************************************************************",
             "#*************** Set a rotational free-stream velocity ******************",
             "#************************************************************************",
-            "#",
             f"SET_FREESTREAM ROTATION {frame} {axis} {angular_velocity}"
         ])
 
@@ -114,9 +113,9 @@ def set_freestream(
 def fluid_properties(
     density: float = 1.225,
     pressure: float = 101325.0,
-    sonic_velocity: float = 340.0,
     temperature: float = 288.15,
-    viscosity: float = 1.789e-5
+    viscosity: float = 1.789e-5,
+    specific_heat_ratio: float = 1.4
 ) -> None:
     """
     Set the fluid properties.
@@ -130,12 +129,12 @@ def fluid_properties(
         Density of the fluid in kg/m^3. Defaults to 1.225.
     pressure : float, optional
         Static pressure of the fluid in Pa. Defaults to 101325.0.
-    sonic_velocity : float, optional
-        Sonic velocity in the fluid in m/sec. Defaults to 340.0.
     temperature : float, optional
         Temperature of the fluid in Kelvin. Defaults to 288.15.
     viscosity : float, optional
         Viscosity of the fluid in Pa-sec. Defaults to 1.789e-5.
+    specific_heat_ratio : float, optional
+        Ratio of specific heats. Defaults to 1.4.
 
     Raises
     ------
@@ -148,10 +147,10 @@ def fluid_properties(
     >>> fluid_properties()
 
     >>> # Set custom fluid properties
-    >>> fluid_properties(density=1.2, pressure=101000, sonic_velocity=343)
+    >>> fluid_properties(density=1.2, pressure=101000, specific_heat_ratio=1.35)
     """
     if not all(isinstance(val, (int, float)) for val in [
-        density, pressure, sonic_velocity, temperature, viscosity
+        density, pressure, temperature, viscosity, specific_heat_ratio
     ]):
         raise ValueError("All fluid properties must be numeric values.")
 
@@ -159,13 +158,12 @@ def fluid_properties(
         "#************************************************************************",
         "#********* Set the fluid properties *************************************",
         "#************************************************************************",
-        "#",
         "FLUID_PROPERTIES",
         f"DENSITY {density}",
         f"PRESSURE {pressure}",
-        f"SONIC_VELOCITY {sonic_velocity}",
         f"TEMPERATURE {temperature}",
-        f"VISCOSITY {viscosity}"
+        f"VISCOSITY {viscosity}",
+        f"SPECIFIC_HEAT_RATIO {specific_heat_ratio}"
     ]
 
     script.append_lines(lines)
@@ -204,7 +202,6 @@ def air_altitude(altitude: float = 15000.0) -> None:
         "#************************************************************************",
         "#********* Set the fluid (air) properties based on altitude *************",
         "#************************************************************************",
-        "#",
         f"AIR_ALTITUDE {altitude}"
     ]
 

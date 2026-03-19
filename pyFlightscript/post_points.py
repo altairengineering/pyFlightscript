@@ -1,4 +1,5 @@
-from . import script
+from .utils import *
+from .script import script
 from .types import VALID_PROBE_POINT_TYPE_LIST, ValidUnits, VALID_UNITS_LIST
 
 def new_probe_point(
@@ -32,6 +33,7 @@ def new_probe_point(
     >>> # Create a surface probe point with default coordinates
     >>> new_probe_point('SURFACE')
     """
+    probe_type = normalize_option(probe_type, "probe_type")
     if probe_type not in VALID_PROBE_POINT_TYPE_LIST:
         raise ValueError(f"`probe_type` should be one of {VALID_PROBE_POINT_TYPE_LIST}")
     if not all(isinstance(coord, (int, float)) for coord in [x, y, z]):
@@ -41,7 +43,6 @@ def new_probe_point(
         "#************************************************************************",
         "#****************** Create a new probe point ****************************",
         "#************************************************************************",
-        "#",
         f"NEW_PROBE_POINT {probe_type} {x} {y} {z}"
     ]
     script.append_lines(lines)
@@ -93,7 +94,6 @@ def new_probe_line(
         "#************************************************************************",
         "#****************** Create a new probe survey line **********************",
         "#************************************************************************",
-        "#",
         f"NEW_PROBE_LINE {num_points} {x1} {y1} {z1} {x2} {y2} {z2}"
     ]
     script.append_lines(lines)
@@ -115,7 +115,6 @@ def update_probe_points() -> None:
         "#************************************************************************",
         "#****************** Update probe point flow properties *****************",
         "#************************************************************************",
-        "#",
         "UPDATE_PROBE_POINTS"
     ]
     script.append_lines(lines)
@@ -144,6 +143,7 @@ def probe_points_import(filepath: str, units: ValidUnits = 'INCH', frame: int = 
     """
     if not isinstance(filepath, str):
         raise ValueError("`filepath` should be a string.")
+    units = normalize_option(units, "units")
     if units not in VALID_UNITS_LIST:
         raise ValueError(f"`units` should be one of {VALID_UNITS_LIST}")
     if not isinstance(frame, int):
@@ -153,7 +153,6 @@ def probe_points_import(filepath: str, units: ValidUnits = 'INCH', frame: int = 
         "#************************************************************************",
         "#****************** Import probe points from file ***********************",
         "#************************************************************************",
-        "#",
         "PROBE_POINTS_IMPORT",
         f"UNITS {units}",
         f"FRAME {frame}",
@@ -186,7 +185,6 @@ def export_probe_points(filepath: str) -> None:
         "#************************************************************************",
         "#****************** Export probe points to file *************************",
         "#************************************************************************",
-        "#",
         "EXPORT_PROBE_POINTS",
         filepath
     ]
@@ -209,7 +207,6 @@ def delete_probe_points() -> None:
         "#************************************************************************",
         "#****************** Delete all existing probe points ********************",
         "#************************************************************************",
-        "#",
         "DELETE_PROBE_POINTS"
     ]
     script.append_lines(lines)

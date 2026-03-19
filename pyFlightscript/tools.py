@@ -1,4 +1,5 @@
 from typing import List, Union, Literal, Optional
+from .utils import *
 from .script import script
 from .types import (
     RunOptions, VALID_RUN_OPTIONS, VALID_STABILITY_UNITS_LIST,
@@ -80,6 +81,13 @@ def execute_solver_sweeper(
         Enable or disable appending to an existing sweep file, by default 'DISABLE'.
     """
     # Validate options
+    angle_of_attack = normalize_option(angle_of_attack, "angle_of_attack")
+    side_slip_angle = normalize_option(side_slip_angle, "side_slip_angle")
+    velocity = normalize_option(velocity, "velocity")
+    clear_solution_after_each_run = normalize_option(clear_solution_after_each_run, "clear_solution_after_each_run")
+    reference_velocity_equals_freestream = normalize_option(reference_velocity_equals_freestream, "reference_velocity_equals_freestream")
+    append_to_existing_sweep = normalize_option(append_to_existing_sweep, "append_to_existing_sweep")
+    export_surface_data_per_step = normalize_option(export_surface_data_per_step, "export_surface_data_per_step")
     for option in [angle_of_attack, side_slip_angle, velocity, clear_solution_after_each_run, 
                    reference_velocity_equals_freestream, append_to_existing_sweep]:
         if option not in VALID_RUN_OPTIONS:
@@ -107,7 +115,7 @@ def execute_solver_sweeper(
         f"SIDE_SLIP_ANGLE_STOP {side_slip_angle_stop}",
         f"SIDE_SLIP_ANGLE_DELTA {side_slip_angle_delta}",
     ]
-    
+
     # Add velocity parameters with correct naming based on velocity_mode
     if velocity_mode == 'MACH':
         lines.extend([
@@ -121,9 +129,9 @@ def execute_solver_sweeper(
             f"VELOCITY_STOP {velocity_stop}",
             f"VELOCITY_DELTA {velocity_delta}",
         ])
-    
+
     lines.append(f"EXPORT_SURFACE_DATA_PER_STEP {export_surface_data_per_step}")
-    
+
     # Add surface results path only if export is not disabled
     if export_surface_data_per_step != 'DISABLE':
         lines.append(surface_results_path)
@@ -163,10 +171,12 @@ def stability_toolbox_settings(
     angular_rate_increment : float, optional
         Incremental angular rate in rad/sec for dynamic coefficients, by default 0.1.
     """
-    if not isinstance(rotation_frame, int):
-        raise ValueError("`rotation_frame` must be an integer.")
+    if not isinstance(rotation_frame, int) or rotation_frame <= 0:
+        raise ValueError("`rotation_frame` must be a positive integer.")
+    units = normalize_option(units, "units")
     if units not in VALID_STABILITY_UNITS_LIST:
         raise ValueError(f"`units` must be one of {VALID_STABILITY_UNITS_LIST}")
+    clear_solver_per_run = normalize_option(clear_solver_per_run, "clear_solver_per_run")
     if clear_solver_per_run not in VALID_RUN_OPTIONS:
         raise ValueError(f"`clear_solver_per_run` must be one of {VALID_RUN_OPTIONS}")
     if not isinstance(angular_rate_increment, (int, float)):
@@ -176,12 +186,7 @@ def stability_toolbox_settings(
         "#************************************************************************",
         "#****************** Set the S&C toolbox parameters here *****************",
         "#************************************************************************",
-        "#",
-        "STABILITY_TOOLBOX_SETTINGS",
-        f"ROTATION_FRAME {rotation_frame}",
-        f"UNITS {units}",
-        f"CLEAR_SOLVER_PER_RUN {clear_solver_per_run}",
-        f"ANGULAR_RATE_INCREMENT {angular_rate_increment}"
+        f"STABILITY_TOOLBOX_SETTINGS {rotation_frame} {units} {clear_solver_per_run} {angular_rate_increment}"
     ]
     script.append_lines(lines)
     return
@@ -220,14 +225,23 @@ def stability_toolbox_new_coefficient(
     boundaries : Union[int, List[int]]
         The geometry boundaries linked to the numerator. Use -1 for all.
     """
+    if not isinstance(frame, int) or frame <= 0:
+        raise ValueError("`frame` must be a positive integer.")
+
+    units = normalize_option(units, "units")
     if units not in VALID_FORCE_UNITS_LIST:
         raise ValueError(f"`units` must be one of {VALID_FORCE_UNITS_LIST}")
+    numerator = normalize_option(numerator, "numerator")
     if numerator not in VALID_STABILITY_NUMERATOR_LIST:
         raise ValueError(f"`numerator` must be one of {VALID_STABILITY_NUMERATOR_LIST}")
+    denominator = normalize_option(denominator, "denominator")
     if denominator not in VALID_STABILITY_DENOMINATOR_LIST:
         raise ValueError(f"`denominator` must be one of {VALID_STABILITY_DENOMINATOR_LIST}")
     if not isinstance(constant, (int, float)):
         raise ValueError("`constant` must be a numeric value.")
+
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError("`name` must be a non-empty string.")
 
     lines = [
         "#************************************************************************",
@@ -238,12 +252,17 @@ def stability_toolbox_new_coefficient(
         f"NUMERATOR {numerator}",
         f"DENOMINATOR {denominator}",
         f"FRAME {frame}",
+        f"UNITS {units}",
         f"CONSTANT {constant}",
     ]
 
     if isinstance(boundaries, int) and boundaries == -1:
         lines.append("BOUNDARIES -1")
     elif isinstance(boundaries, list):
+        if len(boundaries) == 0:
+            raise ValueError("`boundaries` list cannot be empty.")
+        if not all(isinstance(boundary, int) and boundary > 0 for boundary in boundaries):
+            raise ValueError("`boundaries` list values must be positive integers.")
         lines.append(f"BOUNDARIES {len(boundaries)}")
         lines.append(",".join(map(str, boundaries)))
     else:

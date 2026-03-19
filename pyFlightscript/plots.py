@@ -1,4 +1,5 @@
-from . import script
+from .utils import *
+from .script import script
 from .types import VALID_PLOT_TYPE_LIST
 
 def set_plot_type(plot_type: str) -> None:
@@ -20,6 +21,7 @@ def set_plot_type(plot_type: str) -> None:
     >>> # Set the plot type to display unsteady forces
     >>> set_plot_type('UNSTEADY')
     """
+    plot_type = normalize_option(plot_type, "plot_type")
     if plot_type not in VALID_PLOT_TYPE_LIST:
         raise ValueError(f"`plot_type` should be one of {VALID_PLOT_TYPE_LIST}")
     
@@ -27,7 +29,6 @@ def set_plot_type(plot_type: str) -> None:
         "#************************************************************************",
         "#****************** Change the plot type ********************************",
         "#************************************************************************",
-        "#",
         "SET_PLOT_TYPE",
         plot_type
     ]

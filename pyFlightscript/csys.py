@@ -1,7 +1,7 @@
-from .utils import *    
+import numpy as np
+from .utils import *
 from .script import script
 from .types import *
-import numpy as np
 
 def create_new_coordinate_system() -> None:
     """
@@ -20,7 +20,6 @@ def create_new_coordinate_system() -> None:
         "#************************************************************************",
         "#****************** Create a new coordinate system **********************",
         "#************************************************************************",
-        "#",
         "CREATE_NEW_COORDINATE_SYSTEM"
     ]
 
@@ -90,7 +89,6 @@ def edit_coordinate_system(
         "#************************************************************************",
         "#****************** Edit a local coordinate system **********************",
         "#************************************************************************",
-        "#",
         "EDIT_COORDINATE_SYSTEM",
         f"FRAME {frame}",
         f"NAME {name}",
@@ -148,7 +146,6 @@ def set_coordinate_system_name(frame: int, name: str) -> None:
         "#************************************************************************",
         "#********* Set the name of an existing local coordinate system **********",
         "#************************************************************************",
-        "#",
         f"SET_COORDINATE_SYSTEM_NAME {frame} {name}"
     ]
 
@@ -197,6 +194,7 @@ def set_coordinate_system_origin(
     if not all(isinstance(val, (int, float)) for val in [x, y, z]):
         raise ValueError("`x`, `y`, and `z` should be numeric values.")
     
+    units = normalize_option(units, "units")
     if units not in VALID_UNITS_LIST:
         raise ValueError(f"Invalid units: {units}. Must be one of {VALID_UNITS_LIST}.")
     
@@ -204,7 +202,6 @@ def set_coordinate_system_origin(
         "#************************************************************************",
         "#********* Set the origin of an existing local coordinate system ********",
         "#************************************************************************",
-        "#",
         f"SET_COORDINATE_SYSTEM_ORIGIN {frame} {x} {y} {z} {units}"
     ]
 
@@ -254,6 +251,7 @@ def set_coordinate_system_axis(
     if not isinstance(frame, int) or frame <= 1:
         raise ValueError("`frame` should be an integer value greater than 1.")
     
+    axis = normalize_option(axis, "axis")
     if axis not in VALID_AXIS_LIST:
         raise ValueError(f"`axis` should be one of {VALID_AXIS_LIST}")
     
@@ -267,7 +265,6 @@ def set_coordinate_system_axis(
         "#************************************************************************",
         "#********* Edit the axis of an existing local coordinate system *********",
         "#************************************************************************",
-        "#",
         f"SET_COORDINATE_SYSTEM_AXIS {frame} {axis} {nx} {ny} {nz} {normalize_frame}"
     ]
 
@@ -306,7 +303,6 @@ def normalize_coordinate_system(coord_system_index: int = 1) -> None:
         "#************************************************************************",
         "#****************** Normalize coordinate system axes ********************",
         "#************************************************************************",
-        "#",
         f"NORMALIZE_COORDINATE_SYSTEM {coord_system_index}"
     ]
 
@@ -357,6 +353,7 @@ def rotate_coordinate_system(
     if not isinstance(rotation_frame, int):
         raise ValueError("`rotation_frame` should be an integer value.")
     
+    rotation_axis = normalize_option(rotation_axis, "rotation_axis")
     if rotation_axis not in VALID_ROTATION_AXIS_LIST:
         raise ValueError(f"`rotation_axis` should be one of {VALID_ROTATION_AXIS_LIST}")
     
@@ -367,7 +364,6 @@ def rotate_coordinate_system(
         "#************************************************************************",
         "#****************** Rotate a coordinate system **************************",
         "#************************************************************************",
-        "#",
         "ROTATE_COORDINATE_SYSTEM",
         f"FRAME {frame}",
         f"ROTATION_FRAME {rotation_frame}",
@@ -416,6 +412,7 @@ def translate_coordinate_system(
     if not isinstance(frame, int) or frame <= 1:
         raise ValueError("`frame` should be an integer value greater than 1.")
     
+    units = normalize_option(units, "units")
     if units not in VALID_UNITS_LIST:
         raise ValueError(f"Invalid units: {units}. Must be one of {VALID_UNITS_LIST}.")
     
@@ -426,7 +423,6 @@ def translate_coordinate_system(
         "#************************************************************************",
         "#****************** Translate a coordinate system ***********************",
         "#************************************************************************",
-        "#",
         f"TRANSLATE_COORDINATE_SYSTEM {frame} {x} {y} {z} {units}"
     ]
 
@@ -464,7 +460,6 @@ def duplicate_coordinate_system(frame: int) -> None:
         "#************************************************************************",
         "#****************** Duplicate a local coordinate system *****************",
         "#************************************************************************",
-        "#",
         f"DUPLICATE_COORDINATE_SYSTEM {frame}"
     ]
 
@@ -506,6 +501,7 @@ def mirror_coordinate_system(frame: int, plane: ValidPlanes = 'XZ') -> None:
     if not isinstance(frame, int) or frame <= 1:
         raise ValueError("`frame` should be an integer value greater than 1.")
     
+    plane = normalize_option(plane, "plane")
     if plane not in VALID_PLANE_LIST:
         raise ValueError(f"`plane` should be one of {VALID_PLANE_LIST}")
     
@@ -513,7 +509,6 @@ def mirror_coordinate_system(frame: int, plane: ValidPlanes = 'XZ') -> None:
         "#************************************************************************",
         "#****************** Mirror a local coordinate system ********************",
         "#************************************************************************",
-        "#",
         f"MIRROR_COORDINATE_SYSTEM {frame} {plane}"
     ]
 
@@ -551,7 +546,6 @@ def delete_coordinate_system(frame: int) -> None:
         "#************************************************************************",
         "#****************** Delete a coordinate system **************************",
         "#************************************************************************",
-        "#",
         f"DELETE_COORDINATE_SYSTEM {frame}"
     ]
 

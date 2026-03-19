@@ -1,7 +1,7 @@
+from typing import List, Union, Optional
 from .utils import *
 from .script import script
 from .types import *
-from typing import List, Union, Optional
 
 def new_off_body_streamline(
     position_x: float,
@@ -37,6 +37,7 @@ def new_off_body_streamline(
     """
     if not all(isinstance(v, (int, float)) for v in [position_x, position_y, position_z]):
         raise ValueError("Position coordinates must be numeric.")
+    upstream = normalize_option(upstream, "upstream")
     if upstream not in VALID_RUN_OPTIONS:
         raise ValueError(f"`upstream` must be one of {VALID_RUN_OPTIONS}")
 
@@ -44,7 +45,6 @@ def new_off_body_streamline(
         "#************************************************************************",
         "#****************** Create a off-body streamline ************************",
         "#************************************************************************",
-        "#",
         "NEW_OFF_BODY_STREAMLINE",
         f"POSITION_X {position_x}",
         f"POSITION_Y {position_y}",
@@ -105,7 +105,6 @@ def new_streamline_distribution(
         "#************************************************************************",
         "#****************** Create a new off-body streamline distribution *******",
         "#************************************************************************",
-        "#",
         "NEW_STREAMLINE_DISTRIBUTION",
         f"POSITION_1_X {position_1_x}",
         f"POSITION_1_Y {position_1_y}",
@@ -165,7 +164,6 @@ def new_off_body_streamtube(
         "#************************************************************************",
         "#****************** Create a new off-body streamtube ********************",
         "#************************************************************************",
-        "#",
         "NEW_OFF_BODY_STREAMTUBE",
         f"RADIUS {radius}",
         f"FRAME {frame}",
@@ -201,7 +199,6 @@ def set_off_body_streamline_length(length: Optional[float] = None) -> None:
         "#************************************************************************",
         "#****************** Set the length of the new off-body streamlines ******",
         "#************************************************************************",
-        "#",
         "SET_OFF_BODY_STREAMLINE_LENGTH"
     ]
 
@@ -228,7 +225,6 @@ def set_all_off_body_streamlines_upstream():
         "#************************************************************************",
         "#********** Set all off-body streamlines upstream **********************",
         "#************************************************************************",
-        "#",
         "SET_ALL_OFF_BODY_STREAMLINES_UPSTREAM"
     ]
     script.append_lines(lines)
@@ -247,7 +243,6 @@ def set_all_off_body_streamlines_downstream():
         "#************************************************************************",
         "#********** Set all off-body streamlines downstream ********************",
         "#************************************************************************",
-        "#",
         "SET_ALL_OFF_BODY_STREAMLINES_DOWNSTREAM"
     ]
     script.append_lines(lines)
@@ -266,7 +261,6 @@ def generate_all_off_body_streamlines():
         "#************************************************************************",
         "#********** Generate all off-body streamlines *************************",
         "#************************************************************************",
-        "#",
         "GENERATE_ALL_OFF_BODY_STREAMLINES"
     ]
     script.append_lines(lines)
@@ -285,7 +279,6 @@ def delete_all_off_body_streamlines():
         "#************************************************************************",
         "#********** Delete all off-body streamlines ****************************",
         "#************************************************************************",
-        "#",
         "DELETE_ALL_OFF_BODY_STREAMLINES"
     ]
     script.append_lines(lines)
@@ -312,7 +305,6 @@ def export_all_off_body_streamlines(filename: str) -> None:
         "#************************************************************************",
         "#****************** Export all off-body streamlines ********************",
         "#************************************************************************",
-        "#",
         "EXPORT_ALL_OFF_BODY_STREAMLINES",
         f"{filename}"
     ]
@@ -334,7 +326,6 @@ def generate_all_surface_streamlines():
         "#************************************************************************",
         "#****************** Generate all surface streamlines *******************",
         "#************************************************************************",
-        "#",
         "GENERATE_ALL_SURFACE_STREAMLINES",
     ]
 
@@ -354,7 +345,6 @@ def delete_all_surface_streamlines():
         "#************************************************************************",
         "#****************** Delete all surface streamlines *********************",
         "#************************************************************************",
-        "#",
         "DELETE_ALL_SURFACE_STREAMLINES",
     ]
 
@@ -382,7 +372,6 @@ def export_all_surface_streamlines(output_filepath: str) -> None:
         "#************************************************************************",
         "#****************** Export all on-body (surface) streamlines ************",
         "#************************************************************************",
-        "#",
         "EXPORT_ALL_SURFACE_STREAMLINES",
         f"{output_filepath}",
     ]

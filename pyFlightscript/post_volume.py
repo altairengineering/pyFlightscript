@@ -56,10 +56,12 @@ def create_new_rectangle_volume_section(
     """
     if not isinstance(frame, int):
         raise ValueError("`frame` must be an integer.")
+    plane = normalize_option(plane, "plane")
     if plane not in VALID_PLANE_LIST:
         raise ValueError(f"`plane` must be one of {VALID_PLANE_LIST}")
     if not all(isinstance(v, (int, float)) for v in [offset, size, x1, y1, x2, y2, thickness, growth_rate]):
         raise ValueError("Numeric parameters must be of type int or float.")
+    prisms_type = normalize_option(prisms_type, "prisms_type")
     if prisms_type not in VALID_PRISMS_TYPE_LIST:
         raise ValueError(f"`prisms_type` must be one of {VALID_PRISMS_TYPE_LIST}")
     if not isinstance(layers, int):
@@ -69,7 +71,6 @@ def create_new_rectangle_volume_section(
         "#************************************************************************",
         "#****************** Create new volume section (rectangle) ***************",
         "#************************************************************************",
-        "#",
         f"CREATE_NEW_RECTANGLE_VOLUME_SECTION {frame} {plane} {offset} {size} {x1} {y1} {x2} {y2} {prisms_type} {thickness} {layers} {growth_rate}"
     ]
     script.append_lines(lines)
@@ -126,12 +127,14 @@ def create_new_circle_volume_section(
     """
     if not isinstance(frame, int):
         raise ValueError("`frame` must be an integer.")
+    plane = normalize_option(plane, "plane")
     if plane not in VALID_PLANE_LIST:
         raise ValueError(f"`plane` must be one of {VALID_PLANE_LIST}")
     if not all(isinstance(v, (int, float)) for v in [offset, r1, r2, thickness, growth_rate]):
         raise ValueError("Numeric parameters must be of type int or float.")
     if not all(isinstance(v, int) for v in [ipts, jpts, layers]):
         raise ValueError("`ipts`, `jpts`, and `layers` must be integers.")
+    prisms_type = normalize_option(prisms_type, "prisms_type")
     if prisms_type not in VALID_PRISMS_TYPE_LIST:
         raise ValueError(f"`prisms_type` must be one of {VALID_PRISMS_TYPE_LIST}")
 
@@ -139,7 +142,6 @@ def create_new_circle_volume_section(
         "#************************************************************************",
         "#****************** Create new volume section (circle) ******************",
         "#************************************************************************",
-        "#",
         f"CREATE_NEW_CIRCLE_VOLUME_SECTION {frame} {plane} {offset} {ipts} {jpts} {r1} {r2} {prisms_type} {thickness} {layers} {growth_rate}"
     ]
     script.append_lines(lines)
@@ -166,6 +168,7 @@ def volume_section_boundary_layer(index: int, setting: RunOptions = 'DISABLE') -
     """
     if not isinstance(index, int) or index <= 0:
         raise ValueError("`index` must be an integer greater than 0.")
+    setting = normalize_option(setting, "setting")
     if setting not in VALID_RUN_OPTIONS:
         raise ValueError(f"`setting` must be one of {VALID_RUN_OPTIONS}")
 
@@ -173,7 +176,6 @@ def volume_section_boundary_layer(index: int, setting: RunOptions = 'DISABLE') -
         "#************************************************************************",
         "#*************** Toggle volume section boundary layer induction *********",
         "#************************************************************************",
-        "#",
         f"VOLUME_SECTION_BOUNDARY_LAYER {index} {setting}"
     ]
     script.append_lines(lines)
@@ -200,6 +202,7 @@ def volume_section_wireframe(index: int, setting: RunOptions = 'ENABLE') -> None
     """
     if not isinstance(index, int) or index <= 0:
         raise ValueError("`index` must be an integer greater than 0.")
+    setting = normalize_option(setting, "setting")
     if setting not in VALID_RUN_OPTIONS:
         raise ValueError(f"`setting` must be one of {VALID_RUN_OPTIONS}")
 
@@ -207,7 +210,6 @@ def volume_section_wireframe(index: int, setting: RunOptions = 'ENABLE') -> None
         "#************************************************************************",
         "#****************** Toggle volume section wire-frame setting ************",
         "#************************************************************************",
-        "#",
         f"VOLUME_SECTION_WIREFRAME {index} {setting}"
     ]
     script.append_lines(lines)
@@ -229,7 +231,6 @@ def update_all_volume_sections() -> None:
         "#************************************************************************",
         "#****************** Update the volume sections **************************",
         "#************************************************************************",
-        "#",
         "UPDATE_ALL_VOLUME_SECTIONS"
     ]
     script.append_lines(lines)
@@ -263,7 +264,6 @@ def export_volume_section_vtk(index: int, filename: str) -> None:
         "#************************************************************************",
         "#****************** Export volume section as ParaView (VTK) file ********",
         "#************************************************************************",
-        "#",
         f"EXPORT_VOLUME_SECTION_VTK {index}",
         filename
     ]
@@ -298,7 +298,6 @@ def export_volume_section_2d_vtk(index: int, filename: str) -> None:
         "#************************************************************************",
         "#************* Export volume section as 2D ParaView (VTK) file **********",
         "#************************************************************************",
-        "#",
         f"EXPORT_VOLUME_SECTION_2D_VTK {index}",
         filename
     ]
@@ -333,7 +332,6 @@ def export_volume_section_tecplot(index: int, filename: str) -> None:
         "#************************************************************************",
         "#****************** Export volume section as Tecplot (DAT) file *********",
         "#************************************************************************",
-        "#",
         f"EXPORT_VOLUME_SECTION_TECPLOT {index}",
         filename
     ]
@@ -364,7 +362,6 @@ def delete_volume_section(index: int) -> None:
         "#************************************************************************",
         "#****************** Delete a volume section *****************************",
         "#************************************************************************",
-        "#",
         f"DELETE_VOLUME_SECTION {index}"
     ]
     script.append_lines(lines)
@@ -386,7 +383,6 @@ def delete_all_volume_sections() -> None:
         "#************************************************************************",
         "#****************** Delete all volume sections **************************",
         "#************************************************************************",
-        "#",
         "DELETE_ALL_VOLUME_SECTIONS"
     ]
     script.append_lines(lines)

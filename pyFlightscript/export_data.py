@@ -1,7 +1,7 @@
-from .utils import *    
+from typing import Optional, List
+from .utils import *
 from .script import script
 from .types import *
-from typing import Optional, List
 
 def export_solver_analysis_spreadsheet(output_file: str) -> None:
     """
@@ -37,7 +37,6 @@ def export_solver_analysis_spreadsheet(output_file: str) -> None:
         "#************************************************************************",
         "#****************** Export the aerodynamic results **********************",
         "#************************************************************************",
-        "#",
         "EXPORT_SOLVER_ANALYSIS_SPREADSHEET",
         f"{output_file}"
     ]
@@ -79,7 +78,6 @@ def export_solver_analysis_tecplot(output_file: str) -> None:
         "#************************************************************************",
         "#****************** Export the Tecplot data file *************************",
         "#************************************************************************",
-        "#",
         "EXPORT_SOLVER_ANALYSIS_TECPLOT",
         f"{output_file}"
     ]
@@ -139,7 +137,6 @@ def export_solver_analysis_vtk(
         "#************************************************************************",
         "#****************** Export the Visualization Toolkit (*.vtk) file *********",
         "#************************************************************************",
-        "#",
         "EXPORT_SOLVER_ANALYSIS_VTK",
         output_filepath,
         f"SURFACES {surfaces}"
@@ -194,6 +191,7 @@ def set_vtk_export_variables(
     """
     
     # Type and value checking
+    export_wake = normalize_option(export_wake, "export_wake")
     if export_wake not in VALID_RUN_OPTIONS:
         raise ValueError(f"export_wake should be one of {VALID_RUN_OPTIONS}")
     
@@ -284,9 +282,11 @@ def export_solver_analysis_csv(
     if not isinstance(file_path, str):
         raise ValueError("`file_path` should be a string value.")
     
+    format_value = normalize_option(format_value, "format_value")
     if format_value not in VALID_EXPORT_FORMAT_LIST:
         raise ValueError(f"Invalid format value. Valid formats are: {VALID_EXPORT_FORMAT_LIST}")
 
+    units = normalize_option(units, "units")
     if units not in VALID_PRESSURE_UNITS_LIST:
         raise ValueError(f"Invalid unit type. Valid units are: {VALID_PRESSURE_UNITS_LIST}")
     
@@ -308,7 +308,6 @@ def export_solver_analysis_csv(
         "#************************************************************************",
         "#****************** Export the FEM CSV based on solver results **********",
         "#************************************************************************",
-        "#",
         "EXPORT_SOLVER_ANALYSIS_CSV",
         file_path,
         f"FORMAT {format_value}",
@@ -375,7 +374,6 @@ def export_solver_analysis_pload_bdf(
         "#************************************************************************",
         "#*********** Export the NASTRAN PLOAD BDF based on solver results *******",
         "#************************************************************************",
-        "#",
         "EXPORT_SOLVER_ANALYSIS_PLOAD_BDF",
         file_path,
         f"SURFACES {surfaces}"
@@ -442,7 +440,6 @@ def export_solver_analysis_force_distributions(
         "#************************************************************************",
         "#******* Export force distributions file for the selected boundaries ****",
         "#************************************************************************",
-        "#",
         "EXPORT_SOLVER_ANALYSIS_FORCE_DISTRIBUTIONS",
         output_filepath,
         f"SURFACES {surfaces}"

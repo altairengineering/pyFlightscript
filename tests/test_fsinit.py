@@ -1,6 +1,5 @@
 import os
 import pytest
-
 import pyFlightscript as pyfs
 from pyFlightscript.types import VALID_RUN_OPTIONS, VALID_UNITS_LIST
 
@@ -18,7 +17,6 @@ def test_open_fsm_appends_expected_lines(script_state):
         "#************************************************************************",
         "#****************** Open an existing simulation file ********************",
         "#************************************************************************",
-        "#",
         "OPEN",
         str(fsm_path),
         "LOAD_SOLVER_INITIALIZATION ENABLE",
@@ -57,10 +55,9 @@ def test_new_simulation(script_state):
         "#************************************************************************",
         "#****************** Create a new simulation *****************************",
         "#************************************************************************",
-        "#",
         "NEW_SIMULATION",
     ]
-    assert script_state.lines[-5:] == expected
+    assert script_state.lines[-len(expected):] == expected
 
 
 def test_save_as_fsm(script_state, tmp_path):
@@ -70,11 +67,10 @@ def test_save_as_fsm(script_state, tmp_path):
         "#************************************************************************",
         "#****************** Save an existing simulation file ********************",
         "#************************************************************************",
-        "#",
         "SAVEAS",
         str(out_path),
     ]
-    assert script_state.lines[-6:] == expected
+    assert script_state.lines[-len(expected):] == expected
 
 
 def test_set_significant_digits_valid(script_state):

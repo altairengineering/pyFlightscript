@@ -8,10 +8,9 @@ def test_set_solver_steady(script_state):
         "#************************************************************************",
         "#********* Set the steady solver ****************************************",
         "#************************************************************************",
-        "#",
         "SET_SOLVER_STEADY",
     ]
-    assert script_state.lines[-5:] == expected
+    assert script_state.lines[-len(expected):] == expected
 
 
 def test_set_solver_unsteady(script_state):
@@ -20,7 +19,6 @@ def test_set_solver_unsteady(script_state):
         "#************************************************************************",
         "#********* Set the unsteady solver **************************************",
         "#************************************************************************",
-        "#",
         "SET_SOLVER_UNSTEADY",
         "TIME_ITERATIONS 200",
         "DELTA_TIME 0.05",
@@ -40,7 +38,6 @@ def test_unsteady_solver_new_force_plot_all_boundaries(script_state):
         "#************************************************************************",
         "#********* Create a new unsteady solver force & moments plot ************",
         "#************************************************************************",
-        "#",
         "UNSTEADY_SOLVER_NEW_FORCE_PLOT",
         "FRAME 1",
         "UNITS NEWTONS",
@@ -64,7 +61,6 @@ def test_unsteady_solver_new_force_plot_specific_boundaries(script_state):
         "#************************************************************************",
         "#********* Create a new unsteady solver force & moments plot ************",
         "#************************************************************************",
-        "#",
         "UNSTEADY_SOLVER_NEW_FORCE_PLOT",
         "FRAME 2",
         "UNITS NEWTONS",
@@ -87,7 +83,6 @@ def test_unsteady_solver_new_fluid_plot(script_state):
         "#************************************************************************",
         "#********* Create a new unsteady solver fluid properties plot ***********",
         "#************************************************************************",
-        "#",
         "UNSTEADY_SOLVER_NEW_FLUID_PLOT",
         "FRAME 1",
         "PARAMETER VELOCITY",
@@ -104,7 +99,6 @@ def test_unsteady_solver_export_plots(script_state, tmp_path):
         "#************************************************************************",
         "#****************** Export all unsteady solver plots ********************",
         "#************************************************************************",
-        "#",
         "UNSTEADY_SOLVER_EXPORT_PLOTS",
         str(out),
     ]
@@ -117,7 +111,6 @@ def test_unsteady_solver_delete_all_plots(script_state):
         "#************************************************************************",
         "#****************** Delete all unsteady solver plots ********************",
         "#************************************************************************",
-        "#",
         "UNSTEADY_SOLVER_DELETE_ALL_PLOTS",
     ]
     assert script_state.lines[-len(expected_tail):] == expected_tail
@@ -151,7 +144,6 @@ def test_boundary_layer_type(script_state):
         "#************************************************************************",
         "#****************** Set the surface boundary layer type *****************",
         "#************************************************************************",
-        "#",
         "SET_BOUNDARY_LAYER_TYPE TURBULENT",
     ]
     assert script_state.lines[-len(expected_tail):] == expected_tail
@@ -163,7 +155,6 @@ def test_surface_roughness(script_state):
         "#************************************************************************",
         "#****************** Set the surface roughness height ********************",
         "#************************************************************************",
-        "#",
         "SET_SURFACE_ROUGHNESS 50.0",
     ]
     assert script_state.lines[-len(expected_tail):] == expected_tail
@@ -175,7 +166,6 @@ def test_viscous_coupling(script_state):
         "#************************************************************************",
         "#****************** Set the solver viscous coupling ********************",
         "#************************************************************************",
-        "#",
         "SET_SOLVER_VISCOUS_COUPLING DISABLE",
     ]
     assert script_state.lines[-len(expected_tail):] == expected_tail

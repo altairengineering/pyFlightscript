@@ -37,7 +37,6 @@ def acoustic_sources(enable: bool = True) -> None:
         "#************************************************************************",
         "#******** Enable acoustic sources during solver initialization **********",
         "#************************************************************************",
-        "#",
         f"ACOUSTIC_SOURCES {enable}"
     ]
 
@@ -87,7 +86,6 @@ def create_new_acoustic_observer(name: str, x: float = 0.0, y: float = 0.0, z: f
         "#************************************************************************",
         "#******************* Create new acoustic observer ***********************",
         "#************************************************************************",
-        "#",
         f"CREATE_NEW_ACOUSTIC_OBSERVER {name} {x} {y} {z}"
     ]
 
@@ -125,7 +123,6 @@ def acoustic_observers_import(file_path: str) -> None:
         "#************************************************************************",
         "#****************** Import acoustic observers from file *****************",
         "#************************************************************************",
-        "#",
         "ACOUSTIC_OBSERVERS_IMPORT",
         file_path
     ]
@@ -164,7 +161,6 @@ def delete_acoustic_observer(observer_index: int) -> None:
         "#************************************************************************",
         "#******************* Delete acoustic observer ***************************",
         "#************************************************************************",
-        "#",
         "DELETE_ACOUSTIC_OBSERVER",
         str(observer_index)
     ]
@@ -186,7 +182,6 @@ def delete_all_acoustic_observers():
         "#************************************************************************",
         "#******************* Delete all acoustic observers **********************",
         "#************************************************************************",
-        "#",
         "DELETE_ALL_ACOUSTIC_OBSERVERS"
     ]
 
@@ -239,7 +234,6 @@ def set_acoustic_observer_time(initial_time: float = 0.0, final_time: float = 0.
         "#************************************************************************",
         "#******************* Set acoustic observer time parameters **************",
         "#************************************************************************",
-        "#",
         f"SET_ACOUSTIC_OBSERVER_TIME {initial_time} {final_time} {time_steps}"
     ]
 
@@ -263,7 +257,6 @@ def compute_acoustic_signals() -> None:
         "#************************************************************************",
         "#******************* Compute acoustic signals at all observers **********",
         "#************************************************************************",
-        "#",
         "COMPUTE_ACOUSTIC_SIGNALS"
     ]
     
@@ -301,7 +294,6 @@ def export_acoustic_signals(filename: str) -> None:
         "#************************************************************************",
         "#******* Export acoustic signals at all observers to external file ******",
         "#************************************************************************",
-        "#",
         "EXPORT_ACOUSTIC_SIGNALS",
         f"{filename}"
     ]
@@ -333,6 +325,7 @@ def create_acoustic_section(frame: int = 1, plane: str = 'XZ', offset: float = -
     if not isinstance(frame, int):
         raise ValueError("`frame` should be an integer value.")
     
+    plane = normalize_option(plane, "plane")
     if plane not in VALID_PLANE_LIST:
         raise ValueError(f"`plane` should be one of {VALID_PLANE_LIST}")
     
@@ -346,7 +339,6 @@ def create_acoustic_section(frame: int = 1, plane: str = 'XZ', offset: float = -
         "#************************************************************************",
         "#******************* Create & export acoustic section signals ***********",
         "#************************************************************************",
-        "#",
         "CREATE_ACOUSTIC_SECTION",
         f"FRAME {frame}",
         f"PLANE {plane}",

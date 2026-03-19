@@ -1,10 +1,7 @@
 from .utils import *    
 from .script import script
 from .types import *
-
 from typing import List, Union
-from . import script
-from .types import VALID_PLANE_LIST, RunOptions, VALID_RUN_OPTIONS
 
 def create_new_surface_section(
     frame: int = 1,
@@ -51,6 +48,7 @@ def create_new_surface_section(
         raise ValueError("`offset` should be a numeric value.")
     if plot_direction not in [1, 2]:
         raise ValueError("`plot_direction` must be 1 or 2.")
+    symmetry = normalize_option(symmetry, "symmetry")
     if symmetry not in VALID_RUN_OPTIONS:
         raise ValueError(f"`symmetry` must be one of {VALID_RUN_OPTIONS}")
 
@@ -68,7 +66,6 @@ def create_new_surface_section(
         "#************************************************************************",
         f"#****************** Create new surface section ************************",
         "#************************************************************************",
-        "#",
         f"CREATE_NEW_SURFACE_SECTION {frame} {plane} {offset} {plot_direction} {symmetry} {surface_count}"
     ]
 
@@ -111,6 +108,7 @@ def new_surface_section_distribution(
     """
     if not isinstance(frame, int):
         raise ValueError("`frame` should be an integer value.")
+    plane = normalize_option(plane, "plane")
     if plane not in VALID_PLANE_LIST:
         raise ValueError(f"`plane` should be one of {VALID_PLANE_LIST}")
     if not isinstance(num_sections, int) or num_sections <= 0:
@@ -124,7 +122,6 @@ def new_surface_section_distribution(
         "#************************************************************************",
         "#****************** Create new surface section distribution *************",
         "#************************************************************************",
-        "#",
         "NEW_SURFACE_SECTION_DISTRIBUTION",
         f"FRAME {frame}",
         f"PLANE {plane}",
@@ -157,6 +154,7 @@ def compute_surface_sectional_loads(units: ValidForceUnits = 'NEWTONS') -> None:
     >>> # Compute sectional loads as coefficients
     >>> compute_surface_sectional_loads(units='COEFFICIENTS')
     """
+    units = normalize_option(units, "units")
     if units not in VALID_FORCE_UNITS_LIST:
         raise ValueError(f"`units` must be one of {VALID_FORCE_UNITS_LIST}")
 
@@ -164,7 +162,6 @@ def compute_surface_sectional_loads(units: ValidForceUnits = 'NEWTONS') -> None:
         "#************************************************************************",
         "#********** Compute sectional loads on existing surface sections ********",
         "#************************************************************************",
-        "#",
         f"COMPUTE_SURFACE_SECTIONAL_LOADS {units}"
     ]
     script.append_lines(lines)
@@ -194,7 +191,6 @@ def export_surface_sectional_loads(filename: str) -> None:
         "#************************************************************************",
         "#********** Export sectional loads on existing surface sections *********",
         "#************************************************************************",
-        "#",
         "EXPORT_SURFACE_SECTIONAL_LOADS",
         f"{filename}"
     ]
@@ -215,7 +211,6 @@ def update_all_surface_sections():
         "#************************************************************************",
         "#****************** Update the surface sections *************************",
         "#************************************************************************",
-        "#",
         "UPDATE_ALL_SURFACE_SECTIONS"
     ]
 
@@ -245,7 +240,6 @@ def export_all_surface_sections(filename: str) -> None:
         "#************************************************************************",
         "#****************** Export all surface sections to file *****************",
         "#************************************************************************",
-        "#",
         "EXPORT_ALL_SURFACE_SECTIONS",
         f"{filename}"
     ]
@@ -276,7 +270,6 @@ def delete_surface_section(index: int) -> None:
         "#************************************************************************",
         "#****************** Delete a surface section ****************************",
         "#************************************************************************",
-        "#",
         f"DELETE_SURFACE_SECTION {index}"
     ]
     
@@ -297,7 +290,6 @@ def delete_all_surface_sections():
         "#************************************************************************",
         "#******************** Delete all surface sections ***********************",
         "#************************************************************************",
-        "#",
         "DELETE_ALL_SURFACE_SECTIONS"
     ]
 

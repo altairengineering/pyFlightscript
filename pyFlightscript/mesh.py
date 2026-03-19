@@ -1,7 +1,7 @@
-from .utils import check_file_existence, check_valid_length_units
+from typing import List
+from .utils import *
 from .script import script
 from .types import *
-from typing import List
 
 def import_mesh(
     geometry_filepath: str, 
@@ -35,6 +35,7 @@ def import_mesh(
     check_file_existence(geometry_filepath)
     check_valid_length_units(units)
     
+    file_type = normalize_option(file_type, "file_type")
     if file_type not in VALID_IMPORT_MESH_FILE_TYPES:
         raise ValueError(f"'{file_type}' is not a valid file type. Valid file types are: {', '.join(VALID_IMPORT_MESH_FILE_TYPES)}")
     
@@ -42,7 +43,6 @@ def import_mesh(
         "#************************************************************************",
         "#****************** Import an geometry into the simulation **************",
         "#************************************************************************",
-        "#",
         "IMPORT",
         f"UNITS {units}",
         f"FILE_TYPE {file_type}",
@@ -86,6 +86,9 @@ def ccs_import(
     """
     check_file_existence(ccs_filepath)
 
+    close_component_ends = normalize_option(close_component_ends, "close_component_ends")
+    update_properties = normalize_option(update_properties, "update_properties")
+    clear_existing = normalize_option(clear_existing, "clear_existing")
     for option, name in [
         (close_component_ends, 'close_component_ends'),
         (update_properties, 'update_properties'),
@@ -98,7 +101,6 @@ def ccs_import(
         "#************************************************************************",
         "#************ Import a Component Cross-Section (CCS) geometry file ******",
         "#************************************************************************",
-        "#",
         "CCS_IMPORT",
         f"CLOSE_COMPONENT_ENDS {close_component_ends}",
         f"UPDATE_PROPERTIES {update_properties}",
@@ -134,6 +136,7 @@ def export_surface_mesh(
     ValueError
         If an invalid file type is provided.
     """
+    file_type = normalize_option(file_type, "file_type")
     if file_type not in VALID_EXPORT_MESH_FILE_TYPES:
         raise ValueError(f"'file_type' should be one of {VALID_EXPORT_MESH_FILE_TYPES}. Received: {file_type}")
     
@@ -141,7 +144,6 @@ def export_surface_mesh(
         "#************************************************************************",
         "#************ Export a geometry surface to external file ****************",
         "#************************************************************************",
-        "#",
         f"EXPORT_SURFACE_MESH {file_type} {surface}",
         file_path
     ]
@@ -186,9 +188,13 @@ def surface_rotate(
     ValueError
         If an invalid axis or option is provided.
     """
+    axis = normalize_option(axis, "axis")
     if axis not in VALID_ROTATION_AXIS_LIST:
         raise ValueError(f"'axis' should be one of {VALID_ROTATION_AXIS_LIST}. Received: {axis}")
     
+    split_vertices = normalize_option(split_vertices, "split_vertices")
+    adaptive_mesh = normalize_option(adaptive_mesh, "adaptive_mesh")
+    detach_normal_to_axis = normalize_option(detach_normal_to_axis, "detach_normal_to_axis")
     for option, name in [
         (split_vertices, 'split_vertices'),
         (adaptive_mesh, 'adaptive_mesh'),
@@ -201,7 +207,6 @@ def surface_rotate(
         "#************************************************************************",
         "#****************** Rotate an existing surface **************************",
         "#************************************************************************",
-        "#",
         "SURFACE_ROTATE",
         f"FRAME {frame}",
         f"AXIS {axis}",
@@ -251,6 +256,7 @@ def translate_surface_in_frame(
     """
     check_valid_length_units(units)
     
+    split_vertices = normalize_option(split_vertices, "split_vertices")
     if split_vertices not in VALID_RUN_OPTIONS:
         raise ValueError(f"'split_vertices' should be one of {VALID_RUN_OPTIONS}. Received: {split_vertices}")
     
@@ -258,7 +264,6 @@ def translate_surface_in_frame(
         "#************************************************************************",
         "#****************** Translate a surface with a vector *******************",
         "#************************************************************************",
-        "#",
         f"TRANSLATE_SURFACE_IN_FRAME {frame} {x} {y} {z} {units} {surface} {split_vertices}"
     ]
 
@@ -288,7 +293,6 @@ def translate_surface_by_frame(frame1: int = 1, frame2: int = 1, surface: int = 
         "#************************************************************************",
         "#****************** Translate a surface from one frame to another *******",
         "#************************************************************************",
-        "#",
         f"TRANSLATE_SURFACE_BY_FRAME {frame1} {frame2} {surface}"
     ]
 
@@ -324,7 +328,6 @@ def surface_scale(
         "#************************************************************************",
         "#****************** Scale existing surface(s) ***************************",
         "#************************************************************************",
-        "#",
         f"SURFACE_SCALE {frame} {scale_x} {scale_y} {scale_z} {surface}"
     ]
 
@@ -350,7 +353,6 @@ def surface_invert(index: int = 1) -> None:
         "#************************************************************************",
         "#****************** Invert the surface normals of a surface *************",
         "#************************************************************************",
-        "#",
         f"SURFACE_INVERT {index}"
     ]
 
@@ -380,7 +382,6 @@ def surface_rename(name: str, index: int = 1) -> None:
         "#************************************************************************",
         "#****************** Rename the surface geometry *************************",
         "#************************************************************************",
-        "#",
         f"SURFACE_RENAME {index} {name}"
     ]
 
@@ -413,7 +414,6 @@ def select_geometry_by_id(surface: int = 1) -> None:
         "#************************************************************************",
         "#****************** Select a geometry surface by its index **************",
         "#************************************************************************",
-        "#",
         f"SELECT_GEOMETRY_BY_ID {surface}"
     ]
 
@@ -456,14 +456,17 @@ def surface_select_by_threshold(
     """
     if not isinstance(frame, int):
         raise TypeError("`frame` must be an integer.")
+    threshold = normalize_option(threshold, "threshold")
     if threshold not in VALID_THRESHOLD_LIST:
         raise ValueError(f"`threshold` must be one of {VALID_THRESHOLD_LIST}")
     if not isinstance(min_value, (int, float)):
         raise TypeError("`min_value` must be a numeric value.")
     if not isinstance(max_value, (int, float)):
         raise TypeError("`max_value` must be a numeric value.")
+    range_value = normalize_option(range_value, "range_value")
     if range_value not in VALID_RANGE_LIST:
         raise ValueError(f"`range_value` must be one of {VALID_RANGE_LIST}")
+    subset = normalize_option(subset, "subset")
     if subset not in VALID_SUBSET_LIST:
         raise ValueError(f"`subset` must be one of {VALID_SUBSET_LIST}")
     
@@ -471,7 +474,6 @@ def surface_select_by_threshold(
         "#************************************************************************",
         "#****************** Select surface faces by threshold *******************",
         "#************************************************************************",
-        "#",
         "SURFACE_SELECT_BY_THRESHOLD",
         f"FRAME {frame}",
         f"THRESHOLD {threshold}",
@@ -495,7 +497,6 @@ def create_new_surface_from_selection() -> None:
         "#************************************************************************",
         "#************** Create new geometry surface from selected faces *********",
         "#************************************************************************",
-        "#",
         "CREATE_NEW_SURFACE_FROM_SELECTION"
     ]
 
@@ -527,6 +528,7 @@ def surface_cut_by_plane(
     """
     if not isinstance(frame, int):
         raise TypeError("`frame` must be an integer.")
+    plane = normalize_option(plane, "plane")
     if plane not in VALID_PLANE_LIST:
         raise ValueError(f"`plane` must be one of {VALID_PLANE_LIST}")
     if not isinstance(offset, (int, float)):
@@ -538,7 +540,6 @@ def surface_cut_by_plane(
         "#************************************************************************",
         "#****************** Cut all surfaces using a cutting plane **************",
         "#************************************************************************",
-        "#",
         "SURFACE_CUT_BY_PLANE",
         f"FRAME {frame}",
         f"PLANE {plane}",
@@ -586,7 +587,6 @@ def surface_mirror(
         "#************************************************************************",
         "#****************** Mirror an existing surface **************************",
         "#************************************************************************",
-        "#",
         f"SURFACE_MIRROR {surface} {coordinate_system} {mirror_plane} {combine_flag} {delete_source_flag}"
     ]
 
@@ -617,7 +617,6 @@ def surface_auto_hole_fill(surface: int = 1) -> None:
         "#************************************************************************",
         "#************* Automatic hole filling on an existing surface ************",
         "#************************************************************************",
-        "#",
         "SURFACE_AUTO_HOLE_FILL",
         f"{surface}"
     ]
@@ -644,7 +643,6 @@ def surface_combine(surface_indices: List[int]) -> None:
         "#************************************************************************",
         "#****************** Combine selected surfaces ***************************",
         "#************************************************************************",
-        "#",
         f"SURFACE_COMBINE {len(surface_indices)}",
         ",".join(map(str, surface_indices))
     ]
@@ -663,7 +661,6 @@ def delete_selected_faces() -> None:
         "#************************************************************************",
         "#****************** Delete selected mesh faces **************************",
         "#************************************************************************",
-        "#",
         "DELETE_SELECTED_FACES"
     ]
 
@@ -694,7 +691,6 @@ def surface_delete(surface_index: int) -> None:
         "#************************************************************************",
         "#****************** Delete an existing surface **************************",
         "#************************************************************************",
-        "#",
         "SURFACE_DELETE",
         f"SURFACE {surface_index}"
     ]
@@ -713,7 +709,6 @@ def surface_clearall() -> None:
         "#************************************************************************",
         "#****************** Delete all surfaces in simulation *******************",
         "#************************************************************************",
-        "#",
         "SURFACE_CLEARALL"
     ]
 
@@ -749,6 +744,7 @@ def transform_selected_nodes(
     """
     if not isinstance(coordinate_system, int) or coordinate_system <= 0:
         raise ValueError("`coordinate_system` must be a positive integer.")
+    translation_type = normalize_option(translation_type, "translation_type")
     if translation_type not in VALID_TRANSLATION_TYPES:
         raise ValueError(f"`translation_type` must be one of {VALID_TRANSLATION_TYPES}.")
     if not all(isinstance(val, (int, float)) for val in [x, y, z]):
@@ -758,8 +754,1130 @@ def transform_selected_nodes(
         "#************************************************************************",
         "#****************** Transform node by translation ***********************",
         "#************************************************************************",
-        "#",
         f"TRANSFORM_SELECTED_NODES {coordinate_system} {translation_type} {x} {y} {z}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def default_ccs_wing_mesh_settings(
+    direction: str = 'CHORD'
+) -> None:
+    """
+    Apply default CCS wing mesh settings for the specified direction.
+
+    This function appends a command to the script state to reset the CCS
+    wing mesh parameters to their default values for the specified direction.
+
+    Parameters
+    ----------
+    direction : str, optional
+        Meshing direction ('CHORD' or 'SPAN'). Defaults to 'CHORD'.
+
+    Raises
+    ------
+    ValueError
+        If `direction` is not 'CHORD' or 'SPAN'.
+
+    Examples
+    --------
+    >>> default_ccs_wing_mesh_settings()
+
+    >>> default_ccs_wing_mesh_settings(direction='SPAN')
+    """
+    valid_directions = ['CHORD', 'SPAN']
+    direction = normalize_option(direction, "direction")
+    if direction not in valid_directions:
+        raise ValueError(f"`direction` should be one of {valid_directions}. Received: {direction}")
+
+    lines = [
+        "#************************************************************************",
+        "#**************** Default CCS wing mesh settings *************************",
+        "#************************************************************************",
+        f"DEFAULT_CCS_WING_MESH_SETTINGS {direction}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def ccs_wing_mesh_subdivisions(
+    direction: str = 'CHORD',
+    num_pts: int = 120
+) -> None:
+    """
+    Set the number of CCS wing mesh subdivisions in a specified direction.
+
+    This function appends a command to the script state to set the number
+    of grid subdivisions for the CCS wing mesh in the chordwise or
+    spanwise direction.
+
+    Parameters
+    ----------
+    direction : str, optional
+        Subdivision direction ('CHORD' or 'SPAN'). Defaults to 'CHORD'.
+    num_pts : int, optional
+        Number of subdivisions in the specified direction (> 0). Defaults to 120.
+
+    Raises
+    ------
+    ValueError
+        If `direction` is invalid or `num_pts` is not a positive integer.
+
+    Examples
+    --------
+    >>> ccs_wing_mesh_subdivisions(direction='CHORD', num_pts=80)
+    """
+    valid_directions = ['CHORD', 'SPAN']
+    direction = normalize_option(direction, "direction")
+    if direction not in valid_directions:
+        raise ValueError(f"`direction` should be one of {valid_directions}. Received: {direction}")
+
+    if not isinstance(num_pts, int) or num_pts <= 0:
+        raise ValueError("`num_pts` should be a positive integer value.")
+
+    lines = [
+        "#************************************************************************",
+        "#**************** Set CCS wing mesh subdivisions *************************",
+        "#************************************************************************",
+        f"CCS_WING_MESH_SUBDIVISIONS {direction} {num_pts}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def ccs_wing_mesh_growth_scheme(
+    direction: str = 'CHORD',
+    scheme: str = 'DUAL-SIDED'
+) -> None:
+    """
+    Set the CCS wing mesh node clustering growth scheme.
+
+    This function appends a command to the script state to set the node
+    clustering growth scheme for the CCS wing mesh in the specified direction.
+
+    Parameters
+    ----------
+    direction : str, optional
+        Direction of node clustering ('CHORD' or 'SPAN'). Defaults to 'CHORD'.
+    scheme : str, optional
+        Clustering scheme ('NONE', 'DUAL-SIDED', 'SUCCESSIVE', or 'REVERSE').
+        Defaults to 'DUAL-SIDED'.
+
+    Raises
+    ------
+    ValueError
+        If `direction` or `scheme` is invalid.
+
+    Examples
+    --------
+    >>> ccs_wing_mesh_growth_scheme(direction='SPAN', scheme='SUCCESSIVE')
+    """
+    valid_directions = ['CHORD', 'SPAN']
+    direction = normalize_option(direction, "direction")
+    if direction not in valid_directions:
+        raise ValueError(f"`direction` should be one of {valid_directions}. Received: {direction}")
+
+    valid_schemes = ['NONE', 'DUAL-SIDED', 'SUCCESSIVE', 'REVERSE']
+    scheme = normalize_option(scheme, "scheme")
+    if scheme not in valid_schemes:
+        raise ValueError(f"`scheme` should be one of {valid_schemes}. Received: {scheme}")
+
+    lines = [
+        "#************************************************************************",
+        "#**************** Set CCS wing mesh growth scheme ************************",
+        "#************************************************************************",
+        f"CCS_WING_MESH_GROWTH_SCHEME {direction} {scheme}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def ccs_wing_mesh_growth_rate(
+    direction: str = 'CHORD',
+    rate: float = 1.2
+) -> None:
+    """
+    Set the CCS wing mesh node clustering growth rate.
+
+    This function appends a command to the script state to set the node
+    clustering growth rate for the CCS wing mesh in the specified direction.
+
+    Parameters
+    ----------
+    direction : str, optional
+        Direction of node clustering ('CHORD' or 'SPAN'). Defaults to 'CHORD'.
+    rate : float, optional
+        Clustering growth rate (> 0). Defaults to 1.2.
+
+    Raises
+    ------
+    ValueError
+        If `direction` is invalid or `rate` is not positive.
+
+    Examples
+    --------
+    >>> ccs_wing_mesh_growth_rate(direction='SPAN', rate=1.1)
+    """
+    valid_directions = ['CHORD', 'SPAN']
+    direction = normalize_option(direction, "direction")
+    if direction not in valid_directions:
+        raise ValueError(f"`direction` should be one of {valid_directions}. Received: {direction}")
+
+    if not isinstance(rate, (int, float)) or rate <= 0:
+        raise ValueError("`rate` should be a numeric value greater than zero.")
+
+    lines = [
+        "#************************************************************************",
+        "#**************** Set CCS wing mesh growth rate **************************",
+        "#************************************************************************",
+        f"CCS_WING_MESH_GROWTH_RATE {direction} {rate}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def ccs_wing_mesh_periodicity(
+    direction: str = 'CHORD',
+    periodicity: int = 2
+) -> None:
+    """
+    Set the CCS wing mesh clustering periodicity in a specified direction.
+
+    This function appends a command to the script state to set the number
+    of self-repeating clustering periods for the CCS wing mesh.
+
+    Parameters
+    ----------
+    direction : str, optional
+        Direction of periodicity ('CHORD' or 'SPAN'). Defaults to 'CHORD'.
+    periodicity : int, optional
+        Number of self-repeating periods (> 0). Defaults to 2.
+
+    Raises
+    ------
+    ValueError
+        If `direction` is invalid or `periodicity` is not a positive integer.
+
+    Examples
+    --------
+    >>> ccs_wing_mesh_periodicity(direction='SPAN', periodicity=4)
+    """
+    valid_directions = ['CHORD', 'SPAN']
+    direction = normalize_option(direction, "direction")
+    if direction not in valid_directions:
+        raise ValueError(f"`direction` should be one of {valid_directions}. Received: {direction}")
+
+    if not isinstance(periodicity, int) or periodicity <= 0:
+        raise ValueError("`periodicity` should be an integer value greater than zero.")
+
+    lines = [
+        "#************************************************************************",
+        "#**************** Set CCS wing mesh periodicity **************************",
+        "#************************************************************************",
+        f"CCS_WING_MESH_PERIODICITY {direction} {periodicity}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def new_ccs_wing_refinement_zone(
+    v0: float,
+    v1: float,
+    num_pts: int
+) -> None:
+    """
+    Add a new spanwise refinement zone to the CCS wing mesh.
+
+    This function appends a command to the script state to define a spanwise
+    refinement zone between parametric limits v0 and v1, inserting additional
+    grid nodes in that region.
+
+    Parameters
+    ----------
+    v0 : float
+        Inner spanwise parametric limit (0 to 1).
+    v1 : float
+        Outer spanwise parametric limit (0 to 1); must be greater than `v0`.
+    num_pts : int
+        Number of additional grid nodes to insert in the specified spanwise range.
+
+    Raises
+    ------
+    ValueError
+        If `v0` or `v1` are outside [0, 1], `v1` <= `v0`, or `num_pts`
+        is not a positive integer.
+
+    Examples
+    --------
+    >>> new_ccs_wing_refinement_zone(v0=0.8, v1=1.0, num_pts=20)
+    """
+    if not isinstance(v0, (int, float)) or not isinstance(v1, (int, float)):
+        raise ValueError("`v0` and `v1` should be numeric values.")
+    if not (0 <= v0 <= 1) or not (0 <= v1 <= 1):
+        raise ValueError("`v0` and `v1` should be between 0 and 1.")
+    if v1 <= v0:
+        raise ValueError("`v1` should be greater than `v0`.")
+
+    if not isinstance(num_pts, int) or num_pts <= 0:
+        raise ValueError("`num_pts` should be a positive integer value.")
+
+    lines = [
+        "#************************************************************************",
+        "#**************** Add new CCS wing refinement zone ***********************",
+        "#************************************************************************",
+        f"NEW_CCS_WING_REFINEMENT_ZONE {v0} {v1} {num_pts}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def delete_ccs_wing_refinement_zones(
+    zone_index: int = -1
+) -> None:
+    """
+    Delete one or all CCS wing mesh refinement zones.
+
+    This function appends a command to the script state to delete a specified
+    spanwise refinement zone, or all refinement zones if `zone_index` is -1.
+
+    Parameters
+    ----------
+    zone_index : int, optional
+        Index of the refinement zone to delete (> 0), or -1 to delete all.
+        Defaults to -1.
+
+    Raises
+    ------
+    ValueError
+        If `zone_index` is not a positive integer or -1.
+
+    Examples
+    --------
+    >>> # Delete all refinement zones
+    >>> delete_ccs_wing_refinement_zones()
+
+    >>> # Delete refinement zone 2
+    >>> delete_ccs_wing_refinement_zones(zone_index=2)
+    """
+    if not isinstance(zone_index, int):
+        raise ValueError("`zone_index` should be an integer value.")
+    if zone_index == 0 or zone_index < -1:
+        raise ValueError("`zone_index` should be -1 (all) or a positive integer value.")
+
+    lines = [
+        "#************************************************************************",
+        "#**************** Delete CCS wing refinement zones ***********************",
+        "#************************************************************************",
+        f"DELETE_CCS_WING_REFINEMENT_ZONES {zone_index}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def new_ccs_wing_control_surface(
+    name: str,
+    v0: float,
+    v1: float,
+    u0: float,
+    u1: float,
+    hinge_height: float,
+    angle: float,
+    slot_gap: float
+) -> None:
+    """
+    Define a new control surface on the CCS wing mesh.
+
+    This function appends a command to the script state to create a control
+    surface on the CCS wing mesh, defined by its spanwise and chordwise
+    parametric extents, hinge geometry, deflection angle, and slot gap.
+
+    Parameters
+    ----------
+    name : str
+        Name to assign to this control surface.
+    v0 : float
+        Inner spanwise parametric limit (0 to 1).
+    v1 : float
+        Outer spanwise parametric limit (0 to 1); must be greater than `v0`.
+    u0 : float
+        Chordwise parametric depth at the inner span location (0 < u0 < 0.5).
+    u1 : float
+        Chordwise parametric depth at the outer span location (0 < u1 < 0.5).
+    hinge_height : float
+        Parametric hinge height (0 to 1).
+    angle : float
+        Control surface deflection angle in degrees.
+    slot_gap : float
+        Slot gap as a percentage of span on either side of the control surface.
+
+    Raises
+    ------
+    ValueError
+        If any parameter fails validation.
+
+    Examples
+    --------
+    >>> new_ccs_wing_control_surface(
+    ...     name='aileron', v0=0.6, v1=0.9,
+    ...     u0=0.2, u1=0.2, hinge_height=0.5, angle=10.0, slot_gap=0.01
+    ... )
+    """
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError("`name` should be a non-empty string value.")
+
+    for value, label in [(v0, 'v0'), (v1, 'v1')]:
+        if not isinstance(value, (int, float)):
+            raise ValueError(f"`{label}` should be a numeric value.")
+        if not (0 <= value <= 1):
+            raise ValueError(f"`{label}` should be between 0 and 1.")
+    if v1 <= v0:
+        raise ValueError("`v1` should be greater than `v0`.")
+
+    for value, label in [(u0, 'u0'), (u1, 'u1')]:
+        if not isinstance(value, (int, float)):
+            raise ValueError(f"`{label}` should be a numeric value.")
+        if not (0 < value < 0.5):
+            raise ValueError(f"`{label}` should be greater than 0 and less than 0.5.")
+
+    if not isinstance(hinge_height, (int, float)) or not (0 <= hinge_height <= 1):
+        raise ValueError("`hinge_height` should be a numeric value between 0 and 1.")
+
+    if not isinstance(angle, (int, float)):
+        raise ValueError("`angle` should be a numeric value.")
+
+    if not isinstance(slot_gap, (int, float)) or slot_gap < 0:
+        raise ValueError("`slot_gap` should be a numeric value greater than or equal to zero.")
+
+    lines = [
+        "#************************************************************************",
+        "#**************** Add new CCS wing control surface ***********************",
+        "#************************************************************************",
+        f"NEW_CCS_WING_CONTROL_SURFACE {name} {v0} {v1} {u0} {u1} {hinge_height} {angle} {slot_gap}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def new_ccs_wing_morphing_surface(
+    name: str,
+    v0: float,
+    v1: float,
+    u0: float,
+    u1: float
+) -> None:
+    """
+    Define a new morphing surface on the CCS wing mesh.
+
+    This function appends a command to the script state to create a morphing
+    surface region on the CCS wing mesh, defined by its spanwise and chordwise
+    parametric extents.
+
+    Parameters
+    ----------
+    name : str
+        Name to assign to this morphing surface.
+    v0 : float
+        Inner spanwise parametric limit (0 to 1).
+    v1 : float
+        Outer spanwise parametric limit (0 to 1); must be greater than `v0`.
+    u0 : float
+        Chordwise parametric depth at the inner span location (0 < u0 < 0.5).
+    u1 : float
+        Chordwise parametric depth at the outer span location (0 < u1 < 0.5).
+
+    Raises
+    ------
+    ValueError
+        If any parameter fails validation.
+
+    Examples
+    --------
+    >>> new_ccs_wing_morphing_surface(
+    ...     name='flap', v0=0.0, v1=0.5, u0=0.3, u1=0.3
+    ... )
+    """
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError("`name` should be a non-empty string value.")
+
+    for value, label in [(v0, 'v0'), (v1, 'v1')]:
+        if not isinstance(value, (int, float)):
+            raise ValueError(f"`{label}` should be a numeric value.")
+        if not (0 <= value <= 1):
+            raise ValueError(f"`{label}` should be between 0 and 1.")
+    if v1 <= v0:
+        raise ValueError("`v1` should be greater than `v0`.")
+
+    for value, label in [(u0, 'u0'), (u1, 'u1')]:
+        if not isinstance(value, (int, float)):
+            raise ValueError(f"`{label}` should be a numeric value.")
+        if not (0 < value < 0.5):
+            raise ValueError(f"`{label}` should be greater than 0 and less than 0.5.")
+
+    lines = [
+        "#************************************************************************",
+        "#**************** Add new CCS wing morphing surface **********************",
+        "#************************************************************************",
+        f"NEW_CCS_WING_MORPHING_SURFACE {name} {v0} {v1} {u0} {u1}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def delete_ccs_wing_control_surface(
+    control_index: int = -1
+) -> None:
+    """
+    Delete one or all CCS wing mesh control surfaces.
+
+    This function appends a command to the script state to delete a specified
+    control surface, or all control surfaces if `control_index` is -1.
+
+    Parameters
+    ----------
+    control_index : int, optional
+        Index of the control surface to delete (> 0), or -1 to delete all.
+        Defaults to -1.
+
+    Raises
+    ------
+    ValueError
+        If `control_index` is not a positive integer or -1.
+
+    Examples
+    --------
+    >>> # Delete all control surfaces
+    >>> delete_ccs_wing_control_surface()
+
+    >>> # Delete control surface 1
+    >>> delete_ccs_wing_control_surface(control_index=1)
+    """
+    if not isinstance(control_index, int):
+        raise ValueError("`control_index` should be an integer value.")
+    if control_index == 0 or control_index < -1:
+        raise ValueError("`control_index` should be -1 (all) or a positive integer value.")
+
+    lines = [
+        "#************************************************************************",
+        "#**************** Delete CCS wing control surface ************************",
+        "#************************************************************************",
+        f"DELETE_CCS_WING_CONTROL_SURFACE {control_index}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def cad_create_wing_mesh_from_ccs(
+    name: str,
+    mark_trailing_edges: str = 'TRUE',
+    te_geometry: str = 'SHARP',
+    close_ends: str = 'TRUE',
+    loft_type_u: str = 'C2',
+    loft_type_v: str = 'C0'
+) -> None:
+    """
+    Generate a CAD wing mesh from the current CCS wing mesh settings.
+
+    This function appends a command to the script state to create a CAD wing
+    boundary mesh from the configured CCS settings, assigning it the given name.
+
+    Parameters
+    ----------
+    name : str
+        Name to assign to the generated mesh boundary.
+    mark_trailing_edges : str, optional
+        Whether to mark trailing edge boundaries ('TRUE' or 'FALSE').
+        Defaults to 'TRUE'.
+    te_geometry : str, optional
+        Trailing-edge geometry type ('SHARP', 'BLUNT', 'BLEND', or 'OPEN').
+        Defaults to 'SHARP'.
+    close_ends : str, optional
+        Whether to close wing component ends ('TRUE', 'FALSE', 'OPEN', or 'CLOSED').
+        Defaults to 'TRUE'.
+    loft_type_u : str, optional
+        Chordwise spline loft continuity type ('C2' or 'C0'). Defaults to 'C2'.
+    loft_type_v : str, optional
+        Spanwise spline loft continuity type ('C2' or 'C0'). Defaults to 'C0'.
+
+    Raises
+    ------
+    ValueError
+        If `name` is empty or any option parameter is invalid.
+
+    Examples
+    --------
+    >>> cad_create_wing_mesh_from_ccs(name='MainWing')
+    """
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError("`name` should be a non-empty string value.")
+
+    valid_mark = ['TRUE', 'FALSE']
+    mark_trailing_edges = normalize_option(mark_trailing_edges, "mark_trailing_edges")
+    if mark_trailing_edges not in valid_mark:
+        raise ValueError(f"`mark_trailing_edges` should be one of {valid_mark}. Received: {mark_trailing_edges}")
+
+    valid_te_geometry = ['SHARP', 'BLUNT', 'BLEND', 'OPEN']
+    te_geometry = normalize_option(te_geometry, "te_geometry")
+    if te_geometry not in valid_te_geometry:
+        raise ValueError(f"`te_geometry` should be one of {valid_te_geometry}. Received: {te_geometry}")
+
+    valid_close_ends = ['TRUE', 'FALSE', 'OPEN', 'CLOSED']
+    close_ends = normalize_option(close_ends, "close_ends")
+    if close_ends not in valid_close_ends:
+        raise ValueError(f"`close_ends` should be one of {valid_close_ends}. Received: {close_ends}")
+
+    valid_loft_types = ['C2', 'C0']
+    loft_type_u = normalize_option(loft_type_u, "loft_type_u")
+    loft_type_v = normalize_option(loft_type_v, "loft_type_v")
+    if loft_type_u not in valid_loft_types:
+        raise ValueError(f"`loft_type_u` should be one of {valid_loft_types}. Received: {loft_type_u}")
+    if loft_type_v not in valid_loft_types:
+        raise ValueError(f"`loft_type_v` should be one of {valid_loft_types}. Received: {loft_type_v}")
+
+    lines = [
+        "#************************************************************************",
+        "#**************** Create CAD wing mesh from CCS **************************",
+        "#************************************************************************",
+        f"CAD_CREATE_WING_MESH_FROM_CCS {name} {mark_trailing_edges} {te_geometry} {close_ends} {loft_type_u} {loft_type_v}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def export_wing_ccs_file(
+    name: str,
+    mark_trailing_edges: str = 'TRUE',
+    te_geometry: str = 'SHARP',
+    close_ends: str = 'TRUE',
+    loft_type_u: str = 'C2',
+    loft_type_v: str = 'C0',
+    file_path: str = ''
+) -> None:
+    """
+    Export wing CCS mesh settings to a file.
+
+    This function appends a command to the script state to export the CCS
+    wing mesh configuration to a file, using the specified mesh parameters.
+
+    Parameters
+    ----------
+    name : str
+        Name to assign to the mesh boundary in the export.
+    mark_trailing_edges : str, optional
+        Whether to mark trailing edge boundaries ('TRUE' or 'FALSE').
+        Defaults to 'TRUE'.
+    te_geometry : str, optional
+        Trailing-edge geometry type ('SHARP', 'BLUNT', 'BLEND', or 'OPEN').
+        Defaults to 'SHARP'.
+    close_ends : str, optional
+        Whether to close wing component ends ('TRUE', 'FALSE', 'OPEN', or 'CLOSED').
+        Defaults to 'TRUE'.
+    loft_type_u : str, optional
+        Chordwise spline loft continuity type ('C2' or 'C0'). Defaults to 'C2'.
+    loft_type_v : str, optional
+        Spanwise spline loft continuity type ('C2' or 'C0'). Defaults to 'C0'.
+    file_path : str, optional
+        Output file path for the exported CCS file. Must be non-empty.
+
+    Raises
+    ------
+    ValueError
+        If `name` or `file_path` is empty, or any option parameter is invalid.
+
+    Examples
+    --------
+    >>> export_wing_ccs_file(name='MainWing', file_path='output/wing.ccs')
+    """
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError("`name` should be a non-empty string value.")
+
+    valid_mark = ['TRUE', 'FALSE']
+    mark_trailing_edges = normalize_option(mark_trailing_edges, "mark_trailing_edges")
+    if mark_trailing_edges not in valid_mark:
+        raise ValueError(f"`mark_trailing_edges` should be one of {valid_mark}. Received: {mark_trailing_edges}")
+
+    valid_te_geometry = ['SHARP', 'BLUNT', 'BLEND', 'OPEN']
+    te_geometry = normalize_option(te_geometry, "te_geometry")
+    if te_geometry not in valid_te_geometry:
+        raise ValueError(f"`te_geometry` should be one of {valid_te_geometry}. Received: {te_geometry}")
+
+    valid_close_ends = ['TRUE', 'FALSE', 'OPEN', 'CLOSED']
+    close_ends = normalize_option(close_ends, "close_ends")
+    if close_ends not in valid_close_ends:
+        raise ValueError(f"`close_ends` should be one of {valid_close_ends}. Received: {close_ends}")
+
+    valid_loft_types = ['C2', 'C0']
+    loft_type_u = normalize_option(loft_type_u, "loft_type_u")
+    loft_type_v = normalize_option(loft_type_v, "loft_type_v")
+    if loft_type_u not in valid_loft_types:
+        raise ValueError(f"`loft_type_u` should be one of {valid_loft_types}. Received: {loft_type_u}")
+    if loft_type_v not in valid_loft_types:
+        raise ValueError(f"`loft_type_v` should be one of {valid_loft_types}. Received: {loft_type_v}")
+
+    if not isinstance(file_path, str) or not file_path.strip():
+        raise ValueError("`file_path` should be a non-empty string value.")
+
+    lines = [
+        "#************************************************************************",
+        "#**************** Export wing CCS file ***********************************",
+        "#************************************************************************",
+        f"EXPORT_WING_CCS_FILE {name} {mark_trailing_edges} {te_geometry} {close_ends} {loft_type_u} {loft_type_v}",
+        file_path
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def default_ccs_fuselage_mesh_settings(
+    direction: str = 'AXIAL'
+) -> None:
+    """
+    Apply default CCS fuselage mesh settings for the specified direction.
+
+    This function appends a command to the script state to reset the CCS
+    fuselage mesh parameters to their default values for the specified direction.
+
+    Parameters
+    ----------
+    direction : str, optional
+        Meshing direction ('AXIAL' or 'RADIAL'). Defaults to 'AXIAL'.
+
+    Raises
+    ------
+    ValueError
+        If `direction` is not 'AXIAL' or 'RADIAL'.
+
+    Examples
+    --------
+    >>> default_ccs_fuselage_mesh_settings()
+
+    >>> default_ccs_fuselage_mesh_settings(direction='RADIAL')
+    """
+    valid_directions = ['AXIAL', 'RADIAL']
+    direction = normalize_option(direction, "direction")
+    if direction not in valid_directions:
+        raise ValueError(f"`direction` should be one of {valid_directions}. Received: {direction}")
+
+    lines = [
+        "#************************************************************************",
+        "#************* Default CCS fuselage mesh settings ************************",
+        "#************************************************************************",
+        f"DEFAULT_CCS_FUSELAGE_MESH_SETTINGS {direction}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def ccs_fuselage_mesh_subdivisions(
+    direction: str = 'RADIAL',
+    num_pts: int = 40
+) -> None:
+    """
+    Set the number of CCS fuselage mesh subdivisions in a specified direction.
+
+    This function appends a command to the script state to set the number
+    of grid subdivisions for the CCS fuselage mesh in the axial or
+    radial direction.
+
+    Parameters
+    ----------
+    direction : str, optional
+        Subdivision direction ('AXIAL' or 'RADIAL'). Defaults to 'RADIAL'.
+    num_pts : int, optional
+        Number of subdivisions in the specified direction (> 0). Defaults to 40.
+
+    Raises
+    ------
+    ValueError
+        If `direction` is invalid or `num_pts` is not a positive integer.
+
+    Examples
+    --------
+    >>> ccs_fuselage_mesh_subdivisions(direction='AXIAL', num_pts=60)
+    """
+    valid_directions = ['AXIAL', 'RADIAL']
+    direction = normalize_option(direction, "direction")
+    if direction not in valid_directions:
+        raise ValueError(f"`direction` should be one of {valid_directions}. Received: {direction}")
+
+    if not isinstance(num_pts, int) or num_pts <= 0:
+        raise ValueError("`num_pts` should be a positive integer value.")
+
+    lines = [
+        "#************************************************************************",
+        "#************* Set CCS fuselage mesh subdivisions ************************",
+        "#************************************************************************",
+        f"CCS_FUSELAGE_MESH_SUBDIVISIONS {direction} {num_pts}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def ccs_fuselage_mesh_growth_scheme(
+    direction: str = 'AXIAL',
+    scheme: str = 'DUAL-SIDED'
+) -> None:
+    """
+    Set the CCS fuselage mesh node clustering growth scheme.
+
+    This function appends a command to the script state to set the node
+    clustering growth scheme for the CCS fuselage mesh in the specified direction.
+
+    Parameters
+    ----------
+    direction : str, optional
+        Direction of node clustering ('AXIAL' or 'RADIAL'). Defaults to 'AXIAL'.
+    scheme : str, optional
+        Clustering scheme ('NONE', 'DUAL-SIDED', 'SUCCESSIVE', or 'REVERSE').
+        Defaults to 'DUAL-SIDED'.
+
+    Raises
+    ------
+    ValueError
+        If `direction` or `scheme` is invalid.
+
+    Examples
+    --------
+    >>> ccs_fuselage_mesh_growth_scheme(direction='RADIAL', scheme='SUCCESSIVE')
+    """
+    valid_directions = ['AXIAL', 'RADIAL']
+    direction = normalize_option(direction, "direction")
+    if direction not in valid_directions:
+        raise ValueError(f"`direction` should be one of {valid_directions}. Received: {direction}")
+
+    valid_schemes = ['NONE', 'DUAL-SIDED', 'SUCCESSIVE', 'REVERSE']
+    scheme = normalize_option(scheme, "scheme")
+    if scheme not in valid_schemes:
+        raise ValueError(f"`scheme` should be one of {valid_schemes}. Received: {scheme}")
+
+    lines = [
+        "#************************************************************************",
+        "#************* Set CCS fuselage mesh growth scheme ************************",
+        "#************************************************************************",
+        f"CCS_FUSELAGE_MESH_GROWTH_SCHEME {direction} {scheme}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def ccs_fuselage_mesh_growth_rate(
+    direction: str = 'AXIAL',
+    rate: float = 1.1
+) -> None:
+    """
+    Set the CCS fuselage mesh node clustering growth rate.
+
+    This function appends a command to the script state to set the node
+    clustering growth rate for the CCS fuselage mesh in the specified direction.
+
+    Parameters
+    ----------
+    direction : str, optional
+        Direction of node clustering ('AXIAL' or 'RADIAL'). Defaults to 'AXIAL'.
+    rate : float, optional
+        Clustering growth rate (> 0). Defaults to 1.1.
+
+    Raises
+    ------
+    ValueError
+        If `direction` is invalid or `rate` is not positive.
+
+    Examples
+    --------
+    >>> ccs_fuselage_mesh_growth_rate(direction='RADIAL', rate=1.2)
+    """
+    valid_directions = ['AXIAL', 'RADIAL']
+    direction = normalize_option(direction, "direction")
+    if direction not in valid_directions:
+        raise ValueError(f"`direction` should be one of {valid_directions}. Received: {direction}")
+
+    if not isinstance(rate, (int, float)) or rate <= 0:
+        raise ValueError("`rate` should be a numeric value greater than zero.")
+
+    lines = [
+        "#************************************************************************",
+        "#************* Set CCS fuselage mesh growth rate *************************",
+        "#************************************************************************",
+        f"CCS_FUSELAGE_MESH_GROWTH_RATE {direction} {rate}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def ccs_fuselage_mesh_periodicity(
+    direction: str = 'RADIAL',
+    periodicity: int = 1
+) -> None:
+    """
+    Set the CCS fuselage mesh clustering periodicity in a specified direction.
+
+    This function appends a command to the script state to set the number
+    of self-repeating clustering periods for the CCS fuselage mesh.
+
+    Parameters
+    ----------
+    direction : str, optional
+        Direction of periodicity ('AXIAL' or 'RADIAL'). Defaults to 'RADIAL'.
+    periodicity : int, optional
+        Number of self-repeating periods (> 0). Defaults to 1.
+
+    Raises
+    ------
+    ValueError
+        If `direction` is invalid or `periodicity` is not a positive integer.
+
+    Examples
+    --------
+    >>> ccs_fuselage_mesh_periodicity(direction='AXIAL', periodicity=2)
+    """
+    valid_directions = ['AXIAL', 'RADIAL']
+    direction = normalize_option(direction, "direction")
+    if direction not in valid_directions:
+        raise ValueError(f"`direction` should be one of {valid_directions}. Received: {direction}")
+
+    if not isinstance(periodicity, int) or periodicity <= 0:
+        raise ValueError("`periodicity` should be an integer value greater than zero.")
+
+    lines = [
+        "#************************************************************************",
+        "#************* Set CCS fuselage mesh periodicity *************************",
+        "#************************************************************************",
+        f"CCS_FUSELAGE_MESH_PERIODICITY {direction} {periodicity}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def new_ccs_fuselage_relaxed_te(
+    u: float,
+    v0: float,
+    v1: float
+) -> None:
+    """
+    Add a new relaxed trailing-edge boundary to the CCS fuselage mesh.
+
+    This function appends a command to the script state to define a relaxed
+    trailing-edge boundary on the CCS fuselage mesh at the specified radial
+    and axial parametric locations.
+
+    Parameters
+    ----------
+    u : float
+        Radial parametric location of the relaxed trailing-edge boundary (0 to 1).
+    v0 : float
+        Axial parametric inner limit (0 to 1).
+    v1 : float
+        Axial parametric outer limit (0 to 1); must be greater than `v0`.
+
+    Raises
+    ------
+    ValueError
+        If any value is outside [0, 1] or `v1` <= `v0`.
+
+    Examples
+    --------
+    >>> new_ccs_fuselage_relaxed_te(u=0.0, v0=0.2, v1=0.8)
+    """
+    for value, label in [(u, 'u'), (v0, 'v0'), (v1, 'v1')]:
+        if not isinstance(value, (int, float)):
+            raise ValueError(f"`{label}` should be a numeric value.")
+        if not (0 <= value <= 1):
+            raise ValueError(f"`{label}` should be between 0 and 1.")
+
+    if v1 <= v0:
+        raise ValueError("`v1` should be greater than `v0`.")
+
+    lines = [
+        "#************************************************************************",
+        "#************* Add new CCS fuselage relaxed TE ***************************",
+        "#************************************************************************",
+        f"NEW_CCS_FUSELAGE_RELAXED_TE {u} {v0} {v1}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def delete_ccs_fuselage_relaxed_te(
+    index: int = -1
+) -> None:
+    """
+    Delete one or all CCS fuselage relaxed trailing-edge boundaries.
+
+    This function appends a command to the script state to delete a specified
+    relaxed trailing-edge boundary, or all boundaries if `index` is -1.
+
+    Parameters
+    ----------
+    index : int, optional
+        Index of the boundary to delete (> 0), or -1 to delete all.
+        Defaults to -1.
+
+    Raises
+    ------
+    ValueError
+        If `index` is not a positive integer or -1.
+
+    Examples
+    --------
+    >>> # Delete all relaxed TE boundaries
+    >>> delete_ccs_fuselage_relaxed_te()
+
+    >>> # Delete boundary 1
+    >>> delete_ccs_fuselage_relaxed_te(index=1)
+    """
+    if not isinstance(index, int):
+        raise ValueError("`index` should be an integer value.")
+    if index == 0 or index < -1:
+        raise ValueError("`index` should be -1 (all) or a positive integer value.")
+
+    lines = [
+        "#************************************************************************",
+        "#************* Delete CCS fuselage relaxed TE ****************************",
+        "#************************************************************************",
+        f"DELETE_CCS_FUSELAGE_RELAXED_TE {index}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def cad_create_fuselage_mesh_from_ccs(
+    name: str,
+    close_ends: str = 'CLOSED',
+    loft_type_u: str = 'C2',
+    loft_type_v: str = 'C2'
+) -> None:
+    """
+    Generate a CAD fuselage mesh from the current CCS fuselage mesh settings.
+
+    This function appends a command to the script state to create a CAD fuselage
+    boundary mesh from the configured CCS settings, assigning it the given name.
+
+    Parameters
+    ----------
+    name : str
+        Name to assign to the generated mesh boundary.
+    close_ends : str, optional
+        Whether to close fuselage ends ('OPEN' or 'CLOSED'). Defaults to 'CLOSED'.
+    loft_type_u : str, optional
+        Radial spline loft continuity type ('C2' or 'C0'). Defaults to 'C2'.
+    loft_type_v : str, optional
+        Axial spline loft continuity type ('C2' or 'C0'). Defaults to 'C2'.
+
+    Raises
+    ------
+    ValueError
+        If `name` is empty or any option parameter is invalid.
+
+    Examples
+    --------
+    >>> cad_create_fuselage_mesh_from_ccs(name='Fuselage')
+    """
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError("`name` should be a non-empty string value.")
+
+    valid_close_ends = ['OPEN', 'CLOSED']
+    close_ends = normalize_option(close_ends, "close_ends")
+    if close_ends not in valid_close_ends:
+        raise ValueError(f"`close_ends` should be one of {valid_close_ends}. Received: {close_ends}")
+
+    valid_loft_types = ['C2', 'C0']
+    loft_type_u = normalize_option(loft_type_u, "loft_type_u")
+    loft_type_v = normalize_option(loft_type_v, "loft_type_v")
+    if loft_type_u not in valid_loft_types:
+        raise ValueError(f"`loft_type_u` should be one of {valid_loft_types}. Received: {loft_type_u}")
+    if loft_type_v not in valid_loft_types:
+        raise ValueError(f"`loft_type_v` should be one of {valid_loft_types}. Received: {loft_type_v}")
+
+    lines = [
+        "#************************************************************************",
+        "#************* Create CAD fuselage mesh from CCS *************************",
+        "#************************************************************************",
+        f"CAD_CREATE_FUSELAGE_MESH_FROM_CCS {name} {close_ends} {loft_type_u} {loft_type_v}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def export_fuselage_ccs_file(
+    name: str,
+    close_ends: str = 'CLOSED',
+    loft_type_u: str = 'C2',
+    loft_type_v: str = 'C0',
+    file_path: str = ''
+) -> None:
+    """
+    Export fuselage CCS mesh settings to a file.
+
+    This function appends a command to the script state to export the CCS
+    fuselage mesh configuration to a file using the specified mesh parameters.
+
+    Parameters
+    ----------
+    name : str
+        Name to assign to the mesh boundary in the export.
+    close_ends : str, optional
+        Whether to close fuselage ends ('OPEN' or 'CLOSED'). Defaults to 'CLOSED'.
+    loft_type_u : str, optional
+        Radial spline loft continuity type ('C2' or 'C0'). Defaults to 'C2'.
+    loft_type_v : str, optional
+        Axial spline loft continuity type ('C2' or 'C0'). Defaults to 'C0'.
+    file_path : str, optional
+        Output file path for the exported CCS file. Must be non-empty.
+
+    Raises
+    ------
+    ValueError
+        If `name` or `file_path` is empty, or any option parameter is invalid.
+
+    Examples
+    --------
+    >>> export_fuselage_ccs_file(name='Fuselage', file_path='output/fuselage.ccs')
+    """
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError("`name` should be a non-empty string value.")
+
+    valid_close_ends = ['OPEN', 'CLOSED']
+    close_ends = normalize_option(close_ends, "close_ends")
+    if close_ends not in valid_close_ends:
+        raise ValueError(f"`close_ends` should be one of {valid_close_ends}. Received: {close_ends}")
+
+    valid_loft_types = ['C2', 'C0']
+    loft_type_u = normalize_option(loft_type_u, "loft_type_u")
+    loft_type_v = normalize_option(loft_type_v, "loft_type_v")
+    if loft_type_u not in valid_loft_types:
+        raise ValueError(f"`loft_type_u` should be one of {valid_loft_types}. Received: {loft_type_u}")
+    if loft_type_v not in valid_loft_types:
+        raise ValueError(f"`loft_type_v` should be one of {valid_loft_types}. Received: {loft_type_v}")
+
+    if not isinstance(file_path, str) or not file_path.strip():
+        raise ValueError("`file_path` should be a non-empty string value.")
+
+    lines = [
+        "#************************************************************************",
+        "#************* Export fuselage CCS file **********************************",
+        "#************************************************************************",
+        f"EXPORT_FUSELAGE_CCS_FILE {name} {close_ends} {loft_type_u} {loft_type_v}",
+        file_path
     ]
 
     script.append_lines(lines)

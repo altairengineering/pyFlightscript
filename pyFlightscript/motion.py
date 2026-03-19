@@ -1,5 +1,6 @@
+from .utils import *
 from .types import VALID_AXIS_LIST, VALID_MOTION_SOLVER_TYPE_LIST, VALID_MOTION_TYPE_LIST
-from . import script
+from .script import script
 
 def set_motion_controls(
     reference_frame: int = 1, 
@@ -35,7 +36,6 @@ def set_motion_controls(
         raise ValueError("`cg_x`, `cg_y`, and `cg_z` should be numeric values.")
 
     lines = [
-        "#",
         "SET_MOTION_CONTROLS",
         f"REFERENCE_FRAME {reference_frame}",
         f"CG {cg_x} {cg_y} {cg_z}",
@@ -74,6 +74,7 @@ def set_motion_solver(
     >>> # Set up an unsteady motion solver
     >>> set_motion_solver(solver_type='UNSTEADY', time_step=0.005, total_time=2.0)
     """
+    solver_type = normalize_option(solver_type, "solver_type")
     if solver_type not in VALID_MOTION_SOLVER_TYPE_LIST:
         raise ValueError(f"`solver_type` should be one of {VALID_MOTION_SOLVER_TYPE_LIST}")
     if not all(isinstance(x, (int, float)) for x in [time_step, total_time, tolerance]):
@@ -82,7 +83,6 @@ def set_motion_solver(
         raise ValueError("`iterations` should be an integer value.")
 
     lines = [
-        "#",
         "SET_MOTION_SOLVER",
         f"TYPE {solver_type}",
         f"TIME_STEP {time_step}",
@@ -130,15 +130,16 @@ def set_motion_translation(
     >>> # Define a sinusoidal velocity motion along the X-axis
     >>> set_motion_translation(axis='X', motion_type='VELOCITY', amplitude=5.0, frequency=2.0)
     """
+    axis = normalize_option(axis, "axis")
     if axis not in VALID_AXIS_LIST:
         raise ValueError(f"`axis` should be one of {VALID_AXIS_LIST}")
+    motion_type = normalize_option(motion_type, "motion_type")
     if motion_type not in VALID_MOTION_TYPE_LIST:
         raise ValueError(f"`motion_type` should be one of {VALID_MOTION_TYPE_LIST}")
     if not all(isinstance(x, (int, float)) for x in [amplitude, frequency, phase, initial_displacement, initial_velocity]):
         raise ValueError("Motion parameters (`amplitude`, `frequency`, `phase`, `initial_displacement`, `initial_velocity`) should be numeric.")
 
     lines = [
-        "#",
         "SET_MOTION_TRANSLATION",
         f"AXIS {axis}",
         f"TYPE {motion_type}",
@@ -188,15 +189,16 @@ def set_motion_rotation(
     >>> # Define a pitching acceleration motion about the Y-axis
     >>> set_motion_rotation(axis='Y', motion_type='ACCELERATION', amplitude=10.0, frequency=1.5)
     """
+    axis = normalize_option(axis, "axis")
     if axis not in VALID_AXIS_LIST:
         raise ValueError(f"`axis` should be one of {VALID_AXIS_LIST}")
+    motion_type = normalize_option(motion_type, "motion_type")
     if motion_type not in VALID_MOTION_TYPE_LIST:
         raise ValueError(f"`motion_type` should be one of {VALID_MOTION_TYPE_LIST}")
     if not all(isinstance(x, (int, float)) for x in [amplitude, frequency, phase, initial_displacement, initial_velocity]):
         raise ValueError("Motion parameters (`amplitude`, `frequency`, `phase`, `initial_displacement`, `initial_velocity`) should be numeric.")
 
     lines = [
-        "#",
         "SET_MOTION_ROTATION",
         f"AXIS {axis}",
         f"TYPE {motion_type}",
@@ -206,5 +208,36 @@ def set_motion_rotation(
         f"INITIAL_DISPLACEMENT {initial_displacement}",
         f"INITIAL_VELOCITY {initial_velocity}",
     ]
+    script.append_lines(lines)
+    return
+
+
+def set_motion_slipstream_wake_stabilization(motion_id: int, flag: str = 'ENABLE') -> None:
+    """
+    Appends lines to script state to set slipstream wake stabilization for a motion definition.
+
+
+    :param motion_id: Index of the motion definition (> 0).
+    :param flag: ENABLE or DISABLE.
+
+    Example usage:
+    set_motion_slipstream_wake_stabilization(1, 'ENABLE')
+    """
+
+    if not isinstance(motion_id, int) or motion_id <= 0:
+        raise ValueError("`motion_id` should be an integer value greater than 0.")
+
+    valid_flags = ['ENABLE', 'DISABLE']
+    flag = normalize_option(flag, "flag")
+    if flag not in valid_flags:
+        raise ValueError(f"`flag` should be one of {valid_flags}")
+
+    lines = [
+        "#************************************************************************",
+        "#************* Set the slipstream wake stabilization ********************",
+        "#************************************************************************",
+        f"SET_MOTION_SLIPSTREAM_WAKE_STABILIZATION {motion_id} {flag}"
+    ]
+
     script.append_lines(lines)
     return

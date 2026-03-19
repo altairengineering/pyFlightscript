@@ -19,7 +19,6 @@ def view_resize() -> None:
         "#************************************************************************",
         "#****************** Resizing the view in the scene **********************",
         "#************************************************************************",
-        "#",
         "VIEW_RESIZE"
     ]
 
@@ -43,6 +42,7 @@ def change_scene_to(scene: str) -> None:
     >>> # Change the scene to the solver view
     >>> change_scene_to('SOLVER')
     """
+    scene = normalize_option(scene, "scene")
     if scene not in VALID_SCENE_LIST:
         raise ValueError(f"Invalid scene: {scene}. Must be one of {VALID_SCENE_LIST}.")
 
@@ -50,7 +50,6 @@ def change_scene_to(scene: str) -> None:
         "#************************************************************************",
         "#************************ Change the Scene To ***************************",
         "#************************************************************************",
-        "#",
         f"CHANGE_SCENE_TO_{scene}"
     ]
     script.append_lines(lines)
@@ -83,7 +82,6 @@ def save_scene_as_image(filename: str) -> None:
         "#************************************************************************",
         "#****************** Save scene as image file ****************************",
         "#************************************************************************",
-        "#",
         "SAVE_SCENE_AS_IMAGE",
         filename
     ]
@@ -111,6 +109,7 @@ def set_scene_view(view_option: str = 'DEFAULTVIEW') -> None:
     >>> # Set the scene to a negative YZ view
     >>> set_scene_view('YZ_NEGATIVE')
     """
+    view_option = normalize_option(view_option, "view_option")
     if view_option not in VALID_SCENE_VIEW_LIST:
         raise ValueError(f"Invalid view_option. Must be one of {VALID_SCENE_VIEW_LIST}")
 
@@ -128,7 +127,6 @@ def set_scene_view(view_option: str = 'DEFAULTVIEW') -> None:
         "#************************************************************************",
         f"#****************** Setting Scene to {view_option} ************************",
         "#************************************************************************",
-        "#",
         view_commands[view_option]
     ]
     script.append_lines(lines)
@@ -158,8 +156,10 @@ def set_scene_colormap_type(
     >>> # Set the primary colormap to rainbow
     >>> set_scene_colormap_type('PRIMARY', 'RAINBOW_STANDARD')
     """
+    colormap = normalize_option(colormap, "colormap")
     if colormap not in VALID_COLORMAP_LIST:
         raise ValueError(f"`colormap` must be one of {VALID_COLORMAP_LIST}")
+    type_value = normalize_option(type_value, "type_value")
     if type_value not in VALID_COLORMAP_TYPE_LIST:
         raise ValueError(f"`type_value` must be one of {VALID_COLORMAP_TYPE_LIST}")
 
@@ -167,7 +167,6 @@ def set_scene_colormap_type(
         "#************************************************************************",
         "#****************** Set solver colormap type ****************************",
         "#************************************************************************",
-        "#",
         "SET_SCENE_COLORMAP_TYPE",
         f"COLORMAP {colormap}",
         f"TYPE {type_value}"
@@ -201,6 +200,7 @@ def set_scene_colormap_size(
     >>> # Set the size of the secondary colormap
     >>> set_scene_colormap_size('SECONDARY', 400, 20)
     """
+    colormap = normalize_option(colormap, "colormap")
     if colormap not in VALID_COLORMAP_LIST:
         raise ValueError(f"`colormap` must be one of {VALID_COLORMAP_LIST}")
     if not isinstance(thickness, int):
@@ -212,7 +212,6 @@ def set_scene_colormap_size(
         "#************************************************************************",
         "#****************** Set solver colormap size ****************************",
         "#************************************************************************",
-        "#",
         "SET_SCENE_COLORMAP_SIZE",
         f"COLORMAP {colormap}",
         f"THICKNESS {thickness}",
@@ -247,6 +246,7 @@ def set_scene_colormap_position(
     >>> # Reposition the primary colormap
     >>> set_scene_colormap_position('PRIMARY', 100, 50)
     """
+    colormap = normalize_option(colormap, "colormap")
     if colormap not in VALID_COLORMAP_LIST:
         raise ValueError(f"`colormap` must be one of {VALID_COLORMAP_LIST}")
     if not isinstance(x, int):
@@ -258,7 +258,6 @@ def set_scene_colormap_position(
         "#************************************************************************",
         "#****************** Set solver colormap position ************************",
         "#************************************************************************",
-        "#",
         "SET_SCENE_COLORMAP_POSITION",
         f"COLORMAP {colormap}",
         f"X {x}",
@@ -295,10 +294,13 @@ def set_scene_colormap_shading(
     >>> # Reverse the secondary colormap and disable smooth shading
     >>> set_scene_colormap_shading('SECONDARY', 'ENABLE', 'DISABLE')
     """
+    colormap = normalize_option(colormap, "colormap")
     if colormap not in VALID_COLORMAP_LIST:
         raise ValueError(f"`colormap` must be one of {VALID_COLORMAP_LIST}")
+    reverse = normalize_option(reverse, "reverse")
     if reverse not in VALID_RUN_OPTIONS:
         raise ValueError(f"`reverse` must be one of {VALID_RUN_OPTIONS}")
+    smooth = normalize_option(smooth, "smooth")
     if smooth not in VALID_RUN_OPTIONS:
         raise ValueError(f"`smooth` must be one of {VALID_RUN_OPTIONS}")
 
@@ -306,7 +308,6 @@ def set_scene_colormap_shading(
         "#************************************************************************",
         "#****************** Set solver colormap shading *************************",
         "#************************************************************************",
-        "#",
         "SET_SCENE_COLORMAP_SHADING",
         f"COLORMAP {colormap}",
         f"REVERSE {reverse}",
@@ -339,8 +340,10 @@ def set_scene_colormap_custom_mode(
     >>> # Disable custom range for the primary colormap
     >>> set_scene_colormap_custom_mode('PRIMARY', 'DISABLE')
     """
+    colormap = normalize_option(colormap, "colormap")
     if colormap not in VALID_COLORMAP_LIST:
         raise ValueError(f"`colormap` must be one of {VALID_COLORMAP_LIST}")
+    custom_range = normalize_option(custom_range, "custom_range")
     if custom_range not in VALID_RUN_OPTIONS:
         raise ValueError(f"`custom_range` must be one of {VALID_RUN_OPTIONS}")
 
@@ -348,7 +351,6 @@ def set_scene_colormap_custom_mode(
         "#************************************************************************",
         "#****************** Set solver colormap custom range mode ***************",
         "#************************************************************************",
-        "#",
         "SET_SCENE_COLORMAP_CUSTOM_MODE",
         f"COLORMAP {colormap}",
         f"CUSTOM_RANGE {custom_range}"
@@ -386,8 +388,10 @@ def set_scene_colormap_custom_range(
     >>> # Set a custom range for the primary colormap
     >>> set_scene_colormap_custom_range('PRIMARY', 'ABOVE_AND_BELOW', 2.0, -1.0)
     """
+    colormap = normalize_option(colormap, "colormap")
     if colormap not in VALID_COLORMAP_LIST:
         raise ValueError(f"`colormap` must be one of {VALID_COLORMAP_LIST}")
+    cut_off_mode = normalize_option(cut_off_mode, "cut_off_mode")
     if cut_off_mode not in VALID_CUT_OFF_MODE_LIST:
         raise ValueError(f"`cut_off_mode` must be one of {VALID_CUT_OFF_MODE_LIST}")
     if not isinstance(maximum, (int, float)):
@@ -399,7 +403,6 @@ def set_scene_colormap_custom_range(
         "#************************************************************************",
         "#****************** Set solver colormap custom range ********************",
         "#************************************************************************",
-        "#",
         "SET_SCENE_COLORMAP_CUSTOM_RANGE",
         f"COLORMAP {colormap}",
         f"CUT_OFF_MODE {cut_off_mode}",

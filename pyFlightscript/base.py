@@ -1,9 +1,8 @@
 import os
-from .utils import *    
+from typing import Union, Optional, Literal, List
+from .utils import *
 from .script import script
 from .types import *
-from .types import *
-from typing import Union, Optional, Literal, List
 
 def create_new_base_region(
     surface: int,
@@ -57,7 +56,6 @@ def create_new_base_region(
         "#************************************************************************",
         "#****************** Create a new base region ****************************",
         "#************************************************************************",
-        "#",
         f"CREATE_NEW_BASE_REGION {surface} {base_type} {base_pressure_coefficient}",
     ]
 
@@ -78,7 +76,6 @@ def auto_detect_base_regions():
         "#************************************************************************",
         "#****************** Auto-detect base regions on the geometry ************",
         "#************************************************************************",
-        "#",
         "AUTO_DETECT_BASE_REGIONS"
     ]
 
@@ -120,7 +117,6 @@ def detect_base_regions_by_surface(boundary_index: int = 1) -> None:
         "#************************************************************************",
         "#****************** Detect base regions by surface index ****************",
         "#************************************************************************",
-        "#",
         f"DETECT_BASE_REGIONS_BY_SURFACE {boundary_index}"
     ]
 
@@ -165,7 +161,6 @@ def set_base_region_trailing_edges(base_region_boundary: int = -1) -> None:
         "#************************************************************************",
         "#****************** Set base region trailing edges **********************",
         "#************************************************************************",
-        "#",
         f"SET_BASE_REGION_TRAILING_EDGES {base_region_boundary}"
     ]
 
@@ -203,7 +198,6 @@ def delete_base_region(base_region_index: int) -> None:
         "#************************************************************************",
         "#****************** Delete an existing base region **********************",
         "#************************************************************************",
-        "#",
         f"DELETE_BASE_REGION {base_region_index}"
     ]
 
@@ -241,8 +235,55 @@ def select_base_region(base_region_index: int) -> None:
         "#************************************************************************",
         "#****************** Select an existing base region **********************",
         "#************************************************************************",
-        "#",
         f"SELECT_BASE_REGION_FACES {base_region_index}"
+    ]
+
+    script.append_lines(lines)
+    return
+
+
+def remesh_base_region(
+    base_region: int,
+    inner_radius: float = 0.0,
+    elements: int = 10,
+    growth_scheme: int = 1,
+    growth_rate: float = 1.0
+) -> None:
+    """
+    Appends lines to script state to radial mesh an existing base region boundary.
+
+    :param base_region: Index of base region boundary to be meshed (> 0).
+    :param inner_radius: Inner radius of the base region boundary (>= 0.0). Use 0.0 for no inner radius.
+    :param elements: Number of mesh faces to be created in the radial direction (> 0).
+    :param growth_scheme: Growth scheme, either 1 (Successive) or 2 (Dual-side).
+    :param growth_rate: Growth rate for radial distribution of mesh faces (> 0).
+    """
+
+    if not isinstance(base_region, int) or base_region <= 0:
+        raise ValueError("`base_region` should be an integer value greater than 0.")
+
+    if not isinstance(inner_radius, (int, float)) or inner_radius < 0.0:
+        raise ValueError("`inner_radius` should be a numeric value greater than or equal to 0.0.")
+
+    if not isinstance(elements, int) or elements <= 0:
+        raise ValueError("`elements` should be an integer value greater than 0.")
+
+    if not isinstance(growth_scheme, int) or growth_scheme not in [1, 2]:
+        raise ValueError("`growth_scheme` should be either 1 (Successive) or 2 (Dual-side).")
+
+    if not isinstance(growth_rate, (int, float)) or growth_rate <= 0:
+        raise ValueError("`growth_rate` should be a numeric value greater than 0.")
+
+    lines = [
+        "#************************************************************************",
+        "#************ Radial mesh an existing base region boundary **************",
+        "#************************************************************************",
+        "REMESH_BASE_REGION",
+        f"BASE_REGION {base_region}",
+        f"INNER_RADIUS {inner_radius}",
+        f"ELEMENTS {elements}",
+        f"GROWTH_SCHEME {growth_scheme}",
+        f"GROWTH_RATE {growth_rate}"
     ]
 
     script.append_lines(lines)

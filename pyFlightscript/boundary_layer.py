@@ -1,9 +1,8 @@
 import os
-from .utils import *    
+from typing import Union, Optional, Literal, List
+from .utils import *
 from .script import script
 from .types import *
-from .types import *
-from typing import Union, Optional, Literal, List
 
 def delete_transition_trip(transition_trip_index: int) -> None:
     """
@@ -37,7 +36,6 @@ def delete_transition_trip(transition_trip_index: int) -> None:
         "#************************************************************************",
         "#************ Delete an existing transition trip edge set ***************",
         "#************************************************************************",
-        "#",
         f"DELETE_TRANSITION_TRIP {transition_trip_index}"
     ]
 

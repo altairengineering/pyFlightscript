@@ -60,6 +60,7 @@ def initialize_solver(
     >>> # Initialize a tangent cone solver with all surfaces
     >>> initialize_solver('TANGENT_CONE', -1)
     """
+    solver_model = normalize_option(solver_model, "solver_model")
     if solver_model not in VALID_SOLVER_MODEL_LIST:
         raise ValueError(f"`solver_model` must be one of {VALID_SOLVER_MODEL_LIST}")
 
@@ -73,6 +74,7 @@ def initialize_solver(
                     isinstance(surface[0], int) and surface[1] in VALID_RUN_OPTIONS):
                 raise ValueError("Each entry in `surfaces` must be a tuple of (index, 'ENABLE'/'DISABLE').")
 
+    symmetry = normalize_option(symmetry, "symmetry")
     if symmetry not in ["NONE", "MIRROR", "PERIODIC"]:
         raise ValueError(f"`symmetry` must be one of NONE, MIRROR, or PERIODIC")
     if symmetry == 'PERIODIC' and (not isinstance(symmetry_periodicity, int) or symmetry_periodicity <= 0):
@@ -81,8 +83,10 @@ def initialize_solver(
     if solver_model in ['INCOMPRESSIBLE', 'SUBSONIC_PRANDTL_GLAUERT', 'TRANSONIC_FIELD_PANEL']:
         if wake_termination_x != 'DEFAULT' and not isinstance(wake_termination_x, (int, float)):
             raise ValueError("`wake_termination_x` must be 'DEFAULT' or a number.")
+        wall_collision_avoidance = normalize_option(wall_collision_avoidance, "wall_collision_avoidance")
         if wall_collision_avoidance not in VALID_RUN_OPTIONS:
             raise ValueError(f"`wall_collision_avoidance` must be one of {VALID_RUN_OPTIONS}")
+        stabilization = normalize_option(stabilization, "stabilization")
         if stabilization not in VALID_RUN_OPTIONS:
             raise ValueError(f"`stabilization` must be one of {VALID_RUN_OPTIONS}")
         if stabilization == 'ENABLE' and not (0.0 < stabilization_strength < 5.0):
@@ -92,7 +96,6 @@ def initialize_solver(
         "#************************************************************************",
         "#****************** Initialize the solver *******************************",
         "#************************************************************************",
-        "#",
         "INITIALIZE_SOLVER",
         f"SOLVER_MODEL {solver_model}",
     ]
@@ -155,7 +158,6 @@ def solver_proximal_boundaries(*boundaries: int) -> None:
         "#************************************************************************",
         "#********* Enable solver proximity checking for specified boundaries ****",
         "#************************************************************************",
-        "#",
         f"SOLVER_PROXIMAL_BOUNDARIES {len(boundaries)}"
     ]
     lines.extend(map(str, boundaries))
@@ -178,7 +180,6 @@ def solver_remove_initialization() -> None:
         "#************************************************************************",
         "#********* Remove the solver initialization *****************************",
         "#************************************************************************",
-        "#",
         "REMOVE_INITIALIZATION"
     ]
     script.append_lines(lines)

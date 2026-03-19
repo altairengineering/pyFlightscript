@@ -1,10 +1,8 @@
 import os
-from .utils import *    
+from typing import List, Tuple, Literal
+from .utils import *
 from .script import script
 from .types import *
-
-from typing import List, Tuple, Literal
-from .script import script
 
 # Define a type for volume options
 VolumeType = Literal['POSITIVE', 'NEGATIVE']
@@ -152,7 +150,6 @@ def boolean_unite_geometry(
         "#************************************************************************",
         "#************* Boolean unite a selection of geometry bodies *************",
         "#************************************************************************",
-        "#",
         "BOOLEAN_UNITE_GEOMETRY",
         f"BODIES {bodies}"
     ]

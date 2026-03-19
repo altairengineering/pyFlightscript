@@ -82,7 +82,6 @@ def set_inlet_custom_profile(inlet_id: int, motion_filepath: str) -> None:
         "#************************************************************************",
         "#******* Upload custom velocity inlet profile from external file ********",
         "#************************************************************************",
-        "#",
         "SET_INLET_CUSTOM_PROFILE",
         f"{inlet_id}",
         f"{motion_filepath}"
@@ -145,7 +144,6 @@ def remesh_inlet(inlet: int, inner_radius: float = 0.0, elements: int = 10,
         "#************************************************************************",
         "#****************** Radial mesh an existing inlet boundary **************",
         "#************************************************************************",
-        "#",
         "REMESH_INLET",
         f"INLET {inlet}",
         f"INNER_RADIUS {inner_radius}",
@@ -187,7 +185,6 @@ def delete_inlet(inlet: int) -> None:
         "#************************************************************************",
         "#****************** Delete an existing inlet boundary *******************",
         "#************************************************************************",
-        "#",
         f"DELETE INLET {inlet}"
     ]
 

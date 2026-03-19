@@ -1,9 +1,8 @@
 import os
-from .utils import *    
+from typing import Union, Optional, Literal
+from .utils import *
 from .script import script
 from .types import *
-from .types import *
-from typing import Union, Optional, Literal
 
 ValidActuatorTypes = Literal['PROPELLER', 'JET_EXHAUST']
 VALID_ACTUATOR_TYPES = ['PROPELLER', 'JET_EXHAUST']
@@ -36,6 +35,7 @@ def create_new_actuator(actuator_type: ValidActuatorTypes = 'PROPELLER') -> None
     """
     
     # Type and value checking
+    actuator_type = normalize_option(actuator_type, "actuator_type")
     if actuator_type not in VALID_ACTUATOR_TYPES:
         raise ValueError(f"`actuator_type` should be one of {VALID_ACTUATOR_TYPES}")
     
@@ -43,7 +43,6 @@ def create_new_actuator(actuator_type: ValidActuatorTypes = 'PROPELLER') -> None
         "#************************************************************************",
         "#****************** Create a new propeller actuator ********************",
         "#************************************************************************",
-        "#",
         "CREATE_NEW_ACTUATOR",
         f"TYPE {actuator_type}"
     ]
@@ -134,6 +133,7 @@ def edit_actuator(
     if not isinstance(frame, int) or frame <= 0:
         raise ValueError("`frame` should be an integer greater than 0.")
     
+    actuator_type = normalize_option(actuator_type, "actuator_type")
     if actuator_type not in VALID_ACTUATOR_TYPES:
         raise ValueError(f"`actuator_type` should be one of {VALID_ACTUATOR_TYPES}")
     
@@ -144,7 +144,6 @@ def edit_actuator(
         "#************************************************************************",
         "#****************** Edit a propeller actuator here *********************",
         "#************************************************************************",
-        "#",
         "EDIT_ACTUATOR",
         f"ACTUATOR {actuator}",
         f"NAME {name}",
@@ -217,7 +216,6 @@ def set_prop_actuator_rpm(actuator_index: int = 1, rpm: Union[int, float] = 2000
         "#************************************************************************",
         "#****************** Set the RPM of an existing actuator *****************",
         "#************************************************************************",
-        "#",
         f"SET_PROP_ACTUATOR_RPM {actuator_index} {rpm}"
     ]
 
@@ -258,6 +256,7 @@ def set_prop_actuator_profile(actuator_index: int, units_type: str, file_name: s
     """
 
     # Validate parameters
+    units_type = normalize_option(units_type, "units_type")
     if units_type not in VALID_FORCE_UNITS_LIST:
         raise ValueError(f"`units_type` must be one of {VALID_FORCE_UNITS_LIST}")
 
@@ -272,7 +271,6 @@ def set_prop_actuator_profile(actuator_index: int, units_type: str, file_name: s
         "#************************************************************************",
         "#********* Set the thrust profile of an existing actuator ****************",
         "#************************************************************************",
-        "#",
         f"SET_PROP_ACTUATOR_PROFILE {actuator_index} {units_type}",
         file_name
     ]
@@ -323,6 +321,7 @@ def set_prop_actuator_thrust(
         raise ValueError("`ct` should be a positive integer or float value.")
     
     valid_thrust_types = ['COEFFICIENT', 'NEWTONS', 'POUNDS']
+    thrust_type = normalize_option(thrust_type, "thrust_type")
     if thrust_type not in valid_thrust_types:
         raise ValueError(f"`thrust_type` should be one of {valid_thrust_types}")
     
@@ -330,7 +329,6 @@ def set_prop_actuator_thrust(
         "#************************************************************************",
         "#********* Set the thrust coefficient of an existing actuator ***********",
         "#************************************************************************",
-        "#",
         f"SET_PROP_ACTUATOR_THRUST {actuator_index} {ct} {thrust_type}"
     ]
 
@@ -371,6 +369,7 @@ def set_prop_actuator_swirl(actuator_index: int, status: str = 'DISABLE') -> Non
     if not isinstance(actuator_index, int) or actuator_index <= 0:
         raise ValueError("`actuator_index` should be an integer greater than 0.")
     
+    status = normalize_option(status, "status")
     if status not in VALID_RUN_OPTIONS:
         raise ValueError(f"`status` should be one of {VALID_RUN_OPTIONS}")
     
@@ -378,7 +377,6 @@ def set_prop_actuator_swirl(actuator_index: int, status: str = 'DISABLE') -> Non
         "#************************************************************************",
         "#****************** Toggle the swirl velocity selection *****************",
         "#************************************************************************",
-        "#",
         f"SET_PROP_ACTUATOR_SWIRL {actuator_index} {status}"
     ]
 
@@ -441,7 +439,6 @@ def set_actuator_exhaust(
         "#************************************************************************",
         "#********************** Set the exhaust actuator properties *************",
         "#************************************************************************",
-        "#",
         f"SET_ACTUATOR_EXHAUST {actuator_index} {del_vel} {jet_density} {jet_spreading_rate}"
     ]
 
@@ -480,7 +477,6 @@ def enable_actuator(actuator_id: int) -> None:
         "#************************************************************************",
         "#****************** Enable an existing actuator *************************",
         "#************************************************************************",
-        "#",
         f"ENABLE_ACTUATOR {actuator_id}"
     ]
 
@@ -518,7 +514,6 @@ def disable_actuator(actuator_id: int) -> None:
         "#************************************************************************",
         "#****************** Disable an existing actuator ************************",
         "#************************************************************************",
-        "#",
         f"DISABLE_ACTUATOR {actuator_id}"
     ]
 
@@ -556,7 +551,6 @@ def delete_actuator(actuator_index: int) -> None:
         "#************************************************************************",
         "#****************** Delete an actuator **********************************",
         "#************************************************************************",
-        "#",
         f"DELETE ACTUATOR {actuator_index}"
     ]
 

@@ -1,68 +1,68 @@
-from typing import Literal
+from typing import Literal, TypeAlias
 
 # Type Aliases for static type checking
 
 #: Enable/disable options used across most API functions.
-RunOptions = Literal['ENABLE', 'DISABLE']
+RunOptions: TypeAlias = Literal['ENABLE', 'DISABLE']
 
 #: Valid units for length measurements.
-ValidUnits = Literal["INCH", "MILLIMETER", "OTHER", "FEET", "MILE", "METER", "KILOMETER", "MILS", "MICRON", "CENTIMETER", "MICROINCH"]
+ValidUnits: TypeAlias = Literal["INCH", "MILLIMETER", "OTHER", "FEET", "MILE", "METER", "KILOMETER", "MILS", "MICRON", "CENTIMETER", "MICROINCH"]
 
 #: Valid units for force and moment measurements.
-ValidForceUnits = Literal['COEFFICIENTS', 'NEWTONS', 'KILO-NEWTONS', 'POUND-FORCE', 'KILOGRAM-FORCE']
+ValidForceUnits: TypeAlias = Literal['COEFFICIENTS', 'NEWTONS', 'KILO-NEWTONS', 'POUND-FORCE', 'KILOGRAM-FORCE']
 #: Valid coordinate planes.
-ValidPlanes = Literal['XY', 'XZ', 'YZ', 'ZX']
+ValidPlanes: TypeAlias = Literal['XY', 'XZ', 'YZ', 'ZX']
 
 #: Base region types.
-BaseRegionType = Literal['EMPIRICAL', 'USER', 'CUSTOM']
+BaseRegionType: TypeAlias = Literal['EMPIRICAL', 'USER', 'CUSTOM']
 
 #: Valid dimensions for geometry operations.
-ValidDimensions = Literal['2D', '3D']
+ValidDimensions: TypeAlias = Literal['2D', '3D']
 
 #: Valid coordinate axes.
-ValidAxis = Literal['X', 'Y', 'Z']
+ValidAxis: TypeAlias = Literal['X', 'Y', 'Z']
 
 #: Valid growth schemes for meshing.
-ValidGrowthScheme = Literal[1, 2, 3, 4]
+ValidGrowthScheme: TypeAlias = Literal[1, 2, 3, 4]
 
 #: Valid symmetry planes.
-ValidSymmetry = Literal['XY', 'XZ', 'YZ', 'NONE']
+ValidSymmetry: TypeAlias = Literal['XY', 'XZ', 'YZ', 'NONE']
 
 #: Valid CAD/mesh selection options.
-ValidCadMesh = Literal['CAD', 'MESH']
+ValidCadMesh: TypeAlias = Literal['CAD', 'MESH']
 
 #: Valid quadrant numbers.
-ValidQuadrant = Literal[1, 2, 3, 4]
+ValidQuadrant: TypeAlias = Literal[1, 2, 3, 4]
 
 #: Valid rotation axes (numeric or named).
-ValidRotationAxis = Literal['X', 'Y', 'Z', '1', '2', '3']
+ValidRotationAxis: TypeAlias = Literal['X', 'Y', 'Z', '1', '2', '3']
 
 #: Valid export formats for surface data.
-ValidExportFormat = Literal['CP-FREESTREAM', 'CP-REFERENCE', 'PRESSURE', 'DIFFERENCE-PRESSURE']
+ValidExportFormat: TypeAlias = Literal['CP-FREESTREAM', 'CP-REFERENCE', 'PRESSURE', 'DIFFERENCE-PRESSURE']
 
 #: Valid pressure units.
-ValidPressureUnits = Literal['PASCALS', 'MEGAPASCALS', 'BAR', 'ATMOSPHERES', 'PSI']
+ValidPressureUnits: TypeAlias = Literal['PASCALS', 'MEGAPASCALS', 'BAR', 'ATMOSPHERES', 'PSI']
 
 #: Valid freestream types.
-ValidFreestreamType = Literal['CONSTANT', 'CUSTOM', 'ROTATION']
+ValidFreestreamType: TypeAlias = Literal['CONSTANT', 'CUSTOM', 'ROTATION']
 
 #: Valid file types for mesh import.
-ValidImportMeshFileTypes = Literal["STL", "TRI", "P3D", "CSV", "INP", "STRUCTURED_QUAD", "UNSTRUCTURED_QUAD", "LAWGS", "VTK", "AC", "FAC", "OBJ"]
+ValidImportMeshFileTypes: TypeAlias = Literal["STL", "TRI", "P3D", "CSV", "INP", "STRUCTURED_QUAD", "UNSTRUCTURED_QUAD", "LAWGS", "VTK", "AC", "FAC", "OBJ"]
 
 #: Valid file types for mesh export.
-ValidExportMeshFileTypes = Literal["STL", "TRI", "OBJ"]
+ValidExportMeshFileTypes: TypeAlias = Literal["STL", "TRI", "OBJ"]
 
 #: Valid threshold types for mesh operations.
-ValidThresholds = Literal['AREA', 'QUALITY', 'X', 'Y', 'Z', 'VELOCITY', 'VX', 'VY', 'VZ', 'CP', 'MACH', 'SOLVER_QUALITY']
+ValidThresholds: TypeAlias = Literal['AREA', 'QUALITY', 'X', 'Y', 'Z', 'VELOCITY', 'VX', 'VY', 'VZ', 'CP', 'MACH', 'SOLVER_QUALITY']
 
 #: Valid range specifications.
-ValidRanges = Literal['ABOVE_MIN', 'BELOW_MAX', 'ABOVE_MIN_BELOW_MAX']
+ValidRanges: TypeAlias = Literal['ABOVE_MIN', 'BELOW_MAX', 'ABOVE_MIN_BELOW_MAX']
 
 #: Valid subset selections.
-ValidSubsets = Literal['ALL_FACES', 'VISIBLE_FACES', 'SELECTED_FACES']
+ValidSubsets: TypeAlias = Literal['ALL_FACES', 'VISIBLE_FACES', 'SELECTED_FACES']
 
 #: Valid translation types.
-ValidTranslationTypes = Literal["ABSOLUTE", "TRANSLATION"]
+ValidTranslationTypes: TypeAlias = Literal["ABSOLUTE", "TRANSLATION"]
 
 
 # Lists for runtime validation

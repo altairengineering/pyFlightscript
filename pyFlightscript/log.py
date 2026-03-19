@@ -39,7 +39,6 @@ def output_settings_and_status(output_filename: str) -> None:
         "#************************************************************************",
         "#************** Output fluid properties and solver status ***************",
         "#************************************************************************",
-        "#",
         "OUTPUT_SETTINGS_AND_STATUS",
         output_filename
     ]
@@ -71,7 +70,6 @@ def export_log(log_filepath: str) -> None:
         "#************************************************************************",
         "#****************** Export log window messages to file ******************",
         "#************************************************************************",
-        "#",
         "EXPORT_LOG",
         log_filepath
     ]

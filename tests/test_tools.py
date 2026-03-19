@@ -153,12 +153,7 @@ def test_stability_toolbox_settings_appends_expected_lines(script_state):
         "#************************************************************************",
         "#****************** Set the S&C toolbox parameters here *****************",
         "#************************************************************************",
-        "#",
-        "STABILITY_TOOLBOX_SETTINGS",
-        "ROTATION_FRAME 1",
-        "UNITS PER_RADIAN",
-        "CLEAR_SOLVER_PER_RUN DISABLE",
-        "ANGULAR_RATE_INCREMENT 0.25",
+        "STABILITY_TOOLBOX_SETTINGS 1 PER_RADIAN DISABLE 0.25",
     ]
     assert script_state.lines[-len(expected_tail):] == expected_tail
 
@@ -182,6 +177,7 @@ def test_stability_toolbox_new_coefficient_boundaries_all(script_state):
         "NUMERATOR CL",
         "DENOMINATOR AOA",
         "FRAME 1",
+        "UNITS NEWTONS",
         "CONSTANT 1.0",
         "BOUNDARIES -1",
     ]
@@ -207,6 +203,7 @@ def test_stability_toolbox_new_coefficient_specific_boundaries(script_state):
         "NUMERATOR FORCE_X",
         "DENOMINATOR ROTX",
         "FRAME 2",
+        "UNITS KILOGRAM-FORCE",
         "CONSTANT 0.75",
         "BOUNDARIES 3",
         "1,2,4",
